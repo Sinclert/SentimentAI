@@ -1,6 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com) on 14/08/2016
 
-import re, math, codecs, itertools
+import re, math, itertools
 from nltk.classify import NaiveBayesClassifier, util
 from nltk.probability import FreqDist, ConditionalFreqDist
 from nltk.metrics import BigramAssocMeasures
@@ -63,8 +63,8 @@ class Classifier(object):
 		pos_words = []
 		neg_words = []
 
-		pos_sentences = codecs.open(positive_file, 'r', encoding = "latin-1")
-		neg_sentences = codecs.open(negative_file, 'r', encoding = "latin-1")
+		pos_sentences = open(positive_file, 'r')
+		neg_sentences = open(negative_file, 'r')
 
 		# Each line is tokenize and its words are stored in a list
 		for line in pos_sentences:
@@ -93,8 +93,8 @@ class Classifier(object):
 		pos_features = []
 		neg_features = []
 
-		pos_sentences = codecs.open(positive_file, 'r', encoding = "latin-1")
-		neg_sentences = codecs.open(negative_file, 'r', encoding = "latin-1")
+		pos_sentences = open(positive_file, 'r')
+		neg_sentences = open(negative_file, 'r')
 
 		# Each line is tokenize and its words are stored with the positive label in a list
 		for line in pos_sentences:
