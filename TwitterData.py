@@ -1,7 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com) on 14/08/2016
 
-import re
-import tweepy
+import re, tweepy
 from Keys import keys
 
 
