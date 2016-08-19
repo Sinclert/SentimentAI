@@ -21,12 +21,12 @@ class Classifier(object):
 		conditional_freqDist = ConditionalFreqDist()
 
 		for word in pos_words:
-			words_freqDist[word.lower()] += 1
-			conditional_freqDist['pos'][word.lower()] += 1
+			words_freqDist[word] += 1
+			conditional_freqDist['pos'][word] += 1
 
 		for word in neg_words:
-			words_freqDist[word.lower()] += 1
-			conditional_freqDist['neg'][word.lower()] += 1
+			words_freqDist[word] += 1
+			conditional_freqDist['neg'][word] += 1
 
 		# Counts the number of positive and negative words, as well as the total number of them
 		pos_word_count = conditional_freqDist['pos'].N()
@@ -63,17 +63,17 @@ class Classifier(object):
 		pos_words = []
 		neg_words = []
 
-		pos_sentences = open(positive_file, 'r')
-		neg_sentences = open(negative_file, 'r')
+		pos_sentences = open(positive_file, 'r', encoding = "UTF8")
+		neg_sentences = open(negative_file, 'r', encoding = "UTF8")
 
 		# Each line is tokenize and its words are stored in a list
 		for line in pos_sentences:
-			sentence_words = re.findall("[A-Za-z]+[']?[A-Za-z]+", line)
+			sentence_words = [word.lower() for word in re.findall("[A-Za-z]+[']?[A-Za-z]+", line)]
 			pos_words.append(sentence_words)
 
 		# Each line is tokenize and its words are stored in a list
 		for line in neg_sentences:
-			sentence_words = re.findall("[A-Za-z]+[']?[A-Za-z]+", line)
+			sentence_words = [word.lower() for word in re.findall("[A-Za-z]+[']?[A-Za-z]+", line)]
 			neg_words.append(sentence_words)
 
 		pos_sentences.close()
@@ -93,18 +93,18 @@ class Classifier(object):
 		pos_features = []
 		neg_features = []
 
-		pos_sentences = open(positive_file, 'r')
-		neg_sentences = open(negative_file, 'r')
+		pos_sentences = open(positive_file, 'r', encoding = "UTF8")
+		neg_sentences = open(negative_file, 'r', encoding = "UTF8")
 
 		# Each line is tokenize and its words are stored with the positive label in a list
 		for line in pos_sentences:
-			sentence_words = re.findall("[A-Za-z]+[']?[A-Za-z]+", line)
+			sentence_words = [word.lower() for word in re.findall("[A-Za-z]+[']?[A-Za-z]+", line)]
 			sentence_words = (dict([(word, True) for word in sentence_words if word in best_words]), 'pos')
 			pos_features.append(sentence_words)
 
 		# Each line is tokenize and its words are stored with the negative label in a list
 		for line in neg_sentences:
-			sentence_words = re.findall("[A-Za-z]+[']?[A-Za-z]+", line)
+			sentence_words = [word.lower() for word in re.findall("[A-Za-z]+[']?[A-Za-z]+", line)]
 			sentence_words = (dict([(word, True) for word in sentence_words if word in best_words]), 'neg')
 			neg_features.append(sentence_words)
 
