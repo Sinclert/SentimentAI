@@ -130,7 +130,7 @@ class Classifier(object):
 		pos_sentences = open(positive_file, 'r', encoding = "UTF8")
 		neg_sentences = open(negative_file, 'r', encoding = "UTF8")
 
-		# Each line is tokenize and its words are stored with the positive label in a list
+		# Each line is tokenize and its words and bigrams are used to create positive features
 		for line in pos_sentences:
 
 			# Every line word is obtained
@@ -142,7 +142,7 @@ class Classifier(object):
 			pos_features.append([self.__createFeatures(sentence_words, sentence_bigrams, best_words, best_bigrams), 'pos'])
 
 
-		# Each line is tokenize and its words are stored with the negative label in a list
+		# Each line is tokenize and its words and bigrams are used to create negative features
 		for line in neg_sentences:
 
 			# Every line word is obtained
