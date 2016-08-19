@@ -10,8 +10,13 @@ from nltk.collocations import BigramCollocationFinder
 """ Class in charge of classify sentences as positive or negative after being trained"""
 class Classifier(object):
 
-	# Attribute that store the trained model
+
+	# Attribute that stores the trained model
 	MODEL = None
+
+	# Attributes that store the best words and bigrams
+	best_words = []
+	best_bigrams = []
 
 
 	""" Give score to every element taking into account the gain of information """
@@ -53,6 +58,7 @@ class Classifier(object):
 		best_values = sorted(scores.items(), key=lambda element: element[1], reverse = True)[:number]
 		best_elements = set([w for w, s in best_values])
 		return best_elements
+
 
 
 
@@ -115,11 +121,11 @@ class Classifier(object):
 
 		# Obtain best words taking into account the gain of information
 		word_scores = self.__createScores(pos_words, neg_words)
-		best_words = self.__getBestElements(word_scores, num_best_words)
+		self.best_words = self.__getBestElements(word_scores, num_best_words)
 
 		# Obtain best bigrams taking into account the gain of information
 		bigrams_scores = self.__createScores(pos_bigrams, neg_bigrams)
-		best_bigrams = self.__getBestElements(bigrams_scores, num_best_bigrams)
+		self.best_bigrams = self.__getBestElements(bigrams_scores, num_best_bigrams)
 
 
 		# These lists will store lines words with their correspondent label
@@ -139,7 +145,7 @@ class Classifier(object):
 			# Every line bigram is obtained
 			bigram_finder = BigramCollocationFinder.from_words(sentence_words, window_size = 3)
 			sentence_bigrams = bigram_finder.nbest(BigramAssocMeasures.pmi, None)
-			pos_features.append([self.__createFeatures(sentence_words, sentence_bigrams, best_words, best_bigrams), 'pos'])
+			pos_features.append([self.__createFeatures(sentence_words, sentence_bigrams, self.best_words, self.best_bigrams), 'pos'])
 
 
 		# Each line is tokenize and its words and bigrams are used to create negative features
@@ -151,7 +157,7 @@ class Classifier(object):
 			# Every line bigram is obtained
 			bigram_finder = BigramCollocationFinder.from_words(sentence_words, window_size = 3)
 			sentence_bigrams = bigram_finder.nbest(BigramAssocMeasures.pmi, None)
-			neg_features.append([self.__createFeatures(sentence_words, sentence_bigrams, best_words, best_bigrams), 'neg'])
+			neg_features.append([self.__createFeatures(sentence_words, sentence_bigrams, self.best_words, self.best_bigrams), 'neg'])
 
 		pos_sentences.close()
 		neg_sentences.close()
