@@ -15,6 +15,9 @@ class Classifier(object):
 	# Attribute that stores the trained model
 	MODEL = None
 
+	# Attribute that stores the tokenizer object
+	tokenizer = TweetTokenizer(False, True, True)
+
 	# Attributes that store the best words and bigrams
 	best_words = []
 	best_bigrams = []
@@ -63,10 +66,19 @@ class Classifier(object):
 
 
 
-	""" Transform the lists of words and bigrams into valid lists to train """
-	def __createFeatures(self, words, bigrams, best_words, best_bigrams):
-		features_list = dict([(word, True) for word in words if word in best_words])
-		features_list.update([(bigram, True) for bigram in bigrams if bigram in best_bigrams])
+	""" Transform a sentence into valid list to train """
+	def __createFeatures(self, sentence):
+
+		# Every line word is obtained
+		sentence_words = self.tokenizer.tokenize(sentence)
+
+		# Every line bigram is obtained
+		bigram_finder = BigramCollocationFinder.from_words(sentence_words, window_size = 3)
+		sentence_bigrams = bigram_finder.nbest(BigramAssocMeasures.pmi, None)
+
+		# The features list is created
+		features_list = dict([(word, True) for word in sentence_words if word in self.best_words])
+		features_list.update([(bigram, True) for bigram in sentence_bigrams if bigram in self.best_bigrams])
 		return features_list
 
 
@@ -81,9 +93,6 @@ class Classifier(object):
 		pos_bigrams = []
 		neg_bigrams = []
 
-		# Tokenizer creation
-		tokenizer = TweetTokenizer(False, True, True)
-
 
 		pos_sentences = open(positive_file, 'r', encoding = "UTF8")
 		neg_sentences = open(negative_file, 'r', encoding = "UTF8")
@@ -92,7 +101,7 @@ class Classifier(object):
 		for line in pos_sentences:
 
 			# Storing all line words
-			sentence_words = tokenizer.tokenize(line)
+			sentence_words = self.tokenizer.tokenize(line)
 			pos_words.append(sentence_words)
 
 			# Storing all line bigrams
@@ -105,7 +114,7 @@ class Classifier(object):
 		for line in neg_sentences:
 
 			# Storing all line words
-			sentence_words = tokenizer.tokenize(line)
+			sentence_words = self.tokenizer.tokenize(line)
 			neg_words.append(sentence_words)
 
 			# Storing all line bigrams
@@ -142,26 +151,12 @@ class Classifier(object):
 
 		# Each line is tokenize and its words and bigrams are used to create positive features
 		for line in pos_sentences:
-
-			# Every line word is obtained
-			sentence_words = tokenizer.tokenize(line)
-
-			# Every line bigram is obtained
-			bigram_finder = BigramCollocationFinder.from_words(sentence_words, window_size = 3)
-			sentence_bigrams = bigram_finder.nbest(BigramAssocMeasures.pmi, None)
-			pos_features.append([self.__createFeatures(sentence_words, sentence_bigrams, self.best_words, self.best_bigrams), 'pos'])
+			pos_features.append([self.__createFeatures(line), 'pos'])
 
 
 		# Each line is tokenize and its words and bigrams are used to create negative features
 		for line in neg_sentences:
-
-			# Every line word is obtained
-			sentence_words = tokenizer.tokenize(line)
-
-			# Every line bigram is obtained
-			bigram_finder = BigramCollocationFinder.from_words(sentence_words, window_size = 3)
-			sentence_bigrams = bigram_finder.nbest(BigramAssocMeasures.pmi, None)
-			neg_features.append([self.__createFeatures(sentence_words, sentence_bigrams, self.best_words, self.best_bigrams), 'neg'])
+			neg_features.append([self.__createFeatures(line), 'neg'])
 
 		pos_sentences.close()
 		neg_sentences.close()
@@ -177,9 +172,20 @@ class Classifier(object):
 		# Trains the Naive Bayes Classifier
 		self.MODEL = NaiveBayesClassifier.train(train_features)
 
-		print ("Train on", len(train_features), "instances and test on", len(test_features), "instances")
-		print ("Accuracy:", util.accuracy(self.MODEL, test_features))
+		print("Train on", len(train_features), "instances and test on", len(test_features), "instances")
+		print("Accuracy:", util.accuracy(self.MODEL, test_features))
 		self.MODEL.show_most_informative_features(10)
+
+
+
+
+	""" Classify the specified text after obtaining all its words and bigrams """
+	def classify(self, text):
+
+		features_list = self.__createFeatures(text)
+		percentages = self.MODEL.prob_classify(features_list)
+
+		return {"Positive": percentages.prob('pos'), "Negative": percentages.prob('neg')}
 
 
 
@@ -187,3 +193,4 @@ class Classifier(object):
 ##### TESTING #####
 classifier = Classifier()
 classifier.train("./Datasets/PosSentences.txt", "./Datasets/NegSentences.txt", 5000, 20000)
+print(classifier.classify("This is not good"))
