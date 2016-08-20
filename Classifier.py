@@ -73,7 +73,7 @@ class Classifier(object):
 		sentence_words = self.tokenizer.tokenize(sentence)
 
 		# Every line bigram is obtained
-		bigram_finder = BigramCollocationFinder.from_words(sentence_words, window_size = 3)
+		bigram_finder = BigramCollocationFinder.from_words(sentence_words)
 		sentence_bigrams = bigram_finder.nbest(BigramAssocMeasures.pmi, None)
 
 		# The features list is created
@@ -105,7 +105,7 @@ class Classifier(object):
 			pos_words.append(sentence_words)
 
 			# Storing all line bigrams
-			bigram_finder = BigramCollocationFinder.from_words(sentence_words, window_size = 3)
+			bigram_finder = BigramCollocationFinder.from_words(sentence_words)
 			sentence_bigrams = bigram_finder.nbest(BigramAssocMeasures.pmi, None)
 			pos_bigrams.append(sentence_bigrams)
 
@@ -118,7 +118,7 @@ class Classifier(object):
 			neg_words.append(sentence_words)
 
 			# Storing all line bigrams
-			bigram_finder = BigramCollocationFinder.from_words(sentence_words, window_size = 3)
+			bigram_finder = BigramCollocationFinder.from_words(sentence_words)
 			sentence_bigrams = bigram_finder.nbest(BigramAssocMeasures.pmi, None)
 			neg_bigrams.append(sentence_bigrams)
 
@@ -183,9 +183,14 @@ class Classifier(object):
 	def classify(self, text):
 
 		features_list = self.__createFeatures(text)
-		percentages = self.MODEL.prob_classify(features_list)
 
-		return {"Positive": percentages.prob('pos'), "Negative": percentages.prob('neg')}
+		if self.MODEL is not None:
+			percentages = self.MODEL.prob_classify(features_list)
+			return {"Positive": percentages.prob('pos'), "Negative": percentages.prob('neg')}
+
+		else:
+			print("ERROR: The classifier needs to be trained first")
+			exit(-1)
 
 
 
