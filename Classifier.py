@@ -1,6 +1,7 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com) on 14/08/2016
 
-import re, math, itertools
+import math, itertools
+from nltk.tokenize import TweetTokenizer
 from nltk.classify import NaiveBayesClassifier, util
 from nltk.probability import FreqDist, ConditionalFreqDist
 from nltk.metrics import BigramAssocMeasures
@@ -55,7 +56,7 @@ class Classifier(object):
 
 	""" Finds the best 'n' elements based on their scores """
 	def __getBestElements(self, scores, number):
-		best_values = sorted(scores.items(), key=lambda element: element[1], reverse = True)[:number]
+		best_values = sorted(scores.items(), key = lambda element: element[1], reverse = True)[:number]
 		best_elements = set([w for w, s in best_values])
 		return best_elements
 
@@ -80,6 +81,9 @@ class Classifier(object):
 		pos_bigrams = []
 		neg_bigrams = []
 
+		# Tokenizer creation
+		tokenizer = TweetTokenizer(False, True, True)
+
 
 		pos_sentences = open(positive_file, 'r', encoding = "UTF8")
 		neg_sentences = open(negative_file, 'r', encoding = "UTF8")
@@ -88,7 +92,7 @@ class Classifier(object):
 		for line in pos_sentences:
 
 			# Storing all line words
-			sentence_words = [word.lower() for word in re.findall("[A-Za-z]+[']?[A-Za-z]+", line)]
+			sentence_words = tokenizer.tokenize(line)
 			pos_words.append(sentence_words)
 
 			# Storing all line bigrams
@@ -101,7 +105,7 @@ class Classifier(object):
 		for line in neg_sentences:
 
 			# Storing all line words
-			sentence_words = [word.lower() for word in re.findall("[A-Za-z]+[']?[A-Za-z]+", line)]
+			sentence_words = tokenizer.tokenize(line)
 			neg_words.append(sentence_words)
 
 			# Storing all line bigrams
@@ -140,7 +144,7 @@ class Classifier(object):
 		for line in pos_sentences:
 
 			# Every line word is obtained
-			sentence_words = [word.lower() for word in re.findall("[A-Za-z]+[']?[A-Za-z]+", line)]
+			sentence_words = tokenizer.tokenize(line)
 
 			# Every line bigram is obtained
 			bigram_finder = BigramCollocationFinder.from_words(sentence_words, window_size = 3)
@@ -152,7 +156,7 @@ class Classifier(object):
 		for line in neg_sentences:
 
 			# Every line word is obtained
-			sentence_words = [word.lower() for word in re.findall("[A-Za-z]+[']?[A-Za-z]+", line)]
+			sentence_words = tokenizer.tokenize(line)
 
 			# Every line bigram is obtained
 			bigram_finder = BigramCollocationFinder.from_words(sentence_words, window_size = 3)
