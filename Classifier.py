@@ -4,8 +4,8 @@ import math, itertools
 from nltk.tokenize import TweetTokenizer
 from nltk.classify import NaiveBayesClassifier, util
 from nltk.probability import FreqDist, ConditionalFreqDist
-from nltk.metrics import BigramAssocMeasures
-from nltk.collocations import BigramCollocationFinder
+from nltk.metrics import BigramAssocMeasures as BAM
+from nltk.collocations import BigramCollocationFinder as BCF
 
 
 """ Class in charge of classify sentences as positive or negative after being trained"""
@@ -48,8 +48,8 @@ class Classifier(object):
 
 		# Builds a dictionary of word scores based on chi-squared test
 		for elem, freq in freqDist.items():
-			pos_score = BigramAssocMeasures.chi_sq(conditional_freqDist['pos'][elem], (freq, pos_count), total_count)
-			neg_score = BigramAssocMeasures.chi_sq(conditional_freqDist['neg'][elem], (freq, neg_count), total_count)
+			pos_score = BAM.chi_sq(conditional_freqDist['pos'][elem], (freq, pos_count), total_count)
+			neg_score = BAM.chi_sq(conditional_freqDist['neg'][elem], (freq, neg_count), total_count)
 			scores[elem] = pos_score + neg_score
 
 		return scores
@@ -73,8 +73,8 @@ class Classifier(object):
 		sentence_words = self.tokenizer.tokenize(sentence)
 
 		# Every line bigram is obtained
-		bigram_finder = BigramCollocationFinder.from_words(sentence_words)
-		sentence_bigrams = bigram_finder.nbest(BigramAssocMeasures.pmi, None)
+		bigram_finder = BCF.from_words(sentence_words)
+		sentence_bigrams = bigram_finder.nbest(BAM.pmi, None)
 
 		# The features list is created
 		features_list = dict([(word, True) for word in sentence_words if word in self.best_words])
@@ -105,8 +105,8 @@ class Classifier(object):
 			pos_words.append(sentence_words)
 
 			# Storing all line bigrams
-			bigram_finder = BigramCollocationFinder.from_words(sentence_words)
-			sentence_bigrams = bigram_finder.nbest(BigramAssocMeasures.pmi, None)
+			bigram_finder = BCF.from_words(sentence_words)
+			sentence_bigrams = bigram_finder.nbest(BAM.pmi, None)
 			pos_bigrams.append(sentence_bigrams)
 
 
@@ -118,8 +118,8 @@ class Classifier(object):
 			neg_words.append(sentence_words)
 
 			# Storing all line bigrams
-			bigram_finder = BigramCollocationFinder.from_words(sentence_words)
-			sentence_bigrams = bigram_finder.nbest(BigramAssocMeasures.pmi, None)
+			bigram_finder = BCF.from_words(sentence_words)
+			sentence_bigrams = bigram_finder.nbest(BAM.pmi, None)
 			neg_bigrams.append(sentence_bigrams)
 
 		pos_sentences.close()
