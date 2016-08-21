@@ -5,7 +5,7 @@ from Keys import keys
 
 
 """ Class in charge of retrieving data from the Twitter API """
-class TwitterData(object):
+class DataMiner(object):
 
     # Attribute that stores the API connection object
     API = None
@@ -155,7 +155,7 @@ class TwitterData(object):
 
 
 ##### TESTING #####
-data = TwitterData()
+data = DataMiner()
 print(len(data.getFriends("Sinclert_95")))
 print(len(data.getFollowers("Sinclert_95")))
 print(data.getUserTweets("Sinclert_95", 10))

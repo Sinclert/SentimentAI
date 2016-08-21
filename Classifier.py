@@ -180,13 +180,17 @@ class Classifier(object):
 
 
 	""" Classify the specified text after obtaining all its words and bigrams """
-	def classify(self, text):
-
-		features_list = self.__createFeatures(text)
+	def classify(self, sentences):
 
 		if self.MODEL is not None:
-			percentages = self.MODEL.prob_classify(features_list)
-			return {"Positive": percentages.prob('pos'), "Negative": percentages.prob('neg')}
+			probabilities = []
+
+			for sentence in sentences:
+				features_list = self.__createFeatures(sentence)
+				percentages = self.MODEL.prob_classify(features_list)
+				probabilities.append({"Positive": percentages.prob('pos'), "Negative": percentages.prob('neg')})
+
+			return probabilities
 
 		else:
 			print("ERROR: The classifier needs to be trained first")
@@ -198,4 +202,4 @@ class Classifier(object):
 ##### TESTING #####
 classifier = Classifier()
 classifier.train("./Datasets/PosSentences.txt", "./Datasets/NegSentences.txt", 5000, 20000)
-print(classifier.classify("This is not good"))
+print(classifier.classify(["This is not good"]))
