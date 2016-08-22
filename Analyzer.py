@@ -30,12 +30,18 @@ class Analyzer(object):
         for prob_pair in probabilities:
             pos_average += prob_pair['Positive']
 
-        pos_average /= len(probabilities)
+        # The average is only computed if the input list is not empty
+        if len(probabilities) > 0:
+            pos_average /= len(probabilities)
 
-        if pos_average >= 0.5:
-            return ["Positive", round(pos_average, 2)]
+            if pos_average >= 0.5:
+                return ["Positive", round(pos_average, 2)]
+            else:
+                return ["Negative", round(1 - pos_average, 2)]
+
+        # In case of an empty list: return None
         else:
-            return ["Negative", round(1 - pos_average, 2)]
+            return None
 
 
 

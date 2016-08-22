@@ -81,7 +81,7 @@ class DataMiner(object):
                 # If there is any URL or image link in the text: it is removed
                 if (len(tweet.entities['urls']) != 0) or (('media' in tweet.entities) == True):
                     tweet_text = re.sub("http\S+", "", tweet_text)
-                    tweet_text = tweet_text.replace("\n", "")
+                    tweet_text = tweet_text.replace("\n", " ")
                     tweet_text = tweet_text.strip()
 
                 # The final text is added at the end of the list
@@ -128,7 +128,7 @@ class DataMiner(object):
                 # If there is any URL or image link in the text: it is removed
                 elif (len(tweet.entities['urls']) != 0) or (('media' in tweet.entities) == True):
                     tweet_text = re.sub("http\S+", "", tweet_text)
-                    tweet_text = tweet_text.replace("\n", "")
+                    tweet_text = tweet_text.replace("\n", " ")
                     tweet_text = tweet_text.strip()
 
 
