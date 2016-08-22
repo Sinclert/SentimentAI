@@ -70,7 +70,7 @@ class DataMiner(object):
         tweets_list = []
 
         try:
-            for tweet in tweepy.Cursor(self.API.user_timeline, id = user).items(count):
+            for tweet in tweepy.Cursor(self.API.user_timeline, id = user, count = 200).items(count):
 
                 # If it is a retweet: the original text is obtained
                 if hasattr(tweet, "retweeted_status"):
@@ -112,7 +112,7 @@ class DataMiner(object):
         tweets_list = []
 
         try:
-            for tweet in tweepy.Cursor(self.API.user_timeline, id = user).items(depth):
+            for tweet in tweepy.Cursor(self.API.user_timeline, id = user, count = 200).items(depth):
 
                 # If it is a retweet: the original text is obtained
                 if hasattr(tweet, "retweeted_status"):

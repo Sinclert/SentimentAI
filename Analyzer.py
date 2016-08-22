@@ -10,7 +10,7 @@ class Analyzer(object):
     """ Divides a text into sentences and return those containing the specified word """
     def getSentences(self, text, word = None):
 
-        sentences = re.split("[.:!?]\s+", text)
+        sentences = re.split("[.:!?]\s+", str(text))
 
         # If no word is specified: return all the sentences
         if word is not None:
