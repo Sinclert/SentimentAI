@@ -81,10 +81,11 @@ class DataMiner(object):
                 # If there is any URL or image link in the text: it is removed
                 if (len(tweet.entities['urls']) != 0) or (('media' in tweet.entities) == True):
                     tweet_text = re.sub("http\S+", "", tweet_text)
-                    tweet_text = tweet_text.replace("\n", " ")
                     tweet_text = tweet_text.strip()
 
+
                 # The final text is added at the end of the list
+                tweet_text = tweet_text.replace("\n", " ")
                 tweets_list.append(tweet_text)
 
 
@@ -128,11 +129,11 @@ class DataMiner(object):
                 # If there is any URL or image link in the text: it is removed
                 elif (len(tweet.entities['urls']) != 0) or (('media' in tweet.entities) == True):
                     tweet_text = re.sub("http\S+", "", tweet_text)
-                    tweet_text = tweet_text.replace("\n", " ")
                     tweet_text = tweet_text.strip()
 
 
                 # The final text is added at the end of the list
+                tweet_text = tweet_text.replace("\n", " ")
                 tweets_list.append(tweet_text)
 
 
@@ -154,9 +155,53 @@ class DataMiner(object):
 
 
 
+    """ Returns a list containing tweets that fulfill the specified query (each 100 is a request) """
+    def searchTrainTweets(self, query, language, count = 1000):
+
+        tweets_list = []
+
+        try:
+            for tweet in tweepy.Cursor(self.API.search, query, lang = language, count = 100).items(count):
+
+                # If it is a retweet: the original text is obtained
+                if hasattr(tweet, "retweeted_status"):
+                    tweet_text = tweet.retweeted_status.text
+                else:
+                    tweet_text = tweet.text
+
+                # If there is any URL or image link in the text: it is removed
+                if (len(tweet.entities['urls']) != 0) or (('media' in tweet.entities) == True):
+                    tweet_text = re.sub("http\S+", "", tweet_text)
+                    tweet_text = tweet_text.strip()
+
+
+                # The final text is added at the end of the list
+                tweet_text = tweet_text.replace("\n", " ")
+                tweets_list.append(tweet_text)
+
+
+            # In case there are not enough tweets: print message
+            if len(tweets_list) < count:
+                print("There are not", count, "tweets meeting query '", query, "' . Retrieving", len(tweets_list))
+
+            return tweets_list
+
+
+        except tweepy.RateLimitError:
+            print("RATE LIMIT ERROR: Unable to retrieve tweets from the specified search")
+            exit(-1)
+
+        except tweepy.TweepError:
+            print("TWEEPY ERROR: Unable to retrieve tweets from the specified search")
+            exit(-1)
+
+
+
+
 ##### TESTING #####
 data = DataMiner()
 print(len(data.getFriends("Sinclert_95")))
 print(len(data.getFollowers("Sinclert_95")))
 print(data.getUserTweets("Sinclert_95", 10))
 print(data.getTweetsContainingWord("Sinclert_95", "Obama"))
+print(data.searchTrainTweets("happy", "en", 20))
