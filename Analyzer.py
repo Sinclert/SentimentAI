@@ -7,14 +7,25 @@ import re
 class Analyzer(object):
 
 
-    """ Divides a text into sentences and return those containing the specified word """
-    def getSentences(self, text, word = None):
+    """ Divides tweets into sentences and returns those containing the specified word """
+    def getSentences(self, tweets, word = None):
 
-        sentences = re.split("[.:!?]\s+", str(text))
+        sentences = []
 
-        # If no word is specified: return all the sentences
-        if word is not None:
-            sentences = [sentence for sentence in sentences if word.lower() in sentence.lower()]
+        # If there is a list of tweets as input
+        if type(tweets) is list:
+            for tweet in tweets:
+
+                # Recursive call to obtain the sentences of each individual tweet
+                for sentence in self.getSentences(tweet, word):
+                    sentences.append(sentence)
+
+        # Base case: individual tweet
+        else:
+            sentences = re.split("[.:!?]\s+", str(tweets))
+
+            if word is not None:
+                sentences[:] = [sentence for sentence in sentences if word.lower() in sentence.lower()]
 
         return sentences
 
@@ -47,7 +58,7 @@ class Analyzer(object):
 
 
 ##### TESTING #####
-test = "Whats up? I am doing fine. See you later, friend! #ByeBye"
+test = ["Whats up? I am doing fine. See you later, friend! #ByeBye", "All fine. Good to see you!"]
 a = Analyzer()
 print(a.getSentences(test))
 print(a.getSentences(test, "FINE"))
