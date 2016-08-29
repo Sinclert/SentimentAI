@@ -22,6 +22,20 @@ class DataMiner(object):
 
         # Authenticator manager creation and introduction of tokens
         auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+
+        ########### OAUTH TOKEN REQUEST PROCESS ###########
+        #
+        # auth_url = auth.get_authorization_url()
+        #
+        # print("Please visit this link and authorize the app:", auth_url)
+        # print("Enter your PIN code")
+        # verifier = input().strip()
+        #
+        # # Tokens should be store in a DB because they do not expire
+        # token = auth.get_access_token(verifier)
+        #
+        ########### OAUTH TOKEN REQUEST PROCESS ###########
+
         auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 
         # Creation and return of the API connection
