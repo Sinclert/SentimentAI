@@ -21,11 +21,16 @@ class Analyzer(object):
                     sentences.append(sentence)
 
         # Base case: individual tweet
-        else:
+        elif isinstance(tweets, str):
             sentences = re.split("[.:!?]\s+", str(tweets))
 
             if word is not None:
                 sentences[:] = [sentence for sentence in sentences if word.lower() in sentence.lower()]
+
+        # If what we are processing is neither a list nor a string: error
+        else:
+            print("ERROR: Invalid value in one of the text inputs")
+            exit(-1)
 
         return sentences
 
