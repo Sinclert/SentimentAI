@@ -258,5 +258,5 @@ class Classifier(object):
 
 ##### TESTING #####
 classifier = Classifier()
-classifier.train("./Datasets/PosSentences.txt", "./Datasets/NegSentences.txt", 5000, 20000, True)
+classifier.train("./Datasets/PosTweets.txt", "./Datasets/NegTweets.txt", 5000, 20000, True)
 print(classifier.classify(["This is not good"]))
