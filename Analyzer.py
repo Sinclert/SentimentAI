@@ -58,13 +58,3 @@ class Analyzer(object):
         # In case of an empty list: return None
         else:
             return None
-
-
-
-
-##### TESTING #####
-test = ["Whats up? I am doing fine. See you later, friend! #ByeBye", "All fine. Good to see you!"]
-a = Analyzer()
-print(a.getSentences(test))
-print(a.getSentences(test, "FINE"))
-print(a.getPolarity([{"Positive": 0.4, "Negative": 0.6}, {"Positive": 0.2, "Negative": 0.8}]))

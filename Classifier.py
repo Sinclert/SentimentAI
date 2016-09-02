@@ -132,7 +132,7 @@ class Classifier(object):
 
 
 		if debug is True:
-			print("Train on", len(train_features), "instances and test on", len(test_features), "instances\n")
+			print("Trained on", len(train_features), "instances and tested on", len(test_features), "instances\n")
 
 			# Obtaining recall and precision necessary sets
 			ref_set, test_set = self.__compareTestFeatures(test_features)
@@ -148,7 +148,7 @@ class Classifier(object):
 			print()
 
 		elif debug is False:
-			print("Train on", len(train_features), "instances\n")
+			print("Trained on", len(train_features), "instances\n")
 
 
 
@@ -252,11 +252,3 @@ class Classifier(object):
 		else:
 			print("ERROR: The classifier needs to be trained first")
 			exit(-1)
-
-
-
-
-##### TESTING #####
-classifier = Classifier()
-classifier.train("./Datasets/PosTweets.txt", "./Datasets/NegTweets.txt", 5000, 20000, True)
-print(classifier.classify(["This is not good"]))

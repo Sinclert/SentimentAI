@@ -208,14 +208,3 @@ class DataMiner(object):
         except tweepy.TweepError:
             print("TWEEPY ERROR: Unable to retrieve tweets from the specified search")
             exit(-1)
-
-
-
-
-##### TESTING #####
-data = DataMiner()
-print(len(data.getFriends("Sinclert_95")))
-print(len(data.getFollowers("Sinclert_95")))
-print(data.getUserTweets("Sinclert_95", 10))
-print(data.getTweetsContainingWord("Sinclert_95", "Obama"))
-print(data.searchTrainTweets("happy", "en", 20))
