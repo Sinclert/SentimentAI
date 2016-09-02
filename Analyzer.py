@@ -57,4 +57,5 @@ class Analyzer(object):
 
         # In case of an empty list: return None
         else:
+            print("The input probabilities list is empty")
             return None

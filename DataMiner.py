@@ -78,51 +78,8 @@ class DataMiner(object):
 
 
 
-    """ Returns a list containing most recent tweet texts subtracting URLs (each 200 is a request) """
-    def getUserTweets(self, user, count = 200):
-
-        tweets_list = []
-
-        try:
-            for tweet in tweepy.Cursor(self.API.user_timeline, id = user, count = 200).items(count):
-
-                # If it is a retweet: the original text is obtained
-                if hasattr(tweet, "retweeted_status"):
-                    tweet_text = tweet.retweeted_status.text
-                else:
-                    tweet_text = tweet.text
-
-                # If there is any URL or image link in the text: it is removed
-                if (len(tweet.entities['urls']) != 0) or (('media' in tweet.entities) == True):
-                    tweet_text = re.sub("http\S+", "", tweet_text)
-                    tweet_text = tweet_text.strip()
-
-
-                # The final text is added at the end of the list
-                tweet_text = tweet_text.replace("\n", " ")
-                tweets_list.append(tweet_text)
-
-
-            # In case there are not enough tweets: print message
-            if len(tweets_list) < count:
-                print("There are not", count, "tweets from", user, ". Retrieving", len(tweets_list))
-
-            return tweets_list
-
-
-        except tweepy.RateLimitError:
-            print("RATE LIMIT ERROR: Unable to retrieve most recent tweets from", user)
-            exit(-1)
-
-        except tweepy.TweepError:
-            print("TWEEPY ERROR: Unable to retrieve most recent tweets from", user)
-            exit(-1)
-
-
-
-
-    """ Returns a list of tweet texts containing the specified word (each 200 is a request) """
-    def getTweetsContainingWord(self, user, word, depth = 1000):
+    """ Returns a list containing most recent tweets containing the specified word (each 200 is a request) """
+    def getUserTweets(self, user, word = None, depth = 1000):
 
         tweets_list = []
 
@@ -136,12 +93,12 @@ class DataMiner(object):
                     tweet_text = tweet.text
 
 
-                # If the tweet does not contain the word: continue
-                if word.lower() not in tweet_text.lower():
+                # If the tweet does not contain the specified word: continue
+                if (word is not None) and (word.lower() not in tweet_text.lower()):
                     continue
 
                 # If there is any URL or image link in the text: it is removed
-                elif (len(tweet.entities['urls']) != 0) or (('media' in tweet.entities) == True):
+                if (len(tweet.entities['urls']) != 0) or (('media' in tweet.entities) == True):
                     tweet_text = re.sub("http\S+", "", tweet_text)
                     tweet_text = tweet_text.strip()
 
@@ -151,19 +108,23 @@ class DataMiner(object):
                 tweets_list.append(tweet_text)
 
 
-            # In case there are not any tweet with the specified word: print message
-            if len(tweets_list) == 0:
+            # In case no word is specified and there are not enough tweets
+            if (word is None) and (len(tweets_list) < depth):
+                print("There are not", depth, "tweets from", user, ". Retrieving", len(tweets_list))
+
+            # In case word is specified but there are not tweets with it
+            elif (word is not None) and (len(tweets_list) == 0):
                 print("There are no tweets from", user, "containing '", word, "'")
 
             return tweets_list
 
 
         except tweepy.RateLimitError:
-            print("RATE LIMIT ERROR: Unable to retrieve most recent tweets from", user, "containing", word)
+            print("RATE LIMIT ERROR: Unable to retrieve most recent tweets from", user)
             exit(-1)
 
         except tweepy.TweepError:
-            print("TWEEPY ERROR: Unable to retrieve most recent tweets from", user, "containing", word)
+            print("TWEEPY ERROR: Unable to retrieve most recent tweets from", user)
             exit(-1)
 
 

@@ -13,11 +13,11 @@ analyzer = Analyzer()
 
 # Train and mining processes
 classifier.train("./Datasets/PosTweets.txt", "./Datasets/NegTweets.txt", 5000, 20000, False)
-tweets = miner.getTweetsContainingWord("POTUS", "refugees")
+tweets = miner.getUserTweets("POTUS", "refugees")
 
 
 # Obtaining probabilities of each tweet
 sentences = analyzer.getSentences(tweets, "refugees")
-probabilities = classifier.classify(tweets)
+probabilities = classifier.classify(sentences)
 
 print(analyzer.getPolarity(probabilities))
