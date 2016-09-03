@@ -132,12 +132,12 @@ class DataMiner(object):
 
     """ Returns a list containing tweets that fulfill the specified query (each 100 is a request).
         Link to learn about queries: https://dev.twitter.com/rest/public/search """
-    def searchTrainTweets(self, query, language, count = 1000):
+    def searchTrainTweets(self, query, language, depth = 1000):
 
         tweets_list = []
 
         try:
-            for tweet in tweepy.Cursor(self.API.search, query, lang = language, count = 100).items(count):
+            for tweet in tweepy.Cursor(self.API.search, query, lang = language, count = 100).items(depth):
 
                 # If it is a retweet: the original text is obtained
                 if hasattr(tweet, "retweeted_status"):
@@ -157,8 +157,8 @@ class DataMiner(object):
 
 
             # In case there are not enough tweets: print message
-            if len(tweets_list) < count:
-                print("There are not", count, "tweets meeting query '", query, "' . Retrieving", len(tweets_list))
+            if len(tweets_list) < depth:
+                print("There are not", depth, "tweets meeting query '", query, "' . Retrieving", len(tweets_list))
 
             return tweets_list
 

@@ -23,4 +23,4 @@ print(Utilities.getPolarity(probabilities))
 
 
 # tweets = miner.searchTrainTweets(":)", "en", 1000)
-# Utilities.storeTweets(tweets, "Example.txt")
+# Utilities.storeTweets(tweets, "./Datasets/PosSearchTweets.txt")

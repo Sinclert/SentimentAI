@@ -62,7 +62,7 @@ def getPolarity(probabilities):
 """ Appends the specified tweets into the specified text file """
 def storeTweets(tweets, file_name, min_length = 20):
 
-    file = open(file_name, 'a', encoding="UTF8")
+    file = open(file_name, 'a', encoding = "UTF8")
     skipped = 0
 
     for tweet in tweets:
