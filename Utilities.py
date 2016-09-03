@@ -67,6 +67,9 @@ def storeTweets(tweets, file_name, min_length = 20):
 
     for tweet in tweets:
 
+        # Subtracting user names
+        tweet = re.sub("(^|\s*)@\w+($|\s)", "", tweet)
+
         # Store the tweet only if it has enough length
         if len(tweet) >= min_length:
             file.write(tweet)
@@ -74,5 +77,6 @@ def storeTweets(tweets, file_name, min_length = 20):
         else:
             skipped += 1
 
+
     file.close()
-    print(len(tweets) - skipped, "tweets has been stored into '", file_name, "' (min length filter applied)")
+    print(len(tweets) - skipped, "tweets has been stored into '", file_name, "'")

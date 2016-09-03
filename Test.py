@@ -10,6 +10,8 @@ miner = DataMiner()
 classifier = Classifier()
 
 
+##### TRAINING TEST #####
+
 # Train and mining processes
 classifier.train("./Datasets/PosTweets.txt", "./Datasets/NegTweets.txt", 5000, 20000, False)
 tweets = miner.getUserTweets("POTUS", "refugees")
@@ -22,5 +24,8 @@ probabilities = classifier.classify(sentences)
 print(Utilities.getPolarity(probabilities))
 
 
-# tweets = miner.searchTrainTweets(":)", "en", 1000)
+
+##### SEARCH TEST #####
+
+# tweets = miner.searchTrainTweets(":) -filter:retweets", "en", 1000)
 # Utilities.storeTweets(tweets, "./Datasets/PosSearchTweets.txt")
