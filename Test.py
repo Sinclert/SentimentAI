@@ -1,6 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com) on 14/08/2016
 
-from Analyzer import Analyzer
+import Utilities
 from Classifier import Classifier
 from DataMiner import DataMiner
 
@@ -8,7 +8,6 @@ from DataMiner import DataMiner
 # Objects creation
 miner = DataMiner()
 classifier = Classifier()
-analyzer = Analyzer()
 
 
 # Train and mining processes
@@ -17,7 +16,11 @@ tweets = miner.getUserTweets("POTUS", "refugees")
 
 
 # Obtaining probabilities of each tweet
-sentences = analyzer.getSentences(tweets, "refugees")
+sentences = Utilities.getSentences(tweets, "refugees")
 probabilities = classifier.classify(sentences)
 
-print(analyzer.getPolarity(probabilities))
+print(Utilities.getPolarity(probabilities))
+
+
+# tweets = miner.searchTrainTweets(":)", "en", 1000)
+# Utilities.storeTweets(tweets, "Example.txt")

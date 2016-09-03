@@ -130,7 +130,8 @@ class DataMiner(object):
 
 
 
-    """ Returns a list containing tweets that fulfill the specified query (each 100 is a request) """
+    """ Returns a list containing tweets that fulfill the specified query (each 100 is a request).
+        Link to learn about queries: https://dev.twitter.com/rest/public/search """
     def searchTrainTweets(self, query, language, count = 1000):
 
         tweets_list = []
