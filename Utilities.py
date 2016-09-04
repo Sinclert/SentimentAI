@@ -26,7 +26,7 @@ def getSentences(tweets, word = None):
     # If what we are processing is neither a list nor a string: error
     else:
         print("ERROR: Invalid value in one of the text inputs")
-        exit(-1)
+        exit()
 
     return sentences
 

@@ -52,11 +52,11 @@ class DataMiner(object):
 
         except tweepy.RateLimitError:
             print("RATE LIMIT ERROR: Unable to retrieve friends from", user)
-            exit(-1)
+            exit()
 
         except tweepy.TweepError:
             print("TWEEPY ERROR: Unable to retrieve friends from", user)
-            exit(-1)
+            exit()
 
 
 
@@ -69,11 +69,11 @@ class DataMiner(object):
 
         except tweepy.RateLimitError:
             print("RATE LIMIT ERROR: Unable to retrieve followers from", user)
-            exit(-1)
+            exit()
 
         except tweepy.TweepError:
             print("TWEEPY ERROR: Unable to retrieve followers from", user)
-            exit(-1)
+            exit()
 
 
 
@@ -121,11 +121,11 @@ class DataMiner(object):
 
         except tweepy.RateLimitError:
             print("RATE LIMIT ERROR: Unable to retrieve most recent tweets from", user)
-            exit(-1)
+            exit()
 
         except tweepy.TweepError:
             print("TWEEPY ERROR: Unable to retrieve most recent tweets from", user)
-            exit(-1)
+            exit()
 
 
 
@@ -165,8 +165,8 @@ class DataMiner(object):
 
         except tweepy.RateLimitError:
             print("RATE LIMIT ERROR: Unable to retrieve tweets from the specified search")
-            exit(-1)
+            exit()
 
         except tweepy.TweepError:
             print("TWEEPY ERROR: Unable to retrieve tweets from the specified search")
-            exit(-1)
+            exit()

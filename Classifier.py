@@ -89,7 +89,7 @@ class Classifier(object):
 
 		if self.MODEL is None:
 			print("ERROR: The training model has not been initialized")
-			exit(-1)
+			exit()
 
 		ref_set = collections.defaultdict(set)
 		test_set = collections.defaultdict(set)
@@ -124,7 +124,7 @@ class Classifier(object):
 
 		else:
 			print("ERROR: Invalid 'debug' argument value")
-			exit(-1)
+			exit()
 
 
 		# Trains the Naive Bayes Classifier
@@ -251,4 +251,4 @@ class Classifier(object):
 
 		else:
 			print("ERROR: The classifier needs to be trained first")
-			exit(-1)
+			exit()
