@@ -80,6 +80,7 @@ elif (sys.argv[1].lower() == "search") and (len(sys.argv) == 6):
 
 # In case none of the possible options is selected: error
 else:
-    print("ERROR: Invalid arguments. There are 2 possible options:")
-    print("Mode 1 arguments: 'classify', positive file, negative file, debug mode, Twitter account, word")
-    print("Mode 2 arguments: 'search', search query, language, search depth, storing file")
+    print("ERROR: Invalid arguments. There are 3 possible options:")
+    print("Mode 1 arguments: 'train', positive file, negative file, debug mode, model file")
+    print("Mode 2 arguments: 'classify', model file, Twitter account, word")
+    print("Mode 3 arguments: 'search', search query, language, search depth, storing file")
