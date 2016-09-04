@@ -1,6 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com) on 14/08/2016
 
-import math, itertools, collections
+import os, math, itertools, collections, pickle
 from nltk.tokenize import TweetTokenizer
 from nltk.classify import NaiveBayesClassifier, util
 from nltk.probability import FreqDist, ConditionalFreqDist
@@ -17,10 +17,6 @@ class Classifier(object):
 
 	# Attribute that stores the tokenizer object
 	tokenizer = TweetTokenizer(False, True, True)
-
-	# Attributes that store the best words and bigrams
-	best_words = []
-	best_bigrams = []
 
 
 	""" Give score to every element taking into account the gain of information """
@@ -66,7 +62,25 @@ class Classifier(object):
 
 
 
-	""" Transform a sentence into valid list to train """
+	""" Transform a sentence into a valid features list to train """
+	def __createTrainFeatures(self, sentence, best_words, best_bigrams):
+
+		# Every line word is obtained
+		sentence_words = self.tokenizer.tokenize(sentence)
+
+		# Every line bigram is obtained
+		bigram_finder = BCF.from_words(sentence_words)
+		sentence_bigrams = bigram_finder.nbest(BAM.pmi, None)
+
+		# The features list is created
+		features_list = dict([(word, True) for word in sentence_words if word in best_words])
+		features_list.update([(bigram, True) for bigram in sentence_bigrams if bigram in best_bigrams])
+		return features_list
+
+
+
+
+	""" Transform a sentence into a features list """
 	def __createFeatures(self, sentence):
 
 		# Every line word is obtained
@@ -77,8 +91,8 @@ class Classifier(object):
 		sentence_bigrams = bigram_finder.nbest(BAM.pmi, None)
 
 		# The features list is created
-		features_list = dict([(word, True) for word in sentence_words if word in self.best_words])
-		features_list.update([(bigram, True) for bigram in sentence_bigrams if bigram in self.best_bigrams])
+		features_list = dict([(word, True) for word in sentence_words])
+		features_list.update([(bigram, True) for bigram in sentence_bigrams])
 		return features_list
 
 
@@ -148,7 +162,7 @@ class Classifier(object):
 			print()
 
 		elif debug is False:
-			print("Trained on", len(train_features), "instances\n")
+			print("Trained on", len(train_features), "instances")
 
 
 
@@ -203,11 +217,11 @@ class Classifier(object):
 
 		# Obtain best words taking into account the gain of information
 		word_scores = self.__createScores(pos_words, neg_words)
-		self.best_words = self.__getBestElements(word_scores, num_best_words)
+		best_words = self.__getBestElements(word_scores, num_best_words)
 
 		# Obtain best bigrams taking into account the gain of information
 		bigrams_scores = self.__createScores(pos_bigrams, neg_bigrams)
-		self.best_bigrams = self.__getBestElements(bigrams_scores, num_best_bigrams)
+		best_bigrams = self.__getBestElements(bigrams_scores, num_best_bigrams)
 
 
 		# These lists will store lines words with their correspondent label
@@ -220,18 +234,47 @@ class Classifier(object):
 
 		# Each line is tokenize and its words and bigrams are used to create positive features
 		for line in pos_sentences:
-			pos_features.append([self.__createFeatures(line), 'pos'])
+			pos_features.append([self.__createTrainFeatures(line, best_words, best_bigrams), 'pos'])
 
 
 		# Each line is tokenize and its words and bigrams are used to create negative features
 		for line in neg_sentences:
-			neg_features.append([self.__createFeatures(line), 'neg'])
+			neg_features.append([self.__createTrainFeatures(line, best_words, best_bigrams), 'neg'])
 
 		pos_sentences.close()
 		neg_sentences.close()
 
 		# Depending on the "debug" value, additional information is shown or not
 		self.__showInformation(pos_features, neg_features, debug)
+
+
+
+
+	""" Saves a trained model into the models folder """
+	def saveModel(self, model_path):
+
+		model_file = open(model_path, 'wb')
+		pickle.dump(self.MODEL, model_file)
+
+		print("The classifier model has been saved in '", model_path, "'")
+		model_file.close()
+
+
+
+
+	""" Loads a trained model into our classifier object """
+	def loadModel(self, model_path):
+
+		if os.path.isfile(model_path) is True:
+			model_file = open(model_path, 'rb')
+			self.MODEL = pickle.load(model_file)
+
+			print("The classifier model has been loaded from '", model_path, "'")
+			model_file.close()
+
+		else:
+			print("ERROR: The specified model file does not exist")
+			exit()
 
 
 

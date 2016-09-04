@@ -1,6 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com) on 14/08/2016
 
-import Utilities, sys, os.path
+import Utilities, os, sys
 from Classifier import Classifier
 from DataMiner import DataMiner
 
@@ -9,17 +9,18 @@ from DataMiner import DataMiner
 miner = DataMiner()
 classifier = Classifier()
 
-# Datasets folder
-folder = "./Datasets/"
+# Folder paths
+datasets_folder = "./Datasets/"
+models_folder = "./Models/"
 
 
-################# TRAINING TEST #################
-# Arguments: "Classify", positive file, negative file, debug mode, Twitter account, word
+################# TRAIN TEST #################
+# Arguments: "Train", positive file, negative file, debug mode, model file
 
-if (sys.argv[1].lower() == "classify") and (len(sys.argv) == 7):
+if (sys.argv[1].lower() == "train") and (len(sys.argv) == 6):
 
     # Checking if the specified files exist
-    if (os.path.isfile(folder + sys.argv[2]) is False) or (os.path.isfile(folder + sys.argv[3]) is False):
+    if (os.path.isfile(datasets_folder + sys.argv[2]) is False) or (os.path.isfile(datasets_folder + sys.argv[3]) is False):
         print("ERROR: One of the train files does not exist")
         exit()
 
@@ -31,18 +32,37 @@ if (sys.argv[1].lower() == "classify") and (len(sys.argv) == 7):
     elif sys.argv[4].lower() == 'false':
         debug_mode = False
     else:
-        print("ERROR: Invalid 'debug' argument value")
+        print("ERROR: Invalid 'debug mode' argument value")
         exit()
 
-    # Train and mining processes
-    classifier.train(folder + sys.argv[2], folder + sys.argv[3], 500, 2000, debug_mode)
-    tweets = miner.getUserTweets(sys.argv[5], sys.argv[6])
+    # Training and model storing
+    classifier.train(datasets_folder + sys.argv[2], datasets_folder + sys.argv[3], 500, 5000, debug_mode)
+    classifier.saveModel(models_folder + sys.argv[5])
+
+
+
+
+
+################# CLASSIFY TEST #################
+# Arguments: "Classify", model file, Twitter account, word
+
+elif (sys.argv[1].lower() == "classify") and (len(sys.argv) == 5):
+
+    # Checking if the specified file exist
+    if os.path.isfile(models_folder + sys.argv[2]) is False:
+        print("ERROR: The specified model does not exist")
+        exit()
+
+    # Mining process
+    classifier.loadModel(models_folder + sys.argv[2])
+    tweets = miner.getUserTweets(sys.argv[3], sys.argv[4])
 
     # Obtaining probabilities of each tweet
-    sentences = Utilities.getSentences(tweets, sys.argv[6])
+    sentences = Utilities.getSentences(tweets, sys.argv[4])
     probabilities = classifier.classify(sentences)
 
     print(Utilities.getPolarity(probabilities))
+
 
 
 
@@ -52,7 +72,8 @@ if (sys.argv[1].lower() == "classify") and (len(sys.argv) == 7):
 
 elif (sys.argv[1].lower() == "search") and (len(sys.argv) == 6):
     tweets = miner.searchTrainTweets(sys.argv[2], sys.argv[3], int(sys.argv[4]))
-    Utilities.storeTweets(tweets, folder + sys.argv[5])
+    Utilities.storeTweets(tweets, datasets_folder + sys.argv[5])
+
 
 
 
