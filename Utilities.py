@@ -46,10 +46,12 @@ def getPolarity(probabilities):
     if len(probabilities) > 0:
         pos_average /= len(probabilities)
 
-        if pos_average >= 0.5:
+        if pos_average >= 0.6:
             return ["Positive", round(pos_average, 2)]
-        else:
+        elif pos_average <= 0.4:
             return ["Negative", round(1 - pos_average, 2)]
+        else:
+            return "Neutral"
 
     # In case of an empty list: return None
     else:

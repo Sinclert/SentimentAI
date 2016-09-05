@@ -1,6 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com) on 14/08/2016
 
-import Utilities, os, sys, re
+import Utilities, os, sys
 from Classifier import Classifier
 from DataMiner import DataMiner
 
@@ -73,11 +73,6 @@ elif (sys.argv[1].lower() == "classify") and (len(sys.argv) == 5):
 elif (sys.argv[1].lower() == "search") and (len(sys.argv) == 6):
 
     tweets = miner.searchTweets(sys.argv[2], sys.argv[3], int(sys.argv[4]))
-
-    # Faces filter in order to avoid over-fitting
-    for i in range(0, len(tweets)):
-        tweets[i] = re.sub("(:|;)-?(\)+|D|P|\(+)", "", tweets[i])
-
     Utilities.storeTweets(tweets, datasets_folder + sys.argv[5])
 
 
