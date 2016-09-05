@@ -14,30 +14,34 @@ datasets_folder = "./Datasets/"
 models_folder = "./Models/"
 
 
-################# TRAIN TEST #################
-# Arguments: "Train" <Positive file> <Negative file> <Debug mode> <Model file>
 
-if (sys.argv[1].lower() == "train") and (len(sys.argv) == 6):
+
+
+################# TRAIN TEST #################
+# Arguments: "Train" <Classifier> <Positive file> <Negative file>
+
+if (sys.argv[1].lower() == "train") and (len(sys.argv) == 5):
+
+    pos_file_path = datasets_folder + sys.argv[3]
+    neg_file_path = datasets_folder + sys.argv[4]
 
     # Checking if the specified files exist
-    if (os.path.isfile(datasets_folder + sys.argv[2]) is False) or (os.path.isfile(datasets_folder + sys.argv[3]) is False):
+    if (os.path.isfile(pos_file_path) is False) or (os.path.isfile(neg_file_path) is False):
         print("ERROR: One of the train files does not exist")
         exit()
 
-    debug_mode = None
+    # Divide execution depending on the specified classifier
+    if sys.argv[2].lower() == "max-entropy":
+        classifier.train("max-entropy", pos_file_path, neg_file_path, 500, 10000)
+        classifier.saveModel(models_folder + "MaxEntropy.pickle")
 
-    # Obtaining debug mode
-    if sys.argv[4].lower() == 'true':
-        debug_mode = True
-    elif sys.argv[4].lower() == 'false':
-        debug_mode = False
+    elif sys.argv[2].lower() == "naive-bayes":
+        classifier.train("naive-bayes", pos_file_path, neg_file_path, 1000, 50000)
+        classifier.saveModel(models_folder + "NaiveBayes.pickle")
+
     else:
-        print("ERROR: Invalid 'debug mode' argument value")
+        print("ERROR: Invalid classifier. Possible options: 'max-entropy' / 'naive-bayes'")
         exit()
-
-    # Training and model storing
-    classifier.train(datasets_folder + sys.argv[2], datasets_folder + sys.argv[3], 1000, 100000, debug_mode)
-    classifier.saveModel(models_folder + sys.argv[5])
 
 
 
@@ -82,6 +86,6 @@ elif (sys.argv[1].lower() == "search") and (len(sys.argv) == 6):
 # In case none of the possible options is selected: error
 else:
     print("ERROR: Invalid arguments. There are 3 possible options:")
-    print("Mode 1 arguments: 'Train' <Positive file> <Negative file> <Debug mode> <Model file>")
+    print("Mode 1 arguments: 'Train' <Classifier> <Positive file> <Negative file>")
     print("Mode 2 arguments: 'Classify' <Model file> <Twitter account> <Word>")
     print("Mode 3 arguments: 'Search' <Search query> <Language> <Search depth> <Storing file>")

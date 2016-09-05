@@ -1,14 +1,14 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com) on 14/08/2016
 
-import os, math, itertools, collections, pickle
+import os, math, itertools, pickle
 from nltk.tokenize import TweetTokenizer
-from nltk.classify import NaiveBayesClassifier, util
+from nltk.classify import MaxentClassifier, NaiveBayesClassifier, util
 from nltk.probability import FreqDist, ConditionalFreqDist
-from nltk.metrics import BigramAssocMeasures as BAM, precision, recall
+from nltk.metrics import BigramAssocMeasures as BAM
 from nltk.collocations import BigramCollocationFinder as BCF
 
 
-""" Class in charge of classify sentences as positive or negative after being trained"""
+""" Class in charge of classify sentences as positive or negative after being trained """
 class Classifier(object):
 
 
@@ -87,77 +87,8 @@ class Classifier(object):
 
 
 
-	""" Compares the test features with their labels in order to obtain the recall and the precision """
-	def __getStatisticSets(self, test_features):
-
-		if self.MODEL is None:
-			print("ERROR: The training model has not been initialized")
-			exit()
-
-		ref_set = collections.defaultdict(set)
-		test_set = collections.defaultdict(set)
-
-		# For each feature: we compare the classifier result with the correct label
-		for i, (feat, label) in enumerate(test_features):
-			ref_set[label].add(i)
-			observed = self.MODEL.classify(feat)
-			test_set[observed].add(i)
-
-		return ref_set, test_set
-
-
-
-
-	""" Shows information about the training process if it is specified """
-	def __showInformation(self, pos_features, neg_features, debug):
-
-		train_features = None
-		test_features = None
-
-		# If debug mode: 3/4 features for training and 1/4 features for testing
-		if debug is True:
-			pos_cut = int(math.floor(len(pos_features) * 3/4))
-			neg_cut = int(math.floor(len(neg_features) * 3/4))
-			train_features = pos_features[:pos_cut] + neg_features[:neg_cut]
-			test_features = pos_features[pos_cut:] + neg_features[neg_cut:]
-
-		# If no debug mode: every feature is for training
-		elif debug is False:
-			train_features = pos_features[:] + neg_features[:]
-
-		else:
-			print("ERROR: Invalid 'debug' argument value")
-			exit()
-
-
-		# Trains the Naive Bayes Classifier
-		self.MODEL = NaiveBayesClassifier.train(train_features)
-
-
-		if debug is True:
-			print("Trained on", len(train_features), "instances and tested on", len(test_features), "instances\n")
-
-			# Obtaining recall and precision necessary sets
-			ref_set, test_set = self.__getStatisticSets(test_features)
-
-			print("Accuracy:", round(util.accuracy(self.MODEL, test_features), 4))
-			print("'Pos' false positives:", round(1 - precision(ref_set['pos'], test_set['pos']), 4))
-			print("'Pos' false negatives:", round(1 - recall(ref_set['pos'], test_set['pos']), 4))
-			print("'Neg' false positive:", round(1 - precision(ref_set['neg'], test_set['neg']), 4))
-			print("'Neg' false negative:", round(1 - recall(ref_set['neg'], test_set['neg']), 4))
-			print()
-
-			self.MODEL.show_most_informative_features(10)
-			print()
-
-		elif debug is False:
-			print("Trained on", len(train_features), "instances")
-
-
-
-
 	""" Train the Naive Bayes Classifier using the specified files """
-	def train(self, positive_file, negative_file, num_best_words = 1000, num_best_bigrams = 1000, debug = False):
+	def train(self, classifier, positive_file, negative_file, num_best_words = 1000, num_best_bigrams = 1000):
 
 		# These lists will store every lines word and bigram
 		pos_words = []
@@ -233,8 +164,36 @@ class Classifier(object):
 		pos_sentences.close()
 		neg_sentences.close()
 
-		# Depending on the "debug" value, additional information is shown or not
-		self.__showInformation(pos_features, neg_features, debug)
+
+		# Trains the Max Entropy Classifier
+		if classifier.lower() == "max-entropy":
+
+			train_features = pos_features[:] + neg_features[:]
+			self.MODEL = MaxentClassifier.train(train_features, trace = 0, min_lldelta = 0.005)
+
+			print("Training instances:", len(train_features), ". Testing instances:", len(train_features))
+			print("Accuracy:", round(util.accuracy(self.MODEL, train_features), 4), "\n")
+
+
+		# Trains the Naive Bayes Classifier
+		elif classifier.lower() == "naive-bayes":
+
+			# Obtaining the feature testing set
+			pos_cut = int(math.floor(len(pos_features) * 3/4))
+			neg_cut = int(math.floor(len(neg_features) * 3/4))
+			train_features = pos_features[:pos_cut] + neg_features[:neg_cut]
+			test_features = pos_features[pos_cut:] + neg_features[neg_cut:]
+
+			self.MODEL = NaiveBayesClassifier.train(train_features)
+
+			print("Training instances:", len(train_features), ". Testing instances:", len(test_features))
+			print("Accuracy:", round(util.accuracy(self.MODEL, test_features), 4), "\n")
+
+
+		# In case another option is specified: error
+		else:
+			print("ERROR: Invalid classifier. Possible options: 'max-entropy' / 'naive-bayes'")
+			exit()
 
 
 
