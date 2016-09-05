@@ -62,8 +62,8 @@ class Classifier(object):
 
 
 
-	""" Transform a sentence into a valid features list to train """
-	def __createTrainFeatures(self, sentence, best_words, best_bigrams):
+	""" Transform a sentence into a features list to train / classify """
+	def __createFeatures(self, sentence, best_words = None, best_bigrams = None):
 
 		# Every line word is obtained
 		sentence_words = self.tokenizer.tokenize(sentence)
@@ -72,27 +72,16 @@ class Classifier(object):
 		bigram_finder = BCF.from_words(sentence_words)
 		sentence_bigrams = bigram_finder.nbest(BAM.pmi, None)
 
-		# The features list is created
-		features_list = dict([(word, True) for word in sentence_words if word in best_words])
-		features_list.update([(bigram, True) for bigram in sentence_bigrams if bigram in best_bigrams])
-		return features_list
+		# If the best words / bigrams lists are specified: for training
+		if (best_words is not None) and (best_bigrams is not None):
+			features_list = dict([(word, True) for word in sentence_words if word in best_words])
+			features_list.update([(bigram, True) for bigram in sentence_bigrams if bigram in best_bigrams])
 
+		# If any of them is not specified: for classifying
+		else:
+			features_list = dict([(word, True) for word in sentence_words])
+			features_list.update([(bigram, True) for bigram in sentence_bigrams])
 
-
-
-	""" Transform a sentence into a features list """
-	def __createFeatures(self, sentence):
-
-		# Every line word is obtained
-		sentence_words = self.tokenizer.tokenize(sentence)
-
-		# Every line bigram is obtained
-		bigram_finder = BCF.from_words(sentence_words)
-		sentence_bigrams = bigram_finder.nbest(BAM.pmi, None)
-
-		# The features list is created
-		features_list = dict([(word, True) for word in sentence_words])
-		features_list.update([(bigram, True) for bigram in sentence_bigrams])
 		return features_list
 
 
@@ -234,12 +223,12 @@ class Classifier(object):
 
 		# Each line is tokenize and its words and bigrams are used to create positive features
 		for line in pos_sentences:
-			pos_features.append([self.__createTrainFeatures(line, best_words, best_bigrams), 'pos'])
+			pos_features.append([self.__createFeatures(line, best_words, best_bigrams), 'pos'])
 
 
 		# Each line is tokenize and its words and bigrams are used to create negative features
 		for line in neg_sentences:
-			neg_features.append([self.__createTrainFeatures(line, best_words, best_bigrams), 'neg'])
+			neg_features.append([self.__createFeatures(line, best_words, best_bigrams), 'neg'])
 
 		pos_sentences.close()
 		neg_sentences.close()

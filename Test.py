@@ -15,7 +15,7 @@ models_folder = "./Models/"
 
 
 ################# TRAIN TEST #################
-# Arguments: "Train", positive file, negative file, debug mode, model file
+# Arguments: "Train" <Positive file> <Negative file> <Debug mode> <Model file>
 
 if (sys.argv[1].lower() == "train") and (len(sys.argv) == 6):
 
@@ -44,7 +44,7 @@ if (sys.argv[1].lower() == "train") and (len(sys.argv) == 6):
 
 
 ################# CLASSIFY TEST #################
-# Arguments: "Classify", model file, Twitter account, word
+# Arguments: "Classify" <Model file> <Twitter account> <Word>
 
 elif (sys.argv[1].lower() == "classify") and (len(sys.argv) == 5):
 
@@ -68,7 +68,7 @@ elif (sys.argv[1].lower() == "classify") and (len(sys.argv) == 5):
 
 
 ################## SEARCH TEST ##################
-# Arguments: "Search", search query, language, search depth, storing file
+# Arguments: "Search" <Search query> <Language> <Search depth> <Storing file>
 
 elif (sys.argv[1].lower() == "search") and (len(sys.argv) == 6):
     tweets = miner.searchTrainTweets(sys.argv[2], sys.argv[3], int(sys.argv[4]))
@@ -81,6 +81,6 @@ elif (sys.argv[1].lower() == "search") and (len(sys.argv) == 6):
 # In case none of the possible options is selected: error
 else:
     print("ERROR: Invalid arguments. There are 3 possible options:")
-    print("Mode 1 arguments: 'train', positive file, negative file, debug mode, model file")
-    print("Mode 2 arguments: 'classify', model file, Twitter account, word")
-    print("Mode 3 arguments: 'search', search query, language, search depth, storing file")
+    print("Mode 1 arguments: 'Train' <Positive file> <Negative file> <Debug mode> <Model file>")
+    print("Mode 2 arguments: 'Classify' <Model file> <Twitter account> <Word>")
+    print("Mode 3 arguments: 'Search' <Search query> <Language> <Search depth> <Storing file>")
