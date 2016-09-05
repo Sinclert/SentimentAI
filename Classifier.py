@@ -62,6 +62,32 @@ class Classifier(object):
 
 
 
+	""" Stores every word and bigram of the specified file """
+	def __getWordsAndBigrams(self, file):
+
+		words = []
+		bigrams = []
+
+		sentences_file = open(file, 'r', encoding = "UTF8")
+
+		# Each line is tokenize and its words and bigrams are stored in a list
+		for line in sentences_file:
+			# Storing all line words
+			sentence_words = self.tokenizer.tokenize(line)
+			words.append(sentence_words)
+
+			# Storing all line bigrams
+			bigram_finder = BCF.from_words(sentence_words)
+			sentence_bigrams = bigram_finder.nbest(BAM.pmi, None)
+			bigrams.append(sentence_bigrams)
+
+		sentences_file.close()
+
+		return words, bigrams
+
+
+
+
 	""" Transform a sentence into a features list to train / classify """
 	def __getFeatures(self, sentence, best_words = None, best_bigrams = None):
 
@@ -88,52 +114,18 @@ class Classifier(object):
 
 
 	""" Train the Naive Bayes Classifier using the specified files """
-	def train(self, classifier, positive_file, negative_file, num_best_words = 1000, num_best_bigrams = 1000):
+	def train(self, classifier, positive_file, negative_file, num_best_words = 100, num_best_bigrams = 1000):
 
-		# These lists will store every lines word and bigram
-		pos_words = []
-		neg_words = []
-		pos_bigrams = []
-		neg_bigrams = []
-
-
-		pos_sentences = open(positive_file, 'r', encoding = "UTF8")
-		neg_sentences = open(negative_file, 'r', encoding = "UTF8")
-
-		# Each line is tokenize and its words and bigrams are stored in a list
-		for line in pos_sentences:
-
-			# Storing all line words
-			sentence_words = self.tokenizer.tokenize(line)
-			pos_words.append(sentence_words)
-
-			# Storing all line bigrams
-			bigram_finder = BCF.from_words(sentence_words)
-			sentence_bigrams = bigram_finder.nbest(BAM.pmi, None)
-			pos_bigrams.append(sentence_bigrams)
-
-
-		# Each line is tokenize and its words and bigrams are stored in a list
-		for line in neg_sentences:
-
-			# Storing all line words
-			sentence_words = self.tokenizer.tokenize(line)
-			neg_words.append(sentence_words)
-
-			# Storing all line bigrams
-			bigram_finder = BCF.from_words(sentence_words)
-			sentence_bigrams = bigram_finder.nbest(BAM.pmi, None)
-			neg_bigrams.append(sentence_bigrams)
-
-		pos_sentences.close()
-		neg_sentences.close()
-
+		# Obtain every word and bigram in both files
+		pos_words, pos_bigrams = self.__getWordsAndBigrams(positive_file)
+		neg_words, neg_bigrams = self.__getWordsAndBigrams(negative_file)
 
 		# Make all lists iterable
 		pos_words = list(itertools.chain(*pos_words))
 		neg_words = list(itertools.chain(*neg_words))
 		pos_bigrams = list(itertools.chain(*pos_bigrams))
 		neg_bigrams = list(itertools.chain(*neg_bigrams))
+
 
 		# Obtain best words taking into account the gain of information
 		word_scores = self.__getScores(pos_words, neg_words)
@@ -147,7 +139,6 @@ class Classifier(object):
 		# These lists will store lines words with their correspondent label
 		pos_features = []
 		neg_features = []
-
 
 		pos_sentences = open(positive_file, 'r', encoding = "UTF8")
 		neg_sentences = open(negative_file, 'r', encoding = "UTF8")
