@@ -1,6 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com) on 14/08/2016
 
-import Utilities, os, sys
+import Utilities, os, sys, re
 from Classifier import Classifier
 from DataMiner import DataMiner
 
@@ -36,7 +36,7 @@ if (sys.argv[1].lower() == "train") and (len(sys.argv) == 6):
         exit()
 
     # Training and model storing
-    classifier.train(datasets_folder + sys.argv[2], datasets_folder + sys.argv[3], 500, 5000, debug_mode)
+    classifier.train(datasets_folder + sys.argv[2], datasets_folder + sys.argv[3], 1000, 100000, debug_mode)
     classifier.saveModel(models_folder + sys.argv[5])
 
 
@@ -71,7 +71,13 @@ elif (sys.argv[1].lower() == "classify") and (len(sys.argv) == 5):
 # Arguments: "Search" <Search query> <Language> <Search depth> <Storing file>
 
 elif (sys.argv[1].lower() == "search") and (len(sys.argv) == 6):
-    tweets = miner.searchTrainTweets(sys.argv[2], sys.argv[3], int(sys.argv[4]))
+
+    tweets = miner.searchTweets(sys.argv[2], sys.argv[3], int(sys.argv[4]))
+
+    # Faces filter in order to avoid over-fitting
+    for i in range(0, len(tweets)):
+        tweets[i] = re.sub("(:|;)-?(\)+|D|P|\(+)", "", tweets[i])
+
     Utilities.storeTweets(tweets, datasets_folder + sys.argv[5])
 
 

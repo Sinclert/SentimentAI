@@ -108,31 +108,28 @@ class DataMiner(object):
                 tweets_list.append(tweet_text)
 
 
-            # In case no word is specified and there are not enough tweets
-            if (word is None) and (len(tweets_list) < depth):
-                print("There are not", depth, "tweets from", user, ". Retrieving", len(tweets_list))
-
             # In case word is specified but there are not tweets with it
-            elif (word is not None) and (len(tweets_list) == 0):
+            if (word is not None) and (len(tweets_list) == 0):
                 print("There are no tweets from", user, "containing '", word, "'")
 
             return tweets_list
 
 
-        except tweepy.RateLimitError:
-            print("RATE LIMIT ERROR: Unable to retrieve most recent tweets from", user)
-            exit()
-
         except tweepy.TweepError:
-            print("TWEEPY ERROR: Unable to retrieve most recent tweets from", user)
-            exit()
+
+            if len(tweets_list) == 0:
+                print("TWEEPY ERROR: Unable to retrieve most recent tweets from", user)
+                exit()
+            else:
+                print("RATE LIMIT ERROR: Unable to retrieve", depth, "tweets from", user, ". Returning", len(tweets_list))
+                return tweets_list
 
 
 
 
     """ Returns a list containing tweets that fulfill the specified query (each 100 is a request).
         Link to learn about queries: https://dev.twitter.com/rest/public/search """
-    def searchTrainTweets(self, query, language, depth = 1000):
+    def searchTweets(self, query, language, depth = 1000):
 
         tweets_list = []
 
@@ -163,10 +160,11 @@ class DataMiner(object):
             return tweets_list
 
 
-        except tweepy.RateLimitError:
-            print("RATE LIMIT ERROR: Unable to retrieve tweets from the specified search")
-            exit()
-
         except tweepy.TweepError:
-            print("TWEEPY ERROR: Unable to retrieve tweets from the specified search")
-            exit()
+
+            if len(tweets_list) == 0:
+                print("TWEEPY ERROR: Unable to retrieve tweets from the specified search")
+                exit()
+            else:
+                print("RATE LIMIT ERROR: Unable to retrieve", depth, "tweets. Returning", len(tweets_list))
+                return tweets_list

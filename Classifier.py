@@ -20,7 +20,7 @@ class Classifier(object):
 
 
 	""" Give score to every element taking into account the gain of information """
-	def __createScores(self, pos_elements, neg_elements):
+	def __getScores(self, pos_elements, neg_elements):
 
 		# Build frequency distribution of every word and the conditional one within positive and negative labels
 		freqDist = FreqDist()
@@ -63,7 +63,7 @@ class Classifier(object):
 
 
 	""" Transform a sentence into a features list to train / classify """
-	def __createFeatures(self, sentence, best_words = None, best_bigrams = None):
+	def __getFeatures(self, sentence, best_words = None, best_bigrams = None):
 
 		# Every line word is obtained
 		sentence_words = self.tokenizer.tokenize(sentence)
@@ -88,7 +88,7 @@ class Classifier(object):
 
 
 	""" Compares the test features with their labels in order to obtain the recall and the precision """
-	def __compareTestFeatures(self, test_features):
+	def __getStatisticSets(self, test_features):
 
 		if self.MODEL is None:
 			print("ERROR: The training model has not been initialized")
@@ -138,7 +138,7 @@ class Classifier(object):
 			print("Trained on", len(train_features), "instances and tested on", len(test_features), "instances\n")
 
 			# Obtaining recall and precision necessary sets
-			ref_set, test_set = self.__compareTestFeatures(test_features)
+			ref_set, test_set = self.__getStatisticSets(test_features)
 
 			print("Accuracy:", round(util.accuracy(self.MODEL, test_features), 4))
 			print("'Pos' false positives:", round(1 - precision(ref_set['pos'], test_set['pos']), 4))
@@ -205,11 +205,11 @@ class Classifier(object):
 		neg_bigrams = list(itertools.chain(*neg_bigrams))
 
 		# Obtain best words taking into account the gain of information
-		word_scores = self.__createScores(pos_words, neg_words)
+		word_scores = self.__getScores(pos_words, neg_words)
 		best_words = self.__getBestElements(word_scores, num_best_words)
 
 		# Obtain best bigrams taking into account the gain of information
-		bigrams_scores = self.__createScores(pos_bigrams, neg_bigrams)
+		bigrams_scores = self.__getScores(pos_bigrams, neg_bigrams)
 		best_bigrams = self.__getBestElements(bigrams_scores, num_best_bigrams)
 
 
@@ -223,12 +223,12 @@ class Classifier(object):
 
 		# Each line is tokenize and its words and bigrams are used to create positive features
 		for line in pos_sentences:
-			pos_features.append([self.__createFeatures(line, best_words, best_bigrams), 'pos'])
+			pos_features.append([self.__getFeatures(line, best_words, best_bigrams), 'pos'])
 
 
 		# Each line is tokenize and its words and bigrams are used to create negative features
 		for line in neg_sentences:
-			neg_features.append([self.__createFeatures(line, best_words, best_bigrams), 'neg'])
+			neg_features.append([self.__getFeatures(line, best_words, best_bigrams), 'neg'])
 
 		pos_sentences.close()
 		neg_sentences.close()
@@ -275,7 +275,7 @@ class Classifier(object):
 			probabilities = []
 
 			for sentence in sentences:
-				features_list = self.__createFeatures(sentence)
+				features_list = self.__getFeatures(sentence)
 				percentages = self.MODEL.prob_classify(features_list)
 				probabilities.append({"Positive": percentages.prob('pos'), "Negative": percentages.prob('neg')})
 
