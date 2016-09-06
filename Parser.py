@@ -27,7 +27,7 @@ if (sys.argv[1].lower() == "train") and (len(sys.argv) == 5):
 
     # Checking if the specified files exist
     if (os.path.isfile(pos_file_path) is False) or (os.path.isfile(neg_file_path) is False):
-        print("ERROR: One of the train files does not exist")
+        print("ERROR: One of the training files does not exist inside 'Datasets' folder")
         exit()
 
     # Divide execution depending on the specified classifier
@@ -48,13 +48,13 @@ if (sys.argv[1].lower() == "train") and (len(sys.argv) == 5):
 
 
 ################# CLASSIFY TEST #################
-# Arguments: "Classify" <Model file> <Twitter account> <Word>
+# Arguments: "Classify" <Classifier model> <Twitter account> <Word>
 
 elif (sys.argv[1].lower() == "classify") and (len(sys.argv) == 5):
 
     # Checking if the specified file exist
     if os.path.isfile(models_folder + sys.argv[2] + ".pickle") is False:
-        print("ERROR: The specified model does not exist")
+        print("ERROR: The specified classifier model has not been saved")
         exit()
 
     # Mining process
@@ -87,5 +87,5 @@ elif (sys.argv[1].lower() == "search") and (len(sys.argv) == 6):
 else:
     print("ERROR: Invalid arguments. There are 3 possible options:")
     print("Mode 1 arguments: 'Train' <Classifier> <Positive file> <Negative file>")
-    print("Mode 2 arguments: 'Classify' <Model file> <Twitter account> <Word>")
+    print("Mode 2 arguments: 'Classify' <Classifier model> <Twitter account> <Word>")
     print("Mode 3 arguments: 'Search' <Search query> <Language> <Search depth> <Storing file>")
