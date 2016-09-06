@@ -33,11 +33,11 @@ if (sys.argv[1].lower() == "train") and (len(sys.argv) == 5):
     # Divide execution depending on the specified classifier
     if sys.argv[2].lower() == "max-entropy":
         classifier.train("max-entropy", pos_file_path, neg_file_path, 500, 10000)
-        classifier.saveModel(models_folder + "MaxEntropy.pickle")
+        classifier.saveModel(models_folder + "Max-Entropy.pickle")
 
     elif sys.argv[2].lower() == "naive-bayes":
         classifier.train("naive-bayes", pos_file_path, neg_file_path, 1000, 50000)
-        classifier.saveModel(models_folder + "NaiveBayes.pickle")
+        classifier.saveModel(models_folder + "Naive-Bayes.pickle")
 
     else:
         print("ERROR: Invalid classifier. Possible options: 'max-entropy' / 'naive-bayes'")
@@ -53,12 +53,12 @@ if (sys.argv[1].lower() == "train") and (len(sys.argv) == 5):
 elif (sys.argv[1].lower() == "classify") and (len(sys.argv) == 5):
 
     # Checking if the specified file exist
-    if os.path.isfile(models_folder + sys.argv[2]) is False:
+    if os.path.isfile(models_folder + sys.argv[2] + ".pickle") is False:
         print("ERROR: The specified model does not exist")
         exit()
 
     # Mining process
-    classifier.loadModel(models_folder + sys.argv[2])
+    classifier.loadModel(models_folder + sys.argv[2] + ".pickle")
     tweets = miner.getUserTweets(sys.argv[3], sys.argv[4])
 
     # Obtaining probabilities of each tweet

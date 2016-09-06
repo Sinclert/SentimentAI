@@ -22,7 +22,7 @@ class Classifier(object):
 	""" Give score to every element taking into account the gain of information """
 	def __getScores(self, pos_elements, neg_elements):
 
-		# Build frequency distribution of every word and the conditional one within positive and negative labels
+		# Build frequency and conditional distribution within the positive and negative labels
 		freqDist = FreqDist()
 		conditional_freqDist = ConditionalFreqDist()
 
@@ -42,7 +42,7 @@ class Classifier(object):
 
 		scores = {}
 
-		# Builds a dictionary of word scores based on chi-squared test
+		# Builds a dictionary of scores based on chi-squared test
 		for elem, freq in freqDist.items():
 			pos_score = BAM.chi_sq(conditional_freqDist['pos'][elem], (freq, pos_count), total_count)
 			neg_score = BAM.chi_sq(conditional_freqDist['neg'][elem], (freq, neg_count), total_count)
