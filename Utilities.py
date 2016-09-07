@@ -3,6 +3,10 @@
 import re
 
 
+# Indicates de percentage of tweets that are disregarded
+confidence_threshold = 0.10
+
+
 """ Divides tweets into sentences and returns those containing the specified word """
 def getSentences(tweets, word = None):
 
@@ -42,10 +46,31 @@ def getPolarity(probabilities):
     for prob_pair in probabilities:
         pos_average += prob_pair['Positive']
 
+
     # The average is only computed if the input list is not empty
     if len(probabilities) > 0:
         pos_average /= len(probabilities)
 
+        # The number of outliers considering a confidence threshold
+        outliers = round(len(probabilities) * confidence_threshold)
+
+        # If there are outliers: they are subtracted from the mean
+        if outliers > 0:
+
+            differences = []
+            for prob_pair in probabilities:
+                differences.append([prob_pair['Positive'], abs(pos_average - prob_pair['Positive'])])
+
+            differences.sort(key = lambda element: element[1], reverse = True)
+            pos_average *= len(probabilities)
+
+            for i in range(0, outliers):
+                pos_average -= differences[i][0]
+
+            pos_average /= (len(probabilities) - outliers)
+
+
+        # Finally: label classification result
         if pos_average >= 0.55:
             return ["Positive", round(pos_average, 2)]
         elif pos_average <= 0.45:
