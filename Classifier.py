@@ -1,6 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com) on 14/08/2016
 
-import os, math, itertools, pickle
+import os, itertools, pickle
 from nltk.tokenize import TweetTokenizer
 from nltk.classify import MaxentClassifier, NaiveBayesClassifier, util
 from nltk.probability import FreqDist, ConditionalFreqDist
@@ -170,8 +170,8 @@ class Classifier(object):
 		elif classifier.lower() == "naive-bayes":
 
 			# Obtaining the feature testing set
-			pos_cut = int(math.floor(len(pos_features) * 3/4))
-			neg_cut = int(math.floor(len(neg_features) * 3/4))
+			pos_cut = round(len(pos_features) * 3/4)
+			neg_cut = round(len(neg_features) * 3/4)
 			train_features = pos_features[:pos_cut] + neg_features[:neg_cut]
 			test_features = pos_features[pos_cut:] + neg_features[neg_cut:]
 

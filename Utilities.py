@@ -52,7 +52,7 @@ def getPolarity(probabilities):
         pos_average /= len(probabilities)
 
         # The number of outliers considering a confidence threshold
-        outliers = round(len(probabilities) * confidence_threshold)
+        outliers = int(len(probabilities) * confidence_threshold)
 
         # If there are outliers: they are subtracted from the mean
         if outliers > 0:
