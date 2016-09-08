@@ -1,12 +1,11 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com) on 14/08/2016
 
-import os, itertools, pickle
+import Utilities, os, itertools, pickle
 from nltk.tokenize import TweetTokenizer
 from nltk.classify import MaxentClassifier, NaiveBayesClassifier, SklearnClassifier, util
-from nltk.probability import FreqDist, ConditionalFreqDist
 from nltk.metrics import BigramAssocMeasures as BAM
 from nltk.collocations import BigramCollocationFinder as BCF
-from sklearn.svm import LinearSVC
+from sklearn.svm import NuSVC
 
 
 """ Class in charge of classify sentences as positive or negative after being trained """
@@ -18,49 +17,6 @@ class Classifier(object):
 
 	# Attribute that stores the tokenizer object
 	tokenizer = TweetTokenizer(False, True, True)
-
-
-	""" Give score to every element taking into account the gain of information """
-	def __getScores(self, pos_elements, neg_elements):
-
-		# Build frequency and conditional distribution within the positive and negative labels
-		freqDist = FreqDist()
-		conditional_freqDist = ConditionalFreqDist()
-
-		for element in pos_elements:
-			freqDist[element] += 1
-			conditional_freqDist['pos'][element] += 1
-
-		for element in neg_elements:
-			freqDist[element] += 1
-			conditional_freqDist['neg'][element] += 1
-
-		# Counts the number of positive and negative words, as well as the total number of them
-		pos_count = conditional_freqDist['pos'].N()
-		neg_count = conditional_freqDist['neg'].N()
-		total_count = pos_count + neg_count
-
-
-		scores = {}
-
-		# Builds a dictionary of scores based on chi-squared test
-		for elem, freq in freqDist.items():
-			pos_score = BAM.chi_sq(conditional_freqDist['pos'][elem], (freq, pos_count), total_count)
-			neg_score = BAM.chi_sq(conditional_freqDist['neg'][elem], (freq, neg_count), total_count)
-			scores[elem] = pos_score + neg_score
-
-		return scores
-
-
-
-
-	""" Finds the best 'n' elements based on their scores """
-	def __getBestElements(self, scores, number):
-		best_values = sorted(scores.items(), key = lambda element: element[1], reverse = True)[:number]
-		best_elements = set([w for w, s in best_values])
-		return best_elements
-
-
 
 
 	""" Stores every word and bigram of the specified file """
@@ -121,7 +77,7 @@ class Classifier(object):
 	def __performTraining(self, classifier, pos_features, neg_features):
 
 		# Trains the Linear SVC classifier
-		if classifier.lower() == "linear-svc":
+		if classifier.lower() == "nu-svc":
 
 			# Obtaining the feature testing set
 			pos_cut = round(len(pos_features) * 3 / 4)
@@ -129,7 +85,7 @@ class Classifier(object):
 			train_features = pos_features[:pos_cut] + neg_features[:neg_cut]
 			test_features = pos_features[pos_cut:] + neg_features[neg_cut:]
 
-			self.MODEL = SklearnClassifier(LinearSVC()).train(train_features)
+			self.MODEL = SklearnClassifier(NuSVC()).train(train_features)
 
 			print("Linear SVC training process completed")
 			print("Accuracy:", round(util.accuracy(self.MODEL, test_features), 4), "\n")
@@ -181,12 +137,12 @@ class Classifier(object):
 
 
 		# Obtain best words taking into account the gain of information
-		word_scores = self.__getScores(pos_words, neg_words)
-		best_words = self.__getBestElements(word_scores, num_best_words)
+		word_scores = Utilities.getScores(pos_words, neg_words)
+		best_words = Utilities.getBestElements(word_scores, num_best_words)
 
 		# Obtain best bigrams taking into account the gain of information
-		bigrams_scores = self.__getScores(pos_bigrams, neg_bigrams)
-		best_bigrams = self.__getBestElements(bigrams_scores, num_best_bigrams)
+		bigrams_scores = Utilities.getScores(pos_bigrams, neg_bigrams)
+		best_bigrams = Utilities.getBestElements(bigrams_scores, num_best_bigrams)
 
 
 		# These lists will store lines words with their correspondent label
@@ -221,8 +177,8 @@ class Classifier(object):
 		model_file = open(model_path, 'wb')
 		pickle.dump(self.MODEL, model_file)
 
-		print("The classifier model has been saved in '", model_path, "'")
 		model_file.close()
+		print("The classifier model has been saved in '", model_path, "'")
 
 
 
@@ -234,8 +190,8 @@ class Classifier(object):
 			model_file = open(model_path, 'rb')
 			self.MODEL = pickle.load(model_file)
 
-			print("The classifier model has been loaded from '", model_path, "'")
 			model_file.close()
+			print("The classifier model has been loaded from '", model_path, "'")
 
 		else:
 			print("ERROR: The specified model file does not exist")
