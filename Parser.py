@@ -31,7 +31,11 @@ if (sys.argv[1].lower() == "train") and (len(sys.argv) == 5):
         exit()
 
     # Divide execution depending on the specified classifier
-    if sys.argv[2].lower() == "max-entropy":
+    if sys.argv[2].lower() == "linear-svc":
+        classifier.train("linear-svc", pos_file_path, neg_file_path, 2000, 10000)
+        classifier.saveModel(models_folder + "Linear-SVC.pickle")
+
+    elif sys.argv[2].lower() == "max-entropy":
         classifier.train("max-entropy", pos_file_path, neg_file_path, 500, 10000)
         classifier.saveModel(models_folder + "Max-Entropy.pickle")
 
@@ -40,7 +44,7 @@ if (sys.argv[1].lower() == "train") and (len(sys.argv) == 5):
         classifier.saveModel(models_folder + "Naive-Bayes.pickle")
 
     else:
-        print("ERROR: Invalid classifier. Possible options: 'max-entropy' / 'naive-bayes'")
+        print("ERROR: Invalid classifier")
         exit()
 
 

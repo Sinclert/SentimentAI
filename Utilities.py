@@ -38,45 +38,62 @@ def getSentences(tweets, word = None):
 
 
 """ Gets the polarity of several probability pairs by calculating the averages """
-def getPolarity(probabilities):
+def getPolarity(classifications):
 
-    # Calculating the positive average is enough
-    pos_average = 0
+    if len(classifications) > 0:
 
-    for prob_pair in probabilities:
-        pos_average += prob_pair['Positive']
+        # If the input list contains probabilities
+        if isinstance(classifications[0], dict):
 
+            # Calculating the positive average is enough
+            pos_average = 0
 
-    # The average is only computed if the input list is not empty
-    if len(probabilities) > 0:
-        pos_average /= len(probabilities)
+            for prob_pair in classifications:
+                pos_average += prob_pair['Positive']
 
-        # The number of outliers considering a confidence threshold
-        outliers = int(len(probabilities) * confidence_threshold)
-
-        # If there are outliers: they are subtracted from the mean
-        if outliers > 0:
-
-            differences = []
-            for prob_pair in probabilities:
-                differences.append([prob_pair['Positive'], abs(pos_average - prob_pair['Positive'])])
-
-            differences.sort(key = lambda element: element[1], reverse = True)
-            pos_average *= len(probabilities)
-
-            for i in range(0, outliers):
-                pos_average -= differences[i][0]
-
-            pos_average /= (len(probabilities) - outliers)
+            pos_average /= len(classifications)
 
 
-        # Finally: label classification result
-        if pos_average >= 0.55:
-            return ["Positive", round(pos_average, 2)]
-        elif pos_average <= 0.45:
-            return ["Negative", round(1 - pos_average, 2)]
+            # CONFIDENCE THRESHOLD APPLICATION
+            outliers = int(len(classifications) * confidence_threshold)
+
+            # If there are outliers: they are subtracted from the mean
+            if outliers > 0:
+
+                differences = []
+                for prob_pair in classifications:
+                    differences.append([prob_pair['Positive'], abs(pos_average - prob_pair['Positive'])])
+
+                differences.sort(key = lambda element: element[1], reverse = True)
+                pos_average *= len(classifications)
+
+                for i in range(0, outliers):
+                    pos_average -= differences[i][0]
+
+                pos_average /= (len(classifications) - outliers)
+
+
+            # Finally: label classification result
+            if pos_average >= 0.5:
+                return ['Positive', round(pos_average, 2)]
+            else:
+                return ['Negative', round(1 - pos_average, 2)]
+
+
+        # If the input list does not contain probabilities
         else:
-            return "Neutral"
+            pos_counter = 0
+
+            for classification in classifications:
+                if classification == 'pos':
+                    pos_counter += 1
+
+            # Finally: label classification result
+            if pos_counter >= (len(classifications) - pos_counter):
+                return ['Positive', str(pos_counter) + ":" + str(len(classifications) - pos_counter)]
+            else:
+                return ['Negative', str(pos_counter) +":" + str(len(classifications) - pos_counter)]
+
 
     # In case of an empty list: return None
     else:

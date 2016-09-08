@@ -2,10 +2,11 @@
 
 import os, itertools, pickle
 from nltk.tokenize import TweetTokenizer
-from nltk.classify import MaxentClassifier, NaiveBayesClassifier, util
+from nltk.classify import MaxentClassifier, NaiveBayesClassifier, SklearnClassifier, util
 from nltk.probability import FreqDist, ConditionalFreqDist
 from nltk.metrics import BigramAssocMeasures as BAM
 from nltk.collocations import BigramCollocationFinder as BCF
+from sklearn.svm import LinearSVC
 
 
 """ Class in charge of classify sentences as positive or negative after being trained """
@@ -72,6 +73,7 @@ class Classifier(object):
 
 		# Each line is tokenize and its words and bigrams are stored in a list
 		for line in sentences_file:
+
 			# Storing all line words
 			sentence_words = self.tokenizer.tokenize(line)
 			words.append(sentence_words)
@@ -79,10 +81,11 @@ class Classifier(object):
 			# Storing all line bigrams
 			bigram_finder = BCF.from_words(sentence_words)
 			sentence_bigrams = bigram_finder.nbest(BAM.pmi, None)
-			bigrams.append(sentence_bigrams)
+
+			for bigram in sentence_bigrams:
+				bigrams.append(bigram[0] + " " + bigram[1])
 
 		sentences_file.close()
-
 		return words, bigrams
 
 
@@ -101,14 +104,66 @@ class Classifier(object):
 		# If the best words / bigrams lists are specified: for training
 		if (best_words is not None) and (best_bigrams is not None):
 			features_list = dict([(word, True) for word in sentence_words if word in best_words])
-			features_list.update([(bigram, True) for bigram in sentence_bigrams if bigram in best_bigrams])
+			features_list.update([(bigram[0] + " " + bigram[1], True) for bigram in sentence_bigrams
+								  if (bigram[0] + " " + bigram[1]) in best_bigrams])
 
 		# If any of them is not specified: for classifying
 		else:
 			features_list = dict([(word, True) for word in sentence_words])
-			features_list.update([(bigram, True) for bigram in sentence_bigrams])
+			features_list.update([(bigram[0] + " " + bigram[1], True) for bigram in sentence_bigrams])
 
 		return features_list
+
+
+
+
+	""" Performs the training process depending on the specified classifier """
+	def __performTraining(self, classifier, pos_features, neg_features):
+
+		# Trains the Linear SVC classifier
+		if classifier.lower() == "linear-svc":
+
+			# Obtaining the feature testing set
+			pos_cut = round(len(pos_features) * 3 / 4)
+			neg_cut = round(len(neg_features) * 3 / 4)
+			train_features = pos_features[:pos_cut] + neg_features[:neg_cut]
+			test_features = pos_features[pos_cut:] + neg_features[neg_cut:]
+
+			self.MODEL = SklearnClassifier(LinearSVC()).train(train_features)
+
+			print("Linear SVC training process completed")
+			print("Accuracy:", round(util.accuracy(self.MODEL, test_features), 4), "\n")
+
+
+		# Trains the Max Entropy classifier
+		elif classifier.lower() == "max-entropy":
+
+			train_features = pos_features[:] + neg_features[:]
+			self.MODEL = MaxentClassifier.train(train_features, trace = 0, min_lldelta = 0.005)
+
+			print("Max Entropy training process completed")
+			print("Accuracy:", round(util.accuracy(self.MODEL, train_features), 4), "\n")
+
+
+		# Trains the Naive Bayes classifier
+		elif classifier.lower() == "naive-bayes":
+
+			# Obtaining the feature testing set
+			pos_cut = round(len(pos_features) * 3 / 4)
+			neg_cut = round(len(neg_features) * 3 / 4)
+			train_features = pos_features[:pos_cut] + neg_features[:neg_cut]
+			test_features = pos_features[pos_cut:] + neg_features[neg_cut:]
+
+			self.MODEL = NaiveBayesClassifier.train(train_features)
+
+			print("Naive Bayes training process completed")
+			print("Accuracy:", round(util.accuracy(self.MODEL, test_features), 4), "\n")
+
+
+		# In case another option is specified: error
+		else:
+			print("ERROR: Invalid classifier")
+			exit()
 
 
 
@@ -120,11 +175,9 @@ class Classifier(object):
 		pos_words, pos_bigrams = self.__getWordsAndBigrams(positive_file)
 		neg_words, neg_bigrams = self.__getWordsAndBigrams(negative_file)
 
-		# Make all lists iterable
+		# Make word lists iterable
 		pos_words = list(itertools.chain(*pos_words))
 		neg_words = list(itertools.chain(*neg_words))
-		pos_bigrams = list(itertools.chain(*pos_bigrams))
-		neg_bigrams = list(itertools.chain(*neg_bigrams))
 
 
 		# Obtain best words taking into account the gain of information
@@ -156,35 +209,8 @@ class Classifier(object):
 		neg_sentences.close()
 
 
-		# Trains the Max Entropy Classifier
-		if classifier.lower() == "max-entropy":
-
-			train_features = pos_features[:] + neg_features[:]
-			self.MODEL = MaxentClassifier.train(train_features, trace = 0, min_lldelta = 0.005)
-
-			print("Training instances:", len(train_features), ". Testing instances:", len(train_features))
-			print("Accuracy:", round(util.accuracy(self.MODEL, train_features), 4), "\n")
-
-
-		# Trains the Naive Bayes Classifier
-		elif classifier.lower() == "naive-bayes":
-
-			# Obtaining the feature testing set
-			pos_cut = round(len(pos_features) * 3/4)
-			neg_cut = round(len(neg_features) * 3/4)
-			train_features = pos_features[:pos_cut] + neg_features[:neg_cut]
-			test_features = pos_features[pos_cut:] + neg_features[neg_cut:]
-
-			self.MODEL = NaiveBayesClassifier.train(train_features)
-
-			print("Training instances:", len(train_features), ". Testing instances:", len(test_features))
-			print("Accuracy:", round(util.accuracy(self.MODEL, test_features), 4), "\n")
-
-
-		# In case another option is specified: error
-		else:
-			print("ERROR: Invalid classifier. Possible options: 'max-entropy' / 'naive-bayes'")
-			exit()
+		# Trains using the specified classifier
+		self.__performTraining(classifier, pos_features, neg_features)
 
 
 
@@ -222,14 +248,22 @@ class Classifier(object):
 	def classify(self, sentences):
 
 		if self.MODEL is not None:
-			probabilities = []
+			classifications = []
 
 			for sentence in sentences:
 				features_list = self.__getFeatures(sentence)
-				percentages = self.MODEL.prob_classify(features_list)
-				probabilities.append({"Positive": percentages.prob('pos'), "Negative": percentages.prob('neg')})
 
-			return probabilities
+				# If the classifier support probabilities
+				try:
+					result = self.MODEL.prob_classify(features_list)
+					classifications.append({'Positive': result.prob('pos'), 'Negative': result.prob('neg')})
+
+				# If the classifier does not support probabilities
+				except AttributeError:
+					result = self.MODEL.classify(features_list)
+					classifications.append(result)
+
+			return classifications
 
 		else:
 			print("ERROR: The classifier needs to be trained first")
