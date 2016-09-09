@@ -2,11 +2,13 @@
 
 import Utilities, os, sys
 from Classifier import Classifier
-from DataMiner import DataMiner
+from RestMiner import RestMiner
+from StreamMiner import TwitterListener
+from tweepy import Stream
 
 
 # Objects creation
-miner = DataMiner()
+miner = RestMiner()
 classifier = Classifier()
 
 # Folder paths
@@ -83,9 +85,22 @@ elif (sys.argv[1].lower() == "search") and (len(sys.argv) == 6):
 
 
 
+################## STREAM TEST ##################
+# Arguments: "Stream" <Stream query> <Language>
+
+elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 4):
+
+    userAuth = TwitterListener.init()
+    twitterStream = Stream(userAuth, TwitterListener())
+    twitterStream.filter(track = [sys.argv[2]], languages = [sys.argv[3]])
+
+
+
+
 # In case none of the possible options is selected: error
 else:
-    print("ERROR: Invalid arguments. There are 3 possible options:")
+    print("ERROR: Invalid arguments. Possible options:")
     print("Mode 1 arguments: 'Train' <Classifier> <Positive file> <Negative file>")
     print("Mode 2 arguments: 'Classify' <Classifier model> <Twitter account> <Word>")
     print("Mode 3 arguments: 'Search' <Search query> <Language> <Search depth> <Storing file>")
+    print("Mode 4 arguments: 'Stream' <Stream query> <Language>")

@@ -9,6 +9,19 @@ from nltk.metrics import BigramAssocMeasures as BAM
 confidence_threshold = 0.10
 
 
+################ FILTERS ################
+emoji_filter  = re.compile(u'['
+                             u'\U00002600-\U000027B0'
+                             u'\U0001F300-\U0001F64F'
+                             u'\U0001F680-\U0001F6FF'
+                             u'\U0001F910-\U0001F919]+',
+                             re.UNICODE)
+
+spaces_filter = re.compile('\s+')
+
+user_filter = re.compile('(^|\s+)@\w+')
+
+
 
 
 """ Give score to every element taking into account the gain of information """
@@ -49,7 +62,19 @@ def getScores(pos_elements, neg_elements):
 def getBestElements(scores, number):
 	best_values = sorted(scores.items(), key = lambda element: element[1], reverse = True)[:number]
 	best_elements = set([w for w, s in best_values])
+
 	return best_elements
+
+
+
+
+""" Returns the tweet text as a common sentence after applying some filters """
+def getCleanTweet(tweet):
+	tweet = tweet.replace("#", "")
+	tweet = emoji_filter.sub("", tweet)
+	tweet = spaces_filter.sub(" ", tweet)
+
+	return tweet
 
 
 
@@ -60,7 +85,7 @@ def getSentences(tweets, word = None):
 	sentences = []
 
 	# If there is a list of tweets as input
-	if type(tweets) is list:
+	if isinstance(tweets, list):
 		for tweet in tweets:
 
 			# Recursive call to obtain the sentences of each individual tweet
@@ -150,23 +175,32 @@ def getPolarity(classifications):
 
 
 
-""" Appends the specified tweets into the specified text file """
+""" Appends the specified tweets at the end of a text file """
 def storeTweets(tweets, file_name, min_length = 30):
 
-	file = open(file_name, 'a', encoding = "UTF8")
-	skipped = 0
+	# If there is a list of tweets as input
+	if isinstance(tweets, list):
+		for tweet in tweets:
+			storeTweets(tweet, file_name)
 
-	for tweet in tweets:
+		print("Tweets stored into '", file_name, "'")
+
+	# Base case: individual tweet
+	elif isinstance(tweets, str):
+		file = open(file_name, 'a', encoding = "UTF8")
 
 		# Subtracting user names before storing
-		tweet = re.sub("(^|\s+)@\w+", " USER", tweet)
+		tweets = user_filter.sub(" USER", tweets)
+		tweets = tweets.strip()
 
 		# Store the tweet only if it has enough length
-		if len(tweet) >= min_length:
-			file.write(tweet)
+		if len(tweets) >= min_length:
+			file.write(tweets)
 			file.write("\n")
-		else:
-			skipped += 1
 
-	file.close()
-	print(len(tweets) - skipped, "tweets has been stored into '", file_name, "'")
+		file.close()
+
+	# If what we are processing is neither a list nor a string: error
+	else:
+		print("ERROR: Invalid value in one of the text inputs")
+		exit()
