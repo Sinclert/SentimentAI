@@ -158,6 +158,9 @@ def storeTweets(tweets, file_name, min_length = 30):
 
 	for tweet in tweets:
 
+		# Subtracting user names before storing
+		tweet = re.sub("(^|\s+)@\w+", " USER", tweet)
+
 		# Store the tweet only if it has enough length
 		if len(tweet) >= min_length:
 			file.write(tweet)
