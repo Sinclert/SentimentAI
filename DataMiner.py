@@ -10,36 +10,69 @@ class DataMiner(object):
     # Attribute that stores the API connection object
     API = None
 
+    # Attribute containing the emoji filter
+    EMOJI_FILTER = re.compile(u'['
+                              u'\U00002600-\U000027B0'
+                              u'\U0001F300-\U0001F64F'
+                              u'\U0001F680-\U0001F6FF'
+                              u'\U0001F910-\U0001F919]+',
+                              re.UNICODE)
+
+    # Attribute containing the Twitter user filter
+    USER_FILTER = re.compile('(^|\s*)@\w+($|\s)')
+
+    # Attribute containing the spaces filter
+    SPACES_FILTER = re.compile('\s+')
+
+
+
 
     """ Establish Twitter API connection using keys and tokens """
     def __init__(self):
 
         # Obtaining keys and tokens from the Keys file
-        CONSUMER_KEY = keys['consumer_key']
-        CONSUMER_SECRET = keys['consumer_secret']
-        ACCESS_TOKEN = keys['access_token']
-        ACCESS_TOKEN_SECRET = keys['access_token_secret']
+        consumer_key = keys['consumer_key']
+        consumer_secret = keys['consumer_secret']
+        access_token = keys['access_token']
+        access_token_secret = keys['access_token_secret']
 
         # Authenticator manager creation and introduction of tokens
-        auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
-
-        ########### OAUTH TOKEN REQUEST PROCESS ###########
-        #
-        # auth_url = auth.get_authorization_url()
-        #
-        # print("Please visit this link and authorize the app:", auth_url)
-        # print("Enter your PIN code")
-        # verifier = input().strip()
-        #
-        # # Tokens should be store in a DB because they do not expire
-        # token = auth.get_access_token(verifier)
-        #
-        ########### OAUTH TOKEN REQUEST PROCESS ###########
-
-        auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+        auth.set_access_token(access_token, access_token_secret)
 
         # Creation and return of the API connection
         self.API = tweepy.API(auth)
+
+
+
+
+    """ Returns the tweet text as a common sentence after applying some filters """
+    def __getCleanTweet(self, tweet, word = None):
+
+        # If it is a retweet: the original text is obtained
+        if hasattr(tweet, "retweeted_status"):
+            tweet_text = tweet.retweeted_status.text
+        else:
+            tweet_text = tweet.text
+
+        # If the tweet does not contain the specified word: continue
+        if (word is not None) and (word.lower() not in tweet_text.lower()):
+            return None
+
+
+        # If there is any URL or image link in the text: it is removed
+        if (len(tweet.entities['urls']) != 0) or (('media' in tweet.entities) == True):
+            tweet_text = re.sub("http\S+", "", tweet_text)
+
+
+        # Cleaning the tweet
+        tweet_text = tweet_text.replace("#", "")
+        tweet_text = self.EMOJI_FILTER.sub("", tweet_text)
+        tweet_text = self.USER_FILTER.sub(" ", tweet_text)
+        tweet_text = self.SPACES_FILTER.sub(" ", tweet_text)
+        tweet_text = tweet_text.strip()
+
+        return tweet_text
 
 
 
@@ -84,29 +117,13 @@ class DataMiner(object):
         tweets_list = []
 
         try:
+
+            # Each tweet is processed and appended at the end of the list
             for tweet in tweepy.Cursor(self.API.user_timeline, id = user, count = 200).items(depth):
+                cleanTweet = self.__getCleanTweet(tweet, word)
 
-                # If it is a retweet: the original text is obtained
-                if hasattr(tweet, "retweeted_status"):
-                    tweet_text = tweet.retweeted_status.text
-                else:
-                    tweet_text = tweet.text
-
-
-                # If the tweet does not contain the specified word: continue
-                if (word is not None) and (word.lower() not in tweet_text.lower()):
-                    continue
-
-                # If there is any URL or image link in the text: it is removed
-                if (len(tweet.entities['urls']) != 0) or (('media' in tweet.entities) == True):
-                    tweet_text = re.sub("http\S+", "", tweet_text)
-                    tweet_text = tweet_text.strip()
-
-
-                # The final text is added at the end of the list
-                tweet_text = tweet_text.replace("\n", " ")
-                tweets_list.append(tweet_text)
-
+                if cleanTweet is not None:
+                    tweets_list.append(cleanTweet)
 
             # In case word is specified but there are not tweets with it
             if (word is not None) and (len(tweets_list) == 0):
@@ -134,24 +151,13 @@ class DataMiner(object):
         tweets_list = []
 
         try:
+
+            # Each tweet is processed and appended at the end of the list
             for tweet in tweepy.Cursor(self.API.search, query, lang = language, count = 100).items(depth):
+                cleanTweet = self.__getCleanTweet(tweet)
 
-                # If it is a retweet: the original text is obtained
-                if hasattr(tweet, "retweeted_status"):
-                    tweet_text = tweet.retweeted_status.text
-                else:
-                    tweet_text = tweet.text
-
-                # If there is any URL or image link in the text: it is removed
-                if (len(tweet.entities['urls']) != 0) or (('media' in tweet.entities) == True):
-                    tweet_text = re.sub("http\S+", "", tweet_text)
-                    tweet_text = tweet_text.strip()
-
-
-                # The final text is added at the end of the list
-                tweet_text = tweet_text.replace("\n", " ")
-                tweets_list.append(tweet_text)
-
+                if cleanTweet is not None:
+                    tweets_list.append(cleanTweet)
 
             # In case there are not enough tweets: print message
             if len(tweets_list) < depth:

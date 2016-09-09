@@ -16,7 +16,6 @@ models_folder = "./Models/"
 
 
 
-
 ################# TRAIN TEST #################
 # Arguments: "Train" <Classifier> <Positive file> <Negative file>
 
@@ -50,7 +49,6 @@ if (sys.argv[1].lower() == "train") and (len(sys.argv) == 5):
 
 
 
-
 ################# CLASSIFY TEST #################
 # Arguments: "Classify" <Classifier model> <Twitter account> <Word>
 
@@ -74,7 +72,6 @@ elif (sys.argv[1].lower() == "classify") and (len(sys.argv) == 5):
 
 
 
-
 ################## SEARCH TEST ##################
 # Arguments: "Search" <Search query> <Language> <Search depth> <Storing file>
 
@@ -82,7 +79,6 @@ elif (sys.argv[1].lower() == "search") and (len(sys.argv) == 6):
 
     tweets = miner.searchTweets(sys.argv[2], sys.argv[3], int(sys.argv[4]))
     Utilities.storeTweets(tweets, datasets_folder + sys.argv[5])
-
 
 
 

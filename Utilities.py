@@ -5,8 +5,10 @@ from nltk.probability import FreqDist, ConditionalFreqDist
 from nltk.metrics import BigramAssocMeasures as BAM
 
 
-# Indicates de percentage of tweets that are disregarded
+# Indicates tweets confidence percentage
 confidence_threshold = 0.10
+
+
 
 
 """ Give score to every element taking into account the gain of information """
@@ -149,15 +151,12 @@ def getPolarity(classifications):
 
 
 """ Appends the specified tweets into the specified text file """
-def storeTweets(tweets, file_name, min_length = 20):
+def storeTweets(tweets, file_name, min_length = 30):
 
 	file = open(file_name, 'a', encoding = "UTF8")
 	skipped = 0
 
 	for tweet in tweets:
-
-		# Subtracting user names
-		tweet = re.sub("(^|\s*)@\w+($|\s)", "", tweet)
 
 		# Store the tweet only if it has enough length
 		if len(tweet) >= min_length:
@@ -165,7 +164,6 @@ def storeTweets(tweets, file_name, min_length = 20):
 			file.write("\n")
 		else:
 			skipped += 1
-
 
 	file.close()
 	print(len(tweets) - skipped, "tweets has been stored into '", file_name, "'")

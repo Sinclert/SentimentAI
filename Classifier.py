@@ -11,12 +11,13 @@ from sklearn.svm import NuSVC
 """ Class in charge of classify sentences as positive or negative after being trained """
 class Classifier(object):
 
-
 	# Attribute that stores the trained model
 	MODEL = None
 
 	# Attribute that stores the tokenizer object
-	tokenizer = TweetTokenizer(False, True, True)
+	TOKENIZER = TweetTokenizer(False, True, True)
+
+
 
 
 	""" Stores every word and bigram of the specified file """
@@ -31,7 +32,7 @@ class Classifier(object):
 		for line in sentences_file:
 
 			# Storing all line words
-			sentence_words = self.tokenizer.tokenize(line)
+			sentence_words = self.TOKENIZER.tokenize(line)
 			words.append(sentence_words)
 
 			# Storing all line bigrams
@@ -51,7 +52,7 @@ class Classifier(object):
 	def __getFeatures(self, sentence, best_words = None, best_bigrams = None):
 
 		# Every line word is obtained
-		sentence_words = self.tokenizer.tokenize(sentence)
+		sentence_words = self.TOKENIZER.tokenize(sentence)
 
 		# Every line bigram is obtained
 		bigram_finder = BCF.from_words(sentence_words)
