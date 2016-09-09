@@ -19,7 +19,7 @@ class DataMiner(object):
                               re.UNICODE)
 
     # Attribute containing the Twitter user filter
-    USER_FILTER = re.compile('(^|\s*)@\w+($|\s)')
+    USER_FILTER = re.compile('(^|\s+)@\w+')
 
     # Attribute containing the spaces filter
     SPACES_FILTER = re.compile('\s+')
@@ -68,7 +68,7 @@ class DataMiner(object):
         # Cleaning the tweet
         tweet_text = tweet_text.replace("#", "")
         tweet_text = self.EMOJI_FILTER.sub("", tweet_text)
-        tweet_text = self.USER_FILTER.sub(" ", tweet_text)
+        tweet_text = self.USER_FILTER.sub(" USER", tweet_text)
         tweet_text = self.SPACES_FILTER.sub(" ", tweet_text)
         tweet_text = tweet_text.strip()
 
