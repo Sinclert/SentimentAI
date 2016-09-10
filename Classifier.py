@@ -128,6 +128,11 @@ class Classifier(object):
 	""" Train the Naive Bayes Classifier using the specified files """
 	def train(self, classifier, positive_file, negative_file, num_best_words = 100, num_best_bigrams = 1000):
 
+		# Checking if the training files exist
+		if (os.path.isfile(positive_file) is False) or (os.path.isfile(negative_file) is False):
+			print("ERROR: One of the training files does not exist inside 'Datasets' folder")
+			exit()
+
 		# Obtain every word and bigram in both files
 		pos_words, pos_bigrams = self.__getWordsAndBigrams(positive_file)
 		neg_words, neg_bigrams = self.__getWordsAndBigrams(negative_file)

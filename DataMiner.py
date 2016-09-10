@@ -6,7 +6,7 @@ from tweepy import AppAuthHandler, API, Cursor, RateLimitError, TweepError
 
 
 """ Class in charge of retrieving data from the Twitter API """
-class RestMiner(object):
+class DataMiner(object):
 
     # Attribute that stores the API connection object
     API = None

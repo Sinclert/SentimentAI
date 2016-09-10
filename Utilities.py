@@ -82,10 +82,10 @@ def getCleanTweet(tweet):
 """ Divides tweets into sentences and returns those containing the specified word """
 def getSentences(tweets, word = None):
 
-	sentences = []
-
 	# If there is a list of tweets as input
 	if isinstance(tweets, list):
+		sentences = []
+
 		for tweet in tweets:
 
 			# Recursive call to obtain the sentences of each individual tweet
@@ -204,3 +204,33 @@ def storeTweets(tweets, file_name, min_length = 30):
 	else:
 		print("ERROR: Invalid value in one of the text inputs")
 		exit()
+
+
+
+
+""" Writes the specified string into an specific line of the file """
+def storeStreamResults(string, file_name, total_lines, line):
+
+	# Creates the file if it can not be opened
+	try:
+		file = open(file_name, 'r', encoding = "UTF8")
+	except:
+		file = open(file_name, 'w+', encoding = "UTF8")
+
+	# Count the number of lines
+	lines = file.readlines()
+	file.close()
+
+
+	# If the file has not 'x' lines yet: append
+	if len(lines) < total_lines:
+		file = open(file_name, 'a+', encoding = "UTF8")
+		file.write(string)
+		file.close()
+
+	# If the file has already 'x' lines: overwrite
+	else:
+		file = open(file_name, 'w+', encoding = "UTF8")
+		lines[line] = string
+		file.writelines(lines)
+		file.close()

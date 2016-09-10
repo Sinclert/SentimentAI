@@ -2,13 +2,13 @@
 
 import Utilities, os, sys
 from Classifier import Classifier
-from RestMiner import RestMiner
-from StreamMiner import TwitterListener
+from DataMiner import DataMiner
+from StreamListener import TwitterListener
 from tweepy import Stream
 
 
 # Objects creation
-miner = RestMiner()
+miner = DataMiner()
 classifier = Classifier()
 
 # Folder paths
@@ -25,11 +25,6 @@ if (sys.argv[1].lower() == "train") and (len(sys.argv) == 5):
 
     pos_file_path = datasets_folder + sys.argv[3]
     neg_file_path = datasets_folder + sys.argv[4]
-
-    # Checking if the specified files exist
-    if (os.path.isfile(pos_file_path) is False) or (os.path.isfile(neg_file_path) is False):
-        print("ERROR: One of the training files does not exist inside 'Datasets' folder")
-        exit()
 
     # Divide execution depending on the specified classifier
     if sys.argv[2].lower() == "nu-svc":
@@ -56,11 +51,6 @@ if (sys.argv[1].lower() == "train") and (len(sys.argv) == 5):
 
 elif (sys.argv[1].lower() == "classify") and (len(sys.argv) == 5):
 
-    # Checking if the specified file exist
-    if os.path.isfile(models_folder + sys.argv[2] + ".pickle") is False:
-        print("ERROR: The specified classifier model has not been saved")
-        exit()
-
     # Mining process
     classifier.loadModel(models_folder + sys.argv[2] + ".pickle")
     tweets = miner.getUserTweets(sys.argv[3], sys.argv[4])
@@ -86,13 +76,21 @@ elif (sys.argv[1].lower() == "search") and (len(sys.argv) == 6):
 
 
 ################## STREAM TEST ##################
-# Arguments: "Stream" <Stream query> <Language>
+# Arguments: "Stream" <Classifier> <Stream query> <Language> <Output file>
 
-elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 4):
+elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 6):
 
-    userAuth = TwitterListener.init()
-    twitterStream = Stream(userAuth, TwitterListener())
-    twitterStream.filter(track = [sys.argv[2]], languages = [sys.argv[3]])
+    # Creates the stream and authenticator objects
+    stream = TwitterListener()
+    userAuth = stream.getConnection()
+
+    # Set stream classifier and output file
+    classifier.loadModel(models_folder + sys.argv[2] + ".pickle")
+    stream.init(classifier, sys.argv[5])
+
+    # Initiate the stream and apply filters
+    twitterStream = Stream(userAuth, stream)
+    twitterStream.filter(track = [sys.argv[3]], languages = [sys.argv[4]])
 
 
 
@@ -103,4 +101,4 @@ else:
     print("Mode 1 arguments: 'Train' <Classifier> <Positive file> <Negative file>")
     print("Mode 2 arguments: 'Classify' <Classifier model> <Twitter account> <Word>")
     print("Mode 3 arguments: 'Search' <Search query> <Language> <Search depth> <Storing file>")
-    print("Mode 4 arguments: 'Stream' <Stream query> <Language>")
+    print("Mode 4 arguments: 'Stream' <Classifier> <Stream query> <Language> <Output file>")
