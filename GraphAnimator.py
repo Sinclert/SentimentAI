@@ -14,10 +14,10 @@ pie_colors = ["green", "yellowgreen", "orange", "red"]
 
 
 """ Main method to animate live pie charts """
-def animatePieChart(i):
+def animatePieChart(i, file):
 
     try:
-        data = open("Twitter-out.txt", "r").read()
+        data = open(file, "r").read()
     except FileNotFoundError:
         return
 

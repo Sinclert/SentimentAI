@@ -97,7 +97,7 @@ elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 6):
         from matplotlib import pyplot, animation
         from GraphAnimator import animatePieChart, graph
 
-        ani = animation.FuncAnimation(graph, animatePieChart, interval = 1000)
+        ani = animation.FuncAnimation(graph, animatePieChart, interval = 1000, fargs = (sys.argv[5],))
         pyplot.show()
 
         # Finally: kill child process
