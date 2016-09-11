@@ -79,13 +79,9 @@ class TwitterListener(StreamListener):
             # If it has enough length: write it
             if len(tweet_text) >= 30:
                 result = self.CLASSIFIER.classify([tweet_text])
+                string = str(result[0]['Positive']) + "\n"
 
-                if result[0]['Positive'] >= result[0]['Negative']:
-                    string = "Positive " + str(result[0]['Positive']) + "\n"
-                else:
-                    string = "Negative " + str(result[0]['Negative']) + "\n"
-
-                Utilities.storeStreamResults(string, self.OUTPUT, self.TOTAL_LINES, self.LINE_COUNTER)
+                Utilities.storeStream(string, self.OUTPUT, self.TOTAL_LINES, self.LINE_COUNTER)
                 self.LINE_COUNTER += 1
 
                 # Restart line counter
@@ -93,8 +89,9 @@ class TwitterListener(StreamListener):
                     self.LINE_COUNTER = 0
 
 
+        # In case of tweet limit warning: pass
         except KeyError:
-            print("One of the tweet texts can not be obtained")
+            pass
 
 
 

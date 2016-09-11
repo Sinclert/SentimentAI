@@ -88,9 +88,21 @@ elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 6):
     classifier.loadModel(models_folder + sys.argv[2] + ".pickle")
     stream.init(classifier, sys.argv[5])
 
-    # Initiate the stream and apply filters
-    twitterStream = Stream(userAuth, stream)
-    twitterStream.filter(track = [sys.argv[3]], languages = [sys.argv[4]])
+    # Creating a new process
+    pid = os.fork()
+
+    # Main process: Graphical User Interface
+    if pid:
+        from matplotlib import pyplot, animation
+        from GraphAnimator import animatePieChart, graph
+
+        ani = animation.FuncAnimation(graph, animatePieChart, interval = 1000)
+        pyplot.show()
+
+    # Auxiliary process: update stream results
+    else:
+        twitterStream = Stream(userAuth, stream)
+        twitterStream.filter(track = [sys.argv[3]], languages = [sys.argv[4]])
 
 
 

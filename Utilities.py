@@ -209,7 +209,7 @@ def storeTweets(tweets, file_name, min_length = 30):
 
 
 """ Writes the specified string into an specific line of the file """
-def storeStreamResults(string, file_name, total_lines, line):
+def storeStream(string, file_name, total_lines, line):
 
 	# Creates the file if it can not be opened
 	try:
