@@ -1,6 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com) on 14/08/2016
 
-import Utilities, os, sys
+import Utilities, os, sys, signal
 from Classifier import Classifier
 from DataMiner import DataMiner
 from StreamListener import TwitterListener
@@ -91,7 +91,8 @@ elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 6):
     # Creating a new process
     pid = os.fork()
 
-    # Main process: Graphical User Interface
+
+    # Parent process: Graphical User Interface
     if pid:
         from matplotlib import pyplot, animation
         from GraphAnimator import animatePieChart, graph
@@ -99,7 +100,14 @@ elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 6):
         ani = animation.FuncAnimation(graph, animatePieChart, interval = 1000)
         pyplot.show()
 
-    # Auxiliary process: update stream results
+        # Finally: kill child process
+        try:
+            os.kill(pid, signal.SIGTERM)
+        except ProcessLookupError:
+            pass
+
+
+    # Child process: update stream results
     else:
         twitterStream = Stream(userAuth, stream)
         twitterStream.filter(track = [sys.argv[3]], languages = [sys.argv[4]])

@@ -218,7 +218,9 @@ class Classifier(object):
 				# If the classifier support probabilities
 				try:
 					result = self.MODEL.prob_classify(features_list)
-					classifications.append({'Positive': result.prob('pos'), 'Negative': result.prob('neg')})
+					pos_prob = round(result.prob('pos'), 4)
+					neg_prob = round(result.prob('neg'), 4)
+					classifications.append({'Positive': pos_prob, 'Negative': neg_prob})
 
 				# If the classifier does not support probabilities
 				except AttributeError:
