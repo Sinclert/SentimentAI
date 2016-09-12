@@ -1,18 +1,17 @@
-# Created by Sinclert Perez (Sinclert@hotmail.com) on 14/08/2016
+# Created by Sinclert Perez (Sinclert@hotmail.com)
 
 import Utilities, json, re
-from tweepy import OAuthHandler, StreamListener
+from tweepy import OAuthHandler, StreamListener, Stream
 from Keys import keys
 
 
 """ Class in charge of retrieving live data from the Twitter Streaming API """
 class TwitterListener(StreamListener):
 
-    # Attribute to stores the stream classifier
+    # Attributes to stores stream classifier, output-file and connection
     CLASSIFIER = None
-
-    # Attribute to store the output file name
     OUTPUT = None
+    AUTH = None
 
     # Attribute to store the number of results stored in the output file
     TOTAL_LINES = 200
@@ -24,8 +23,7 @@ class TwitterListener(StreamListener):
 
 
     """ Establish Twitter API connection using user authentication """
-    @staticmethod
-    def getConnection():
+    def setConnection(self):
 
         # Obtaining application keys from the Keys file
         consumer_key = keys['consumer_key']
@@ -38,15 +36,19 @@ class TwitterListener(StreamListener):
         auth.set_access_token(access_token, access_token_secret)
 
         # Tweepy API connection creation
-        return auth
+        self.AUTH = auth
 
 
 
 
     """ Set the listener classifier and output file """
-    def init(self, classifier, output_file):
+    def init(self, classifier, query, languages, output_file):
         self.CLASSIFIER = classifier
         self.OUTPUT = output_file
+        self.setConnection()
+
+        twitterStream = Stream(self.AUTH, self)
+        twitterStream.filter(track = query, languages = languages)
 
 
 

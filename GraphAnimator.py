@@ -1,16 +1,14 @@
-# Created by Sinclert Perez (Sinclert@hotmail.com) on 14/08/2016
+# Created by Sinclert Perez (Sinclert@hotmail.com)
 
 from matplotlib import pyplot, style
 
 
 # Global variables
 style.use("ggplot")
-graph = pyplot.figure()
+figure = pyplot.figure()
 
 pie_labels = ["Very positive", "Positive", "Negative", "Very negative"]
 pie_colors = ["green", "yellowgreen", "orange", "red"]
-
-
 
 
 """ Main method to animate live pie charts """
@@ -44,5 +42,8 @@ def animatePieChart(i, file):
             elif number <= 0.2:
                 vneg_counter += 1
 
-    graph.clear()
-    pyplot.pie([vpos_counter, pos_counter, neg_counter, vneg_counter], labels = pie_labels, colors = pie_colors)
+
+    # Avoid empty pie chart when write is performed
+    if (vpos_counter + pos_counter + neg_counter + vneg_counter) != 0:
+        figure.clear()
+        pyplot.pie([vpos_counter, pos_counter, neg_counter, vneg_counter], labels = pie_labels, colors = pie_colors)

@@ -1,4 +1,4 @@
-# Created by Sinclert Perez (Sinclert@hotmail.com) on 14/08/2016
+# Created by Sinclert Perez (Sinclert@hotmail.com)
 
 import Utilities, re
 from Keys import keys

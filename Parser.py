@@ -1,10 +1,10 @@
-# Created by Sinclert Perez (Sinclert@hotmail.com) on 14/08/2016
+# Created by Sinclert Perez (Sinclert@hotmail.com)
 
-import Utilities, os, sys, signal
+import Utilities, sys
 from Classifier import Classifier
 from DataMiner import DataMiner
 from StreamListener import TwitterListener
-from tweepy import Stream
+from multiprocessing import Process
 
 
 # Objects creation
@@ -80,37 +80,25 @@ elif (sys.argv[1].lower() == "search") and (len(sys.argv) == 6):
 
 elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 6):
 
-    # Creates the stream and authenticator objects
-    stream = TwitterListener()
-    userAuth = stream.getConnection()
+    from matplotlib import pyplot, animation
+    from GraphAnimator import animatePieChart, figure
 
-    # Set stream classifier and output file
+    # Load a trained classifier
     classifier.loadModel(models_folder + sys.argv[2] + ".pickle")
-    stream.init(classifier, sys.argv[5])
 
-    # Creating a new process
-    pid = os.fork()
-
-
-    # Parent process: Graphical User Interface
-    if pid:
-        from matplotlib import pyplot, animation
-        from GraphAnimator import animatePieChart, graph
-
-        ani = animation.FuncAnimation(graph, animatePieChart, interval = 1000, fargs = (sys.argv[5],))
-        pyplot.show()
-
-        # Finally: kill child process
-        try:
-            os.kill(pid, signal.SIGTERM)
-        except ProcessLookupError:
-            pass
+    # Creates the stream object and start stream
+    stream = TwitterListener()
+    streamProcess = Process(target = stream.init, args = (classifier, [sys.argv[3]], [sys.argv[4]], sys.argv[5]))
+    streamProcess.start()
 
 
-    # Child process: update stream results
-    else:
-        twitterStream = Stream(userAuth, stream)
-        twitterStream.filter(track = [sys.argv[3]], languages = [sys.argv[4]])
+    # Animate the graph each milliseconds interval
+    ani = animation.FuncAnimation(figure, animatePieChart, interval = 1000, fargs = (sys.argv[5],))
+    pyplot.show()
+
+    # Finally: kill stream process
+    if streamProcess is not None:
+        streamProcess.terminate()
 
 
 
