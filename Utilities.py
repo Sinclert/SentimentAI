@@ -139,7 +139,7 @@ def getPolarity(classifications):
 				differences.sort(key = lambda element: element[1], reverse = True)
 				pos_average *= len(classifications)
 
-				for i in range(0, outliers):
+				for i in range(outliers):
 					pos_average -= differences[i][0]
 
 				pos_average /= (len(classifications) - outliers)

@@ -8,14 +8,14 @@ style.use("ggplot")
 figure = pyplot.figure()
 
 pie_labels = ["Very positive", "Positive", "Negative", "Very negative"]
-pie_colors = ["green", "yellowgreen", "orange", "red"]
+pie_colors = ["green", "yellowgreen", "orange", "orangered"]
 
 
 """ Main method to animate live pie charts """
 def animatePieChart(i, file):
 
     try:
-        data = open(file, "r").read()
+        data = open(file, 'r').read()
     except FileNotFoundError:
         return
 

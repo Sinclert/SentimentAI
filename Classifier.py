@@ -1,6 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-import Utilities, os, itertools, pickle
+import Utilities, os, math, itertools, pickle
 from nltk.tokenize import TweetTokenizer
 from nltk.classify import MaxentClassifier, NaiveBayesClassifier, SklearnClassifier, util
 from nltk.metrics import BigramAssocMeasures as BAM
@@ -75,51 +75,76 @@ class Classifier(object):
 
 
 	""" Performs the training process depending on the specified classifier """
-	def __performTraining(self, classifier, pos_features, neg_features):
+	def __performTraining(self, classifier_name, pos_features, neg_features):
 
-		# Trains the Linear SVC classifier
-		if classifier.lower() == "nu-svc":
-
-			# Obtaining the feature testing set
-			pos_cut = round(len(pos_features) * 3 / 4)
-			neg_cut = round(len(neg_features) * 3 / 4)
-			train_features = pos_features[:pos_cut] + neg_features[:neg_cut]
-			test_features = pos_features[pos_cut:] + neg_features[neg_cut:]
-
-			self.MODEL = SklearnClassifier(NuSVC()).train(train_features)
-
-			print("Linear SVC training process completed")
-			print("Accuracy:", round(util.accuracy(self.MODEL, test_features), 4), "\n")
-
+		train_features = pos_features[:] + neg_features[:]
 
 		# Trains the Max Entropy classifier
-		elif classifier.lower() == "max-entropy":
+		if classifier_name.lower() == "max-entropy":
 
-			train_features = pos_features[:] + neg_features[:]
 			self.MODEL = MaxentClassifier.train(train_features, trace = 0, min_lldelta = 0.005)
 
 			print("Max Entropy training process completed")
+			print("Calculating accuracy...")
 			print("Accuracy:", round(util.accuracy(self.MODEL, train_features), 4), "\n")
 
 
 		# Trains the Naive Bayes classifier
-		elif classifier.lower() == "naive-bayes":
+		elif classifier_name.lower() == "naive-bayes":
 
-			# Obtaining the feature testing set
-			pos_cut = round(len(pos_features) * 3 / 4)
-			neg_cut = round(len(neg_features) * 3 / 4)
-			train_features = pos_features[:pos_cut] + neg_features[:neg_cut]
-			test_features = pos_features[pos_cut:] + neg_features[neg_cut:]
-
-			self.MODEL = NaiveBayesClassifier.train(train_features)
+			classifier = NaiveBayesClassifier
+			self.MODEL = classifier.train(train_features)
 
 			print("Naive Bayes training process completed")
-			print("Accuracy:", round(util.accuracy(self.MODEL, test_features), 4), "\n")
+			print("Calculating accuracy...")
+			print("Accuracy:", self.__crossValidation(classifier, pos_features, neg_features), "\n")
+
+
+		# Trains the Nu SVC classifier
+		elif classifier_name.lower() == "nu-svc":
+
+			classifier = SklearnClassifier(NuSVC())
+			self.MODEL = classifier.train(train_features)
+
+			print("Nu SVC training process completed")
+			print("Calculating accuracy...")
+			print("Accuracy:", self.__crossValidation(classifier, pos_features, neg_features), "\n")
 
 
 		# In case another option is specified: error
 		else:
 			print("ERROR: Invalid classifier")
+			exit()
+
+
+
+
+	""" Test the specified classifier applying cross validation """
+	@staticmethod
+	def __crossValidation(classifier, pos_features, neg_features, folds = 10):
+
+		if folds > 1:
+
+			# Calculating cut offs in both features lists
+			pos_cutoff = math.ceil(len(pos_features) / folds)
+			neg_cutoff = math.ceil(len(neg_features) / folds)
+
+			mean_accuracy = 0
+
+			# Calculating each fold accuracy
+			for i in range(folds):
+				test_features = pos_features[((folds - i - 1) * pos_cutoff):((folds - i) * pos_cutoff)] + \
+								neg_features[((folds - i - 1) * neg_cutoff):((folds - i) * neg_cutoff)]
+
+				train_features = [feature for feature in (pos_features + neg_features) if feature not in test_features]
+
+				model = classifier.train(train_features)
+				mean_accuracy += util.accuracy(model, test_features)
+
+			return round((mean_accuracy / folds), 4)
+
+		else:
+			print("ERROR: The number of cross validation folds must be greater than 1")
 			exit()
 
 
