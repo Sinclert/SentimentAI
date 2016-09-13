@@ -81,7 +81,7 @@ class DataMiner(object):
                     tweet_text = tweet.text
 
                 # If the tweet does not contain the specified word: continue
-                if (word is not None) and (word.lower() not in tweet.lower()):
+                if (word is not None) and (word.lower() not in tweet_text.lower()):
                     continue
 
 

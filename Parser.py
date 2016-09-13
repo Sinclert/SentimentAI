@@ -28,11 +28,11 @@ if (sys.argv[1].lower() == "train") and (len(sys.argv) == 5):
 
     # Divide execution depending on the specified classifier
     if sys.argv[2].lower() == "max-entropy":
-        classifier.train("max-entropy", pos_file_path, neg_file_path, 1000, 20000)
+        classifier.train("max-entropy", pos_file_path, neg_file_path, 1000, 10000)
         classifier.saveModel(models_folder + "Max-Entropy.pickle")
 
     elif sys.argv[2].lower() == "naive-bayes":
-        classifier.train("naive-bayes", pos_file_path, neg_file_path, 1000, 50000)
+        classifier.train("naive-bayes", pos_file_path, neg_file_path, 1000, 10000)
         classifier.saveModel(models_folder + "Naive-Bayes.pickle")
 
     elif sys.argv[2].lower() == "nu-svc":
@@ -83,9 +83,12 @@ elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 6):
     # Load a trained classifier
     classifier.loadModel(models_folder + sys.argv[2] + ".pickle")
 
+    tracks = sys.argv[3].split(',')
+    languages = sys.argv[4].split(',')
+
     # Creates the stream object and start stream
     stream = TwitterListener()
-    streamProcess = Process(target = stream.init, args = (classifier, [sys.argv[3]], [sys.argv[4]], sys.argv[5]))
+    streamProcess = Process(target = stream.init, args = (classifier, tracks, languages, sys.argv[5]))
     streamProcess.start()
 
     from matplotlib import pyplot, animation
