@@ -7,8 +7,8 @@ from matplotlib import pyplot, style
 style.use("ggplot")
 figure = pyplot.figure()
 
-pie_labels = ["Very positive", "Positive", "Negative", "Very negative"]
-pie_colors = ["green", "yellowgreen", "orange", "orangered"]
+pie_labels = ["Positive", "Negative"]
+pie_colors = ["green", "orangered"]
 
 
 """ Main method to animate live pie charts """
@@ -22,10 +22,8 @@ def animatePieChart(i, file):
     lines = data.split('\n')
 
     # Labels counters
-    vpos_counter = 0
     pos_counter = 0
     neg_counter = 0
-    vneg_counter = 0
 
     for line in lines:
 
@@ -33,17 +31,14 @@ def animatePieChart(i, file):
         if len(line) > 0:
             number = float(line)
 
-            if number >= 0.8:
-                vpos_counter += 1
-            elif (number > 0.5) and (number < 0.8):
+            # Tweets between 0.45 and 0.55 are not considered
+            if number > 0.55:
                 pos_counter += 1
-            elif (number > 0.2) and (number < 0.5):
+            elif number < 0.45:
                 neg_counter += 1
-            elif number <= 0.2:
-                vneg_counter += 1
 
 
     # Avoid empty pie chart when write is performed
-    if (vpos_counter + pos_counter + neg_counter + vneg_counter) != 0:
+    if (pos_counter + neg_counter) != 0:
         figure.clear()
-        pyplot.pie([vpos_counter, pos_counter, neg_counter, vneg_counter], labels = pie_labels, colors = pie_colors)
+        pyplot.pie([pos_counter, neg_counter], labels = pie_labels, colors = pie_colors)
