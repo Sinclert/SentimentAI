@@ -2,6 +2,7 @@
 
 import Utilities, os, math, itertools, pickle
 from nltk.tokenize import TweetTokenizer
+from nltk.stem import SnowballStemmer
 from nltk.classify import MaxentClassifier, NaiveBayesClassifier, SklearnClassifier, util
 from nltk.metrics import BigramAssocMeasures as BAM
 from nltk.collocations import BigramCollocationFinder as BCF
@@ -17,6 +18,9 @@ class Classifier(object):
 	# Attribute that stores the tokenizer object
 	TOKENIZER = TweetTokenizer(False, True, True)
 
+	# Attribute that stores the lemmatizer object
+	LEMMATIZER = SnowballStemmer('english')
+
 
 
 
@@ -31,8 +35,9 @@ class Classifier(object):
 		# Each line is tokenize and its words and bigrams are stored in a list
 		for line in sentences_file:
 
-			# Storing all line words
+			# Storing all line words after extracting the root
 			sentence_words = self.TOKENIZER.tokenize(line)
+			sentence_words = [self.LEMMATIZER.stem(word) for word in sentence_words]
 			words.append(sentence_words)
 
 			# Storing all line bigrams
@@ -51,8 +56,9 @@ class Classifier(object):
 	""" Transform a sentence into a features list to train / classify """
 	def __getFeatures(self, sentence, best_words = None, best_bigrams = None):
 
-		# Every line word is obtained
+		# Every line word root is obtained
 		sentence_words = self.TOKENIZER.tokenize(sentence)
+		sentence_words = [self.LEMMATIZER.stem(word) for word in sentence_words]
 
 		# Every line bigram is obtained
 		bigram_finder = BCF.from_words(sentence_words)
