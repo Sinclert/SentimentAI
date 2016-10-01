@@ -76,19 +76,26 @@ elif (sys.argv[1].lower() == "search") and (len(sys.argv) == 6):
 
 
 ################## STREAM TEST ##################
-# Arguments: "Stream" <Classifier> <Stream query> <Language> <Output file>
+# Arguments: "Stream" <Classifier> <Stream query> <Language> <Output file> <Coordinates>
 
-elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 6):
+elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 7):
 
     # Load a trained classifier
     classifier.loadModel(models_folder + sys.argv[2] + ".pickle")
 
     tracks = sys.argv[3].split(',')
     languages = sys.argv[4].split(',')
+    coordinates = sys.argv[6].split(',')
+
+    if len(coordinates) % 4 != 0:
+        print("ERROR: The number of coordinates must be a multiple of 4")
+        exit()
+
+    coordinates = [float(coord) for coord in coordinates]
 
     # Creates the stream object and start stream
     stream = TwitterListener()
-    streamProcess = Process(target = stream.init, args = (classifier, tracks, languages, sys.argv[5]))
+    streamProcess = Process(target = stream.init, args = (classifier, tracks, languages, sys.argv[5], coordinates))
     streamProcess.start()
 
     from matplotlib import pyplot, animation
@@ -111,4 +118,4 @@ else:
     print("Mode 1 arguments: 'Train' <Classifier> <Positive file> <Negative file>")
     print("Mode 2 arguments: 'Classify' <Classifier model> <Twitter account> <Word>")
     print("Mode 3 arguments: 'Search' <Search query> <Language> <Search depth> <Storing file>")
-    print("Mode 4 arguments: 'Stream' <Classifier> <Stream query> <Language> <Output file>")
+    print("Mode 4 arguments: 'Stream' <Classifier> <Stream query> <Language> <Output file> <Coordinates>")

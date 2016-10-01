@@ -42,13 +42,13 @@ class TwitterListener(StreamListener):
 
 
     """ Set the listener classifier and output file """
-    def init(self, classifier, query, languages, output_file):
+    def init(self, classifier, query, languages, output_file, coordinates):
         self.CLASSIFIER = classifier
         self.OUTPUT = output_file
         self.setConnection()
 
         twitterStream = Stream(self.AUTH, self)
-        twitterStream.filter(track = query, languages = languages)
+        twitterStream.filter(track = query, languages = languages, locations = coordinates)
 
 
 

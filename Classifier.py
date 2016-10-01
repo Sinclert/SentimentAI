@@ -132,8 +132,8 @@ class Classifier(object):
 		if folds > 1:
 
 			# Calculating cut offs in both features lists
-			pos_cutoff = math.ceil(len(pos_features) / folds)
-			neg_cutoff = math.ceil(len(neg_features) / folds)
+			pos_cutoff = math.floor(len(pos_features) / folds)
+			neg_cutoff = math.floor(len(neg_features) / folds)
 
 			mean_accuracy = 0
 
