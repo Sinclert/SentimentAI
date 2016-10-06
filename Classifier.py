@@ -1,6 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-import Utilities, os, math, itertools, pickle
+import Utilities, math, itertools, pickle
 from nltk.tokenize import TweetTokenizer
 from nltk.stem import SnowballStemmer
 from nltk.classify import MaxentClassifier, NaiveBayesClassifier, SklearnClassifier, util
@@ -30,25 +30,31 @@ class Classifier(object):
 		words = []
 		bigrams = []
 
-		sentences_file = open(file, 'r', encoding = "UTF8")
+		try:
+			sentences_file = open(file, 'r', encoding = "UTF8")
 
-		# Each line is tokenize and its words and bigrams are stored in a list
-		for line in sentences_file:
+			# Each line is tokenize and its words and bigrams are stored in a list
+			for line in sentences_file:
 
-			# Storing all line words after extracting the root
-			sentence_words = self.TOKENIZER.tokenize(line)
-			sentence_words = [self.LEMMATIZER.stem(word) for word in sentence_words]
-			words.append(sentence_words)
+				# Storing all line words after extracting the root
+				sentence_words = self.TOKENIZER.tokenize(line)
+				sentence_words = [self.LEMMATIZER.stem(word) for word in sentence_words]
+				words.append(sentence_words)
 
-			# Storing all line bigrams
-			bigram_finder = BCF.from_words(sentence_words)
-			sentence_bigrams = bigram_finder.nbest(BAM.pmi, None)
+				# Storing all line bigrams
+				bigram_finder = BCF.from_words(sentence_words)
+				sentence_bigrams = bigram_finder.nbest(BAM.pmi, None)
 
-			for bigram in sentence_bigrams:
-				bigrams.append(bigram[0] + " " + bigram[1])
+				for bigram in sentence_bigrams:
+					bigrams.append(bigram[0] + " " + bigram[1])
 
-		sentences_file.close()
-		return words, bigrams
+			sentences_file.close()
+			return words, bigrams
+
+
+		except FileNotFoundError or PermissionError or IsADirectoryError:
+			print("ERROR: The file '", file, "' cannot be opened")
+			exit()
 
 
 
@@ -159,11 +165,6 @@ class Classifier(object):
 	""" Train the Naive Bayes Classifier using the specified files """
 	def train(self, classifier, positive_file, negative_file, num_best_words = 100, num_best_bigrams = 1000):
 
-		# Checking if the training files exist
-		if (os.path.isfile(positive_file) is False) or (os.path.isfile(negative_file) is False):
-			print("ERROR: One of the training files does not exist inside 'Datasets' folder")
-			exit()
-
 		# Obtain every word and bigram in both files
 		pos_words, pos_bigrams = self.__getWordsAndBigrams(positive_file)
 		neg_words, neg_bigrams = self.__getWordsAndBigrams(negative_file)
@@ -186,20 +187,25 @@ class Classifier(object):
 		pos_features = []
 		neg_features = []
 
-		pos_sentences = open(positive_file, 'r', encoding = "UTF8")
-		neg_sentences = open(negative_file, 'r', encoding = "UTF8")
+		try:
+			pos_sentences = open(positive_file, 'r', encoding = "UTF8")
+			neg_sentences = open(negative_file, 'r', encoding = "UTF8")
 
-		# Each line is tokenize and its words and bigrams are used to create positive features
-		for line in pos_sentences:
-			pos_features.append([self.__getFeatures(line, best_words, best_bigrams), 'pos'])
+			# Each line is tokenize and its words and bigrams are used to create positive features
+			for line in pos_sentences:
+				pos_features.append([self.__getFeatures(line, best_words, best_bigrams), 'pos'])
 
 
-		# Each line is tokenize and its words and bigrams are used to create negative features
-		for line in neg_sentences:
-			neg_features.append([self.__getFeatures(line, best_words, best_bigrams), 'neg'])
+			# Each line is tokenize and its words and bigrams are used to create negative features
+			for line in neg_sentences:
+				neg_features.append([self.__getFeatures(line, best_words, best_bigrams), 'neg'])
 
-		pos_sentences.close()
-		neg_sentences.close()
+			pos_sentences.close()
+			neg_sentences.close()
+
+		except FileNotFoundError or PermissionError or IsADirectoryError:
+			print("ERROR: One of the files cannot be opened")
+			exit()
 
 
 		# Trains using the specified classifier
@@ -223,15 +229,15 @@ class Classifier(object):
 	""" Loads a trained model into our classifier object """
 	def loadModel(self, model_path):
 
-		if os.path.isfile(model_path) is True:
+		try:
 			model_file = open(model_path, 'rb')
 			self.MODEL = pickle.load(model_file)
 
 			model_file.close()
 			print("The classifier model has been loaded from '", model_path, "'")
 
-		else:
-			print("ERROR: The specified model file does not exist")
+		except FileNotFoundError or PermissionError or IsADirectoryError:
+			print("ERROR: The model '", model_path, "' cannot be loaded")
 			exit()
 
 
