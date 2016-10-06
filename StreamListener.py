@@ -58,10 +58,12 @@ class TwitterListener(StreamListener):
 
         # In case either the classifier or the output file are not specified: error
         if (self.CLASSIFIER is None) or (self.OUTPUT is None):
-            print("ERROR: The TwitterListener object needs to call 'init()' first")
+            print("ERROR: TwitterListener object requires to call 'init()' first")
             exit()
 
+        labels = self.CLASSIFIER.MODEL.labels()
         tweet_dict = json.loads(tweet)
+
 
         try:
             # If it is a retweet: the original text is obtained
@@ -81,7 +83,7 @@ class TwitterListener(StreamListener):
             # If it has enough length: write it
             if len(tweet_text) >= 30:
                 result = self.CLASSIFIER.classify([tweet_text])
-                string = str(result[0]['Positive']) + "\n"
+                string = str(result[0][labels[0]]) + "\n"
 
                 Utilities.storeStream(string, self.OUTPUT, self.TOTAL_LINES, self.LINE_COUNTER)
                 self.LINE_COUNTER += 1

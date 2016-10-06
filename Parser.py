@@ -19,25 +19,25 @@ models_folder = "./Models/"
 
 
 ################# TRAIN TEST #################
-# Arguments: "Train" <Classifier> <Positive file> <Negative file>
+# Arguments: "Train" <Classifier> <Label 1 file> <Label 2 file>
 
 if (sys.argv[1].lower() == "train") and (len(sys.argv) == 5):
 
-    pos_file_path = datasets_folder + sys.argv[3]
-    neg_file_path = datasets_folder + sys.argv[4]
+    l1_file_path = datasets_folder + sys.argv[3]
+    l2_file_path = datasets_folder + sys.argv[4]
 
     # Divide execution depending on the specified classifier
-    if sys.argv[2].lower() == "max-entropy":
-        classifier.train("max-entropy", pos_file_path, neg_file_path, 1000, 10000)
-        classifier.saveModel(models_folder + "Max-Entropy.pickle")
+    if "max-entropy" in sys.argv[2].lower():
+        classifier.train("max-entropy", l1_file_path, l2_file_path, 1000, 10000)
+        classifier.saveModel(models_folder + sys.argv[2] + ".pickle")
 
-    elif sys.argv[2].lower() == "naive-bayes":
-        classifier.train("naive-bayes", pos_file_path, neg_file_path, 1000, 10000)
-        classifier.saveModel(models_folder + "Naive-Bayes.pickle")
+    elif "naive-bayes" in sys.argv[2].lower():
+        classifier.train("naive-bayes", l1_file_path, l2_file_path, 1000, 10000)
+        classifier.saveModel(models_folder + sys.argv[2] + ".pickle")
 
-    elif sys.argv[2].lower() == "nu-svc":
-        classifier.train("nu-svc", pos_file_path, neg_file_path, 1000, 10000)
-        classifier.saveModel(models_folder + "Nu-SVC.pickle")
+    elif "nu-svc" in sys.argv[2].lower():
+        classifier.train("nu-svc", l1_file_path, l2_file_path, 1000, 10000)
+        classifier.saveModel(models_folder + sys.argv[2] + ".pickle")
 
     else:
         print("ERROR: Invalid classifier")
@@ -47,7 +47,7 @@ if (sys.argv[1].lower() == "train") and (len(sys.argv) == 5):
 
 
 ################# CLASSIFY TEST #################
-# Arguments: "Classify" <Classifier model> <Twitter account> <Word>
+# Arguments: "Classify" <Classifier> <Twitter account> <Word>
 
 elif (sys.argv[1].lower() == "classify") and (len(sys.argv) == 5):
 
@@ -86,6 +86,7 @@ elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 7):
     tracks = sys.argv[3].split(',')
     languages = sys.argv[4].split(',')
     coordinates = sys.argv[6].split(',')
+    labels = classifier.MODEL.labels()
 
     if len(coordinates) % 4 != 0:
         print("ERROR: The number of coordinates must be a multiple of 4")
@@ -102,7 +103,7 @@ elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 7):
     from GraphAnimator import animatePieChart, figure
 
     # Animate the graph each milliseconds interval
-    ani = animation.FuncAnimation(figure, animatePieChart, interval = 1000, fargs = (sys.argv[5],))
+    ani = animation.FuncAnimation(figure, animatePieChart, interval = 1000, fargs = (sys.argv[5], labels,))
     pyplot.show()
 
     # Finally: kill stream process
@@ -115,7 +116,7 @@ elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 7):
 # In case none of the possible options is selected: error
 else:
     print("ERROR: Invalid arguments. Possible options:")
-    print("Mode 1 arguments: 'Train' <Classifier> <Positive file> <Negative file>")
-    print("Mode 2 arguments: 'Classify' <Classifier model> <Twitter account> <Word>")
+    print("Mode 1 arguments: 'Train' <Classifier> <Label 1 file> <Label 2 file>")
+    print("Mode 2 arguments: 'Classify' <Classifier> <Twitter account> <Word>")
     print("Mode 3 arguments: 'Search' <Search query> <Language> <Search depth> <Storing file>")
     print("Mode 4 arguments: 'Stream' <Classifier> <Stream query> <Language> <Output file> <Coordinates>")

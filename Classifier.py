@@ -9,7 +9,7 @@ from nltk.collocations import BigramCollocationFinder as BCF
 from sklearn.svm import NuSVC
 
 
-""" Class in charge of classify sentences as positive or negative after being trained """
+""" Class in charge of classifying sentences with a label given a pair of them """
 class Classifier(object):
 
 	# Attribute that stores the trained model
@@ -87,9 +87,9 @@ class Classifier(object):
 
 
 	""" Performs the training process depending on the specified classifier """
-	def __performTraining(self, classifier_name, pos_features, neg_features):
+	def __performTraining(self, classifier_name, l1_features, l2_features):
 
-		train_features = pos_features[:] + neg_features[:]
+		train_features = l1_features[:] + l2_features[:]
 
 		# Trains the Max Entropy classifier
 		if classifier_name.lower() == "max-entropy":
@@ -109,7 +109,7 @@ class Classifier(object):
 
 			print("Naive Bayes training process completed")
 			print("Calculating accuracy...")
-			print("Accuracy:", self.__crossValidation(classifier, pos_features, neg_features), "\n")
+			print("Accuracy:", self.__crossValidation(classifier, l1_features, l2_features), "\n")
 
 
 		# Trains the Nu SVC classifier
@@ -120,7 +120,7 @@ class Classifier(object):
 
 			print("Nu SVC training process completed")
 			print("Calculating accuracy...")
-			print("Accuracy:", self.__crossValidation(classifier, pos_features, neg_features), "\n")
+			print("Accuracy:", self.__crossValidation(classifier, l1_features, l2_features), "\n")
 
 
 		# In case another option is specified: error
@@ -133,22 +133,22 @@ class Classifier(object):
 
 	""" Test the specified classifier applying cross validation """
 	@staticmethod
-	def __crossValidation(classifier, pos_features, neg_features, folds = 10):
+	def __crossValidation(classifier, l1_features, l2_features, folds = 10):
 
 		if folds > 1:
 
 			# Calculating cut offs in both features lists
-			pos_cutoff = math.floor(len(pos_features) / folds)
-			neg_cutoff = math.floor(len(neg_features) / folds)
+			l1_cutoff = math.floor(len(l1_features) / folds)
+			l2_cutoff = math.floor(len(l2_features) / folds)
 
 			mean_accuracy = 0
 
 			# Calculating each fold accuracy
 			for i in range(folds):
-				test_features = pos_features[((folds - i - 1) * pos_cutoff):((folds - i) * pos_cutoff)] + \
-								neg_features[((folds - i - 1) * neg_cutoff):((folds - i) * neg_cutoff)]
+				test_features = l1_features[((folds - i - 1) * l1_cutoff):((folds - i) * l1_cutoff)] + \
+								l2_features[((folds - i - 1) * l2_cutoff):((folds - i) * l2_cutoff)]
 
-				train_features = [feature for feature in (pos_features + neg_features) if feature not in test_features]
+				train_features = [feature for feature in (l1_features + l2_features) if feature not in test_features]
 
 				model = classifier.train(train_features)
 				mean_accuracy += util.accuracy(model, test_features)
@@ -163,45 +163,49 @@ class Classifier(object):
 
 
 	""" Train the Naive Bayes Classifier using the specified files """
-	def train(self, classifier, positive_file, negative_file, num_best_words = 100, num_best_bigrams = 1000):
+	def train(self, classifier, label1_file, label2_file, num_best_words = 100, num_best_bigrams = 1000):
+
+		# Obtaining the labels
+		label1 = label1_file.rsplit('/')[-1].rsplit('.')[0]
+		label2 = label2_file.rsplit('/')[-1].rsplit('.')[0]
+
 
 		# Obtain every word and bigram in both files
-		pos_words, pos_bigrams = self.__getWordsAndBigrams(positive_file)
-		neg_words, neg_bigrams = self.__getWordsAndBigrams(negative_file)
+		l1_words, l1_bigrams = self.__getWordsAndBigrams(label1_file)
+		l2_words, l2_bigrams = self.__getWordsAndBigrams(label2_file)
 
 		# Make word lists iterable
-		pos_words = list(itertools.chain(*pos_words))
-		neg_words = list(itertools.chain(*neg_words))
+		l1_words = list(itertools.chain(*l1_words))
+		l2_words = list(itertools.chain(*l2_words))
 
 
 		# Obtain best words taking into account the gain of information
-		word_scores = Utilities.getScores(pos_words, neg_words)
+		word_scores = Utilities.getScores(l1_words, l2_words)
 		best_words = Utilities.getBestElements(word_scores, num_best_words)
 
 		# Obtain best bigrams taking into account the gain of information
-		bigrams_scores = Utilities.getScores(pos_bigrams, neg_bigrams)
+		bigrams_scores = Utilities.getScores(l1_bigrams, l2_bigrams)
 		best_bigrams = Utilities.getBestElements(bigrams_scores, num_best_bigrams)
 
 
 		# These lists will store lines words with their correspondent label
-		pos_features = []
-		neg_features = []
+		l1_features = []
+		l2_features = []
 
 		try:
-			pos_sentences = open(positive_file, 'r', encoding = "UTF8")
-			neg_sentences = open(negative_file, 'r', encoding = "UTF8")
+			l1_sentences = open(label1_file, 'r', encoding = "UTF8")
+			l2_sentences = open(label2_file, 'r', encoding = "UTF8")
 
-			# Each line is tokenize and its words and bigrams are used to create positive features
-			for line in pos_sentences:
-				pos_features.append([self.__getFeatures(line, best_words, best_bigrams), 'pos'])
+			# Each line is tokenize and its words and bigrams are used to create label1 features
+			for line in l1_sentences:
+				l1_features.append([self.__getFeatures(line, best_words, best_bigrams), label1])
 
+			# Each line is tokenize and its words and bigrams are used to create label2 features
+			for line in l2_sentences:
+				l2_features.append([self.__getFeatures(line, best_words, best_bigrams), label2])
 
-			# Each line is tokenize and its words and bigrams are used to create negative features
-			for line in neg_sentences:
-				neg_features.append([self.__getFeatures(line, best_words, best_bigrams), 'neg'])
-
-			pos_sentences.close()
-			neg_sentences.close()
+			l1_sentences.close()
+			l2_sentences.close()
 
 		except FileNotFoundError or PermissionError or IsADirectoryError:
 			print("ERROR: One of the files cannot be opened")
@@ -209,7 +213,7 @@ class Classifier(object):
 
 
 		# Trains using the specified classifier
-		self.__performTraining(classifier, pos_features, neg_features)
+		self.__performTraining(classifier, l1_features, l2_features)
 
 
 
@@ -217,11 +221,16 @@ class Classifier(object):
 	""" Saves a trained model into the models folder """
 	def saveModel(self, model_path):
 
-		model_file = open(model_path, 'wb')
-		pickle.dump(self.MODEL, model_file)
+		try:
+			model_file = open(model_path, 'wb')
+			pickle.dump(self.MODEL, model_file)
 
-		model_file.close()
-		print("The classifier model has been saved in '", model_path, "'")
+			model_file.close()
+			print("The classifier model has been saved in '", model_path, "'")
+
+		except FileNotFoundError or PermissionError or IsADirectoryError:
+			print("ERROR: The model cannot be saved into '", model_path, "'")
+			exit()
 
 
 
@@ -247,6 +256,7 @@ class Classifier(object):
 	def classify(self, sentences):
 
 		if self.MODEL is not None:
+			labels = self.MODEL.labels()
 			classifications = []
 
 			for sentence in sentences:
@@ -255,9 +265,9 @@ class Classifier(object):
 				# If the classifier support probabilities
 				try:
 					result = self.MODEL.prob_classify(features_list)
-					pos_prob = round(result.prob('pos'), 4)
-					neg_prob = round(result.prob('neg'), 4)
-					classifications.append({'Positive': pos_prob, 'Negative': neg_prob})
+					l1_prob = round(result.prob(labels[0]), 4)
+					l2_prob = round(result.prob(labels[1]), 4)
+					classifications.append({labels[0]: l1_prob, labels[1]: l2_prob})
 
 				# If the classifier does not support probabilities
 				except AttributeError:
