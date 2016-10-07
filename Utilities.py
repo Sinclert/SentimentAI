@@ -1,6 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-import re
+import os, re
 from nltk.probability import FreqDist, ConditionalFreqDist
 from nltk.metrics import BigramAssocMeasures as BAM
 
@@ -25,33 +25,33 @@ user_filter = re.compile('(^|\s+)@\w+')
 
 
 """ Give score to every element taking into account the gain of information """
-def getScores(pos_elements, neg_elements):
+def getScores(l1_elements, l2_elements):
 
-	# Build frequency and conditional distribution within the positive and negative labels
+	# Build frequency and conditional distribution within the possible labels
 	freqDist = FreqDist()
 	conditional_freqDist = ConditionalFreqDist()
 
-	for element in pos_elements:
+	for element in l1_elements:
 		freqDist[element] += 1
-		conditional_freqDist['pos'][element] += 1
+		conditional_freqDist['label1'][element] += 1
 
-	for element in neg_elements:
+	for element in l2_elements:
 		freqDist[element] += 1
-		conditional_freqDist['neg'][element] += 1
+		conditional_freqDist['label2'][element] += 1
 
 	# Counts the number of positive and negative words, as well as the total number of them
-	pos_count = conditional_freqDist['pos'].N()
-	neg_count = conditional_freqDist['neg'].N()
-	total_count = pos_count + neg_count
+	l1_count = conditional_freqDist['label1'].N()
+	l2_count = conditional_freqDist['label2'].N()
+	total_count = l1_count + l2_count
 
 
 	scores = {}
 
 	# Builds a dictionary of scores based on chi-squared test
 	for elem, freq in freqDist.items():
-		pos_score = BAM.chi_sq(conditional_freqDist['pos'][elem], (freq, pos_count), total_count)
-		neg_score = BAM.chi_sq(conditional_freqDist['neg'][elem], (freq, neg_count), total_count)
-		scores[elem] = pos_score + neg_score
+		l1_score = BAM.chi_sq(conditional_freqDist['label1'][elem], (freq, l1_count), total_count)
+		l2_score = BAM.chi_sq(conditional_freqDist['label2'][elem], (freq, l2_count), total_count)
+		scores[elem] = l1_score + l2_score
 
 	return scores
 
@@ -110,7 +110,7 @@ def getSentences(tweets, word = None):
 
 
 """ Gets the polarity of several probability pairs by calculating the averages """
-def getPolarity(classifications):
+def getPolarity(classifications, labels):
 
 	if len(classifications) > 0:
 
@@ -118,12 +118,12 @@ def getPolarity(classifications):
 		if isinstance(classifications[0], dict):
 
 			# Calculating the positive average is enough
-			pos_average = 0
+			l1_average = 0
 
 			for prob_pair in classifications:
-				pos_average += prob_pair['Positive']
+				l1_average += prob_pair[labels[0]]
 
-			pos_average /= len(classifications)
+			l1_average /= len(classifications)
 
 
 			# CONFIDENCE THRESHOLD APPLICATION
@@ -134,37 +134,37 @@ def getPolarity(classifications):
 
 				differences = []
 				for prob_pair in classifications:
-					differences.append([prob_pair['Positive'], abs(pos_average - prob_pair['Positive'])])
+					differences.append([prob_pair[labels[0]], abs(l1_average - prob_pair[labels[0]])])
 
 				differences.sort(key = lambda element: element[1], reverse = True)
-				pos_average *= len(classifications)
+				l1_average *= len(classifications)
 
 				for i in range(outliers):
-					pos_average -= differences[i][0]
+					l1_average -= differences[i][0]
 
-				pos_average /= (len(classifications) - outliers)
+				l1_average /= (len(classifications) - outliers)
 
 
 			# Finally: label classification result
-			if pos_average >= 0.5:
-				return ['Positive', round(pos_average, 2)]
+			if l1_average >= 0.5:
+				return [labels[0], round(l1_average, 2)]
 			else:
-				return ['Negative', round(1 - pos_average, 2)]
+				return [labels[1], round(1 - l1_average, 2)]
 
 
 		# If the input list does not contain probabilities
 		else:
-			pos_counter = 0
+			l1_counter = 0
 
 			for classification in classifications:
-				if classification == 'pos':
-					pos_counter += 1
+				if classification == labels[0]:
+					l1_counter += 1
 
 			# Finally: label classification result
-			if pos_counter >= (len(classifications) - pos_counter):
-				return ['Positive', str(pos_counter) + ":" + str(len(classifications) - pos_counter)]
+			if l1_counter >= (len(classifications) - l1_counter):
+				return [labels[0], str(l1_counter) + ":" + str(len(classifications) - l1_counter)]
 			else:
-				return ['Negative', str(pos_counter) +":" + str(len(classifications) - pos_counter)]
+				return [labels[1], str(l1_counter) + ":" + str(len(classifications) - l1_counter)]
 
 
 	# In case of an empty list: return None
@@ -209,28 +209,34 @@ def storeTweets(tweets, file_name, min_length = 30):
 
 
 """ Writes the specified string into an specific line of the file """
-def storeStream(string, file_name, total_lines, line):
+def storeStream(string, file_path, total_lines, line):
 
-	# Creates the file if it can not be opened
+	# Tries to create the file if it does not exist
 	try:
-		file = open(file_name, 'r', encoding = "UTF8")
-	except:
-		file = open(file_name, 'w+', encoding = "UTF8")
+		if os.path.isfile(file_path):
+			file = open(file_path, 'r', encoding = "UTF8")
+		else:
+			file = open(file_path, 'w+', encoding = "UTF8")
 
-	# Count the number of lines
-	lines = file.readlines()
-	file.close()
-
-
-	# If the file has not 'x' lines yet: append
-	if len(lines) < total_lines:
-		file = open(file_name, 'a+', encoding = "UTF8")
-		file.write(string)
+		# Count the number of lines
+		lines = file.readlines()
 		file.close()
 
-	# If the file has already 'x' lines: overwrite
-	else:
-		file = open(file_name, 'w+', encoding = "UTF8")
-		lines[line] = string
-		file.writelines(lines)
-		file.close()
+		# If the file has not 'x' lines yet: append
+		if len(lines) < total_lines:
+			file = open(file_path, 'a+', encoding="UTF8")
+			file.write(string)
+			file.close()
+
+		# If the file has already 'x' lines: overwrite
+		else:
+			file = open(file_path, 'w+', encoding="UTF8")
+			lines[line] = string
+			file.writelines(lines)
+			file.close()
+
+
+	# In case of any error creating the file
+	except FileNotFoundError or PermissionError or IsADirectoryError:
+		print("ERROR: The file '", file_path, "' cannot be opened")
+		exit()

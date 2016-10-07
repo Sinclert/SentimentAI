@@ -59,7 +59,7 @@ elif (sys.argv[1].lower() == "classify") and (len(sys.argv) == 5):
     sentences = Utilities.getSentences(tweets, sys.argv[4])
     probabilities = classifier.classify(sentences)
 
-    print(Utilities.getPolarity(probabilities))
+    print(Utilities.getPolarity(probabilities, classifier.MODEL.labels()))
 
 
 
