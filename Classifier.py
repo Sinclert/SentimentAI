@@ -218,6 +218,32 @@ class Classifier(object):
 
 
 
+	""" Classify the specified text after obtaining all its words and bigrams """
+	def classify(self, sentence):
+
+		if self.MODEL is not None:
+
+			labels = sorted(self.MODEL.labels())
+			features_list = self.__getFeatures(sentence)
+
+			# If the classifier support probabilities
+			try:
+				result = self.MODEL.prob_classify(features_list)
+				l1_prob = round(result.prob(labels[0]), 4)
+				l2_prob = round(result.prob(labels[1]), 4)
+				return {labels[0]: l1_prob, labels[1]: l2_prob}
+
+			# If the classifier does not support probabilities
+			except AttributeError:
+				return self.MODEL.classify(features_list)
+
+		else:
+			print("ERROR: The classifier needs to be trained first")
+			exit()
+
+
+
+
 	""" Saves a trained model into the models folder """
 	def saveModel(self, model_path):
 
@@ -247,35 +273,4 @@ class Classifier(object):
 
 		except FileNotFoundError or PermissionError or IsADirectoryError:
 			print("ERROR: The model '", model_path, "' cannot be loaded")
-			exit()
-
-
-
-
-	""" Classify the specified text after obtaining all its words and bigrams """
-	def classify(self, sentences):
-
-		if self.MODEL is not None:
-			labels = self.MODEL.labels()
-			classifications = []
-
-			for sentence in sentences:
-				features_list = self.__getFeatures(sentence)
-
-				# If the classifier support probabilities
-				try:
-					result = self.MODEL.prob_classify(features_list)
-					l1_prob = round(result.prob(labels[0]), 4)
-					l2_prob = round(result.prob(labels[1]), 4)
-					classifications.append({labels[0]: l1_prob, labels[1]: l2_prob})
-
-				# If the classifier does not support probabilities
-				except AttributeError:
-					result = self.MODEL.classify(features_list)
-					classifications.append(result)
-
-			return classifications
-
-		else:
-			print("ERROR: The classifier needs to be trained first")
 			exit()

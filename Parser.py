@@ -57,7 +57,10 @@ elif (sys.argv[1].lower() == "classify") and (len(sys.argv) == 5):
 
     # Obtaining probabilities of each tweet
     sentences = Utilities.getSentences(tweets, sys.argv[4])
-    probabilities = classifier.classify(sentences)
+    probabilities = []
+
+    for sentence in sentences:
+        probabilities.append(classifier.classify(sentence))
 
     print(Utilities.getPolarity(probabilities, classifier.MODEL.labels()))
 
@@ -86,7 +89,7 @@ elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 7):
     tracks = sys.argv[3].split(',')
     languages = sys.argv[4].split(',')
     coordinates = sys.argv[6].split(',')
-    labels = classifier.MODEL.labels()
+    labels = sorted(classifier.MODEL.labels())
 
     if len(coordinates) % 4 != 0:
         print("ERROR: The number of coordinates must be a multiple of 4")

@@ -58,7 +58,7 @@ class TwitterListener(StreamListener):
             print("ERROR: TwitterListener object requires to call 'init()' first")
             exit()
 
-        labels = self.CLASSIFIER.MODEL.labels()
+        labels = sorted(self.CLASSIFIER.MODEL.labels())
         tweet_dict = json.loads(tweet)
 
 
@@ -73,14 +73,26 @@ class TwitterListener(StreamListener):
             if (len(tweet_dict['entities']['urls']) != 0) or (tweet_dict['entities'].get('media') is not None):
                 tweet_text = re.sub("http\S+", "", tweet_text)
 
-
             # Clean the tweet
             tweet_text = Utilities.getCleanTweet(tweet_text)
 
+
             # If it has enough length: write it
             if len(tweet_text) >= 30:
-                result = self.CLASSIFIER.classify([tweet_text])
-                self.BUFFER[self.COUNTER] = result[0][labels[0]]
+                result = self.CLASSIFIER.classify(tweet_text)
+
+                # If the classifier supports probabilities
+                if isinstance(result, dict):
+                    self.BUFFER[self.COUNTER] = result[labels[0]]
+
+                # If not: 1.0 = First label
+                elif result == labels[0]:
+                    self.BUFFER[self.COUNTER] = 1.0
+
+                # If not: 0.0 = Second label
+                elif result == labels[1]:
+                    self.BUFFER[self.COUNTER] = 0.0
+
                 self.COUNTER = (self.COUNTER + 1) % len(self.BUFFER)
 
 
