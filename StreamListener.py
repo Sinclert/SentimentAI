@@ -8,16 +8,13 @@ from Keys import keys
 """ Class in charge of retrieving live data from the Twitter Streaming API """
 class TwitterListener(StreamListener):
 
-    # Attributes to stores stream classifier, output-file and connection
+    # Attributes to stores stream classifier, probabilities buffer and connection
     CLASSIFIER = None
-    OUTPUT = None
+    BUFFER = None
     AUTH = None
 
-    # Attribute to store the number of results stored in the output file
-    TOTAL_LINES = 200
-
     # Attribute to store the line counter for overwriting
-    LINE_COUNTER = 0
+    COUNTER = 0
 
 
 
@@ -41,10 +38,10 @@ class TwitterListener(StreamListener):
 
 
 
-    """ Set the listener classifier and output file """
-    def init(self, classifier, query, languages, output_file, coordinates):
+    """ Set the listener classifier, buffer and connection """
+    def init(self, classifier, query, languages, coordinates, prob_buffer):
         self.CLASSIFIER = classifier
-        self.OUTPUT = output_file
+        self.BUFFER = prob_buffer
         self.setConnection()
 
         twitterStream = Stream(self.AUTH, self)
@@ -56,8 +53,8 @@ class TwitterListener(StreamListener):
     """ Prints live data according to the stream parameters """
     def on_data(self, tweet):
 
-        # In case either the classifier or the output file are not specified: error
-        if (self.CLASSIFIER is None) or (self.OUTPUT is None):
+        # In case either the classifier or the buffer is not specified: error
+        if (self.CLASSIFIER is None) or (self.BUFFER is None):
             print("ERROR: TwitterListener object requires to call 'init()' first")
             exit()
 
@@ -83,14 +80,8 @@ class TwitterListener(StreamListener):
             # If it has enough length: write it
             if len(tweet_text) >= 30:
                 result = self.CLASSIFIER.classify([tweet_text])
-                string = str(result[0][labels[0]]) + "\n"
-
-                Utilities.storeStream(string, self.OUTPUT, self.TOTAL_LINES, self.LINE_COUNTER)
-                self.LINE_COUNTER += 1
-
-                # Restart line counter
-                if self.LINE_COUNTER >= self.TOTAL_LINES:
-                    self.LINE_COUNTER = 0
+                self.BUFFER[self.COUNTER] = result[0][labels[0]]
+                self.COUNTER = (self.COUNTER + 1) % len(self.BUFFER)
 
 
         # In case of tweet limit warning: pass

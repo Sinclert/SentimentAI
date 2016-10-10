@@ -4,7 +4,7 @@ import Utilities, sys
 from Classifier import Classifier
 from DataMiner import DataMiner
 from StreamListener import TwitterListener
-from multiprocessing import Process
+from multiprocessing import Process, Array
 
 
 # Objects creation
@@ -76,7 +76,7 @@ elif (sys.argv[1].lower() == "search") and (len(sys.argv) == 6):
 
 
 ################## STREAM TEST ##################
-# Arguments: "Stream" <Classifier> <Stream query> <Language> <Output file> <Coordinates>
+# Arguments: "Stream" <Classifier> <Stream query> <Language> <Buffer size> <Coordinates>
 
 elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 7):
 
@@ -94,16 +94,24 @@ elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 7):
 
     coordinates = [float(coord) for coord in coordinates]
 
+
+    # Shared array of classifications between both processes
+    prob_buffer = Array('f', int(sys.argv[5]))
+
+    for i in range(0, len(prob_buffer)):
+        prob_buffer[i] = 0.5
+
+
     # Creates the stream object and start stream
     stream = TwitterListener()
-    streamProcess = Process(target = stream.init, args = (classifier, tracks, languages, sys.argv[5], coordinates))
+    streamProcess = Process(target = stream.init, args = (classifier, tracks, languages, coordinates, prob_buffer))
     streamProcess.start()
 
     from matplotlib import pyplot, animation
     from GraphAnimator import animatePieChart, figure
 
     # Animate the graph each milliseconds interval
-    ani = animation.FuncAnimation(figure, animatePieChart, interval = 1000, fargs = (sys.argv[5], labels,))
+    ani = animation.FuncAnimation(figure, animatePieChart, interval = 500, fargs = (labels, prob_buffer))
     pyplot.show()
 
     # Finally: kill stream process
@@ -119,4 +127,4 @@ else:
     print("Mode 1 arguments: 'Train' <Classifier> <Label 1 file> <Label 2 file>")
     print("Mode 2 arguments: 'Classify' <Classifier> <Twitter account> <Word>")
     print("Mode 3 arguments: 'Search' <Search query> <Language> <Search depth> <Storing file>")
-    print("Mode 4 arguments: 'Stream' <Classifier> <Stream query> <Language> <Output file> <Coordinates>")
+    print("Mode 4 arguments: 'Stream' <Classifier> <Stream query> <Language> <Buffer size> <Coordinates>")

@@ -1,6 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-import os, re
+import re
 from nltk.probability import FreqDist, ConditionalFreqDist
 from nltk.metrics import BigramAssocMeasures as BAM
 
@@ -203,40 +203,4 @@ def storeTweets(tweets, file_name, min_length = 30):
 	# If what we are processing is neither a list nor a string: error
 	else:
 		print("ERROR: Invalid value in one of the text inputs")
-		exit()
-
-
-
-
-""" Writes the specified string into an specific line of the file """
-def storeStream(string, file_path, total_lines, line):
-
-	# Tries to create the file if it does not exist
-	try:
-		if os.path.isfile(file_path):
-			file = open(file_path, 'r', encoding = "UTF8")
-		else:
-			file = open(file_path, 'w+', encoding = "UTF8")
-
-		# Count the number of lines
-		lines = file.readlines()
-		file.close()
-
-		# If the file has not 'x' lines yet: append
-		if len(lines) < total_lines:
-			file = open(file_path, 'a+', encoding="UTF8")
-			file.write(string)
-			file.close()
-
-		# If the file has already 'x' lines: overwrite
-		else:
-			file = open(file_path, 'w+', encoding="UTF8")
-			lines[line] = string
-			file.writelines(lines)
-			file.close()
-
-
-	# In case of any error creating the file
-	except FileNotFoundError or PermissionError or IsADirectoryError:
-		print("ERROR: The file '", file_path, "' cannot be opened")
 		exit()
