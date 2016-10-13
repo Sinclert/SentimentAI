@@ -8,8 +8,9 @@ from Keys import keys
 """ Class in charge of retrieving live data from the Twitter Streaming API """
 class TwitterListener(StreamListener):
 
-    # Attributes to stores stream classifier, probabilities buffer and connection
-    CLASSIFIER = None
+    # Attributes to stores stream classifiers, probabilities buffer and connection
+    CLASSIFIER1 = None
+    CLASSIFIER2 = None
     BUFFER = None
     API = None
 
@@ -45,8 +46,9 @@ class TwitterListener(StreamListener):
 
 
     """ Set the listener classifier, buffer and connection """
-    def init(self, classifier, buffer_size, query, languages, coordinates, shared_dict):
-        self.CLASSIFIER = classifier
+    def init(self, classifier1, classifier2, buffer_size, query, languages, coordinates, shared_dict):
+        self.CLASSIFIER1 = classifier1
+        self.CLASSIFIER2 = classifier2
         self.BUFFER = [None] * buffer_size
         self.SHARED_DICT = shared_dict
 
@@ -60,11 +62,11 @@ class TwitterListener(StreamListener):
     def on_data(self, tweet):
 
         # In case either the classifier or the buffer is not specified: error
-        if (self.CLASSIFIER is None) or (self.BUFFER is None):
-            print("ERROR: TwitterListener object requires to call 'init()' first")
+        if (self.CLASSIFIER1 is None) or (self.CLASSIFIER2 is None) or (self.BUFFER is None):
+            print("ERROR: TwitterListener requires to call 'init()' first")
             exit()
 
-        labels = sorted(self.CLASSIFIER.MODEL.labels())
+        labels = sorted(self.CLASSIFIER2.MODEL.labels())
         tweet_dict = json.loads(tweet)
 
 
@@ -85,20 +87,28 @@ class TwitterListener(StreamListener):
 
             # If it has enough length: write it
             if len(tweet_text) >= 30:
-                result = self.CLASSIFIER.classify(tweet_text)
+                result = self.CLASSIFIER1.classify(tweet_text)
 
-                # If the classifier supports probabilities
-                if isinstance(result, dict):
+                # If the tweet is classified as polarized
+                if (isinstance(result, dict) and result['Polarized'] > 0.55) or result == "Polarized":
+                    result = self.CLASSIFIER2.classify(tweet_text)
 
-                    if result[labels[0]] > 0.55:
-                        self.updateBuffers(labels[0])
+                    # If the classifier supports probabilities
+                    if isinstance(result, dict):
 
-                    if result[labels[1]] > 0.55:
-                        self.updateBuffers(labels[1])
+                        if result[labels[0]] > 0.55:
+                            self.updateBuffers(labels[0])
 
-                # If the result is just the label
+                        if result[labels[1]] > 0.55:
+                            self.updateBuffers(labels[1])
+
+                    # If the result is just the label
+                    else:
+                        self.updateBuffers(result)
+
+                # If the tweet is not consider as polarized: neutral
                 else:
-                    self.updateBuffers(result)
+                    self.updateBuffers('Neutral')
 
 
         # In case of tweet limit warning: pass

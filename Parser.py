@@ -85,20 +85,22 @@ elif (sys.argv[1].lower() == "search") and (len(sys.argv) == 6):
 
 
 ################## STREAM TEST ##################
-# Arguments: "Stream" <Classifier> <Buffer size> <Stream query> <Language> <Coordinates>
+# Arguments: "Stream" <Classifier 1> <Classifier 2> <Buffer size> <Stream query> <Language> <Coordinates>
 
-elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 7):
+elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 8):
 
-    # Load a trained classifier
-    classifier = Classifier()
-    classifier.loadModel(models_folder + sys.argv[2] + ".pickle")
-    labels = sorted(classifier.MODEL.labels())
+    # Load both trained classifiers
+    classifier1 = Classifier()
+    classifier2 = Classifier()
+    classifier1.loadModel(models_folder + sys.argv[2] + ".pickle")
+    classifier2.loadModel(models_folder + sys.argv[3] + ".pickle")
+    labels = ['Negative', 'Neutral', 'Positive']
 
     # Parsing arguments
-    buffer_size = int(sys.argv[3])
-    tracks = sys.argv[4].split(',')
-    languages = sys.argv[5].split(',')
-    coordinates = sys.argv[6].split(',')
+    buffer_size = int(sys.argv[4])
+    tracks = sys.argv[5].split(',')
+    languages = sys.argv[6].split(',')
+    coordinates = sys.argv[7].split(',')
 
     if len(coordinates) % 4 != 0:
         print("ERROR: The number of coordinates must be a multiple of 4")
@@ -109,13 +111,14 @@ elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 7):
 
     # Shared dictionary between both processes
     shared_dict = Manager().dict()
-    shared_dict[labels[0]] = 0
-    shared_dict[labels[1]] = 0
+    shared_dict['Negative'] = 0
+    shared_dict['Neutral'] = 0
+    shared_dict['Positive'] = 0
 
     # Creates the stream object and start stream
     stream = TwitterListener()
     stream.setConnection()
-    streamProcess = Process(target = stream.init, args = (classifier, buffer_size, tracks, languages, coordinates, shared_dict))
+    streamProcess = Process(target = stream.init, args = (classifier1, classifier2, buffer_size, tracks, languages, coordinates, shared_dict))
     streamProcess.start()
 
 
@@ -139,4 +142,4 @@ else:
     print("Mode 1 arguments: 'Train' <Classifier> <Label 1 file> <Label 2 file>")
     print("Mode 2 arguments: 'Classify' <Classifier> <Twitter account> <Word>")
     print("Mode 3 arguments: 'Search' <Search query> <Language> <Search depth> <Storing file>")
-    print("Mode 4 arguments: 'Stream' <Classifier> <Buffer size> <Stream query> <Language> <Coordinates>")
+    print("Mode 4 arguments: 'Stream' <Classifier 1> <Classifier 2> <Buffer size> <Stream query> <Language> <Coordinates>")
