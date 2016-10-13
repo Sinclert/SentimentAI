@@ -1,7 +1,7 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
 import Utilities, json, re
-from tweepy import OAuthHandler, StreamListener, Stream
+from tweepy import AppAuthHandler, API, OAuthHandler, StreamListener, Stream
 from Keys import keys
 
 
@@ -11,7 +11,7 @@ class TwitterListener(StreamListener):
     # Attributes to stores stream classifier, probabilities buffer and connection
     CLASSIFIER = None
     BUFFER = None
-    AUTH = None
+    API = None
 
     # Attribute to store the line counter for overwriting
     COUNTER = 0
@@ -28,12 +28,15 @@ class TwitterListener(StreamListener):
         access_token = keys['access_token']
         access_token_secret = keys['access_token_secret']
 
+        # AppAuthHandler call is needed due to a OAuth 1.0 bug
+        AppAuthHandler(consumer_key, consumer_secret)
+
         # Authentication creation using keys and tokens
         auth = OAuthHandler(consumer_key, consumer_secret)
         auth.set_access_token(access_token, access_token_secret)
 
         # Tweepy API connection creation
-        self.AUTH = auth
+        self.API = API(auth)
 
 
 
@@ -42,9 +45,8 @@ class TwitterListener(StreamListener):
     def init(self, classifier, query, languages, coordinates, prob_buffer):
         self.CLASSIFIER = classifier
         self.BUFFER = prob_buffer
-        self.setConnection()
 
-        twitterStream = Stream(self.AUTH, self)
+        twitterStream = Stream(self.API.auth, self)
         twitterStream.filter(track = query, languages = languages, locations = coordinates)
 
 

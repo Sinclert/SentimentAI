@@ -7,10 +7,6 @@ from StreamListener import TwitterListener
 from multiprocessing import Process, Array
 
 
-# Objects creation
-miner = DataMiner()
-classifier = Classifier()
-
 # Folder paths
 datasets_folder = "./Datasets/"
 models_folder = "./Models/"
@@ -25,6 +21,9 @@ if (sys.argv[1].lower() == "train") and (len(sys.argv) == 5):
 
     l1_file_path = datasets_folder + sys.argv[3]
     l2_file_path = datasets_folder + sys.argv[4]
+
+    # Object creation
+    classifier = Classifier()
 
     # Divide execution depending on the specified classifier
     if "max-entropy" in sys.argv[2].lower():
@@ -51,6 +50,10 @@ if (sys.argv[1].lower() == "train") and (len(sys.argv) == 5):
 
 elif (sys.argv[1].lower() == "classify") and (len(sys.argv) == 5):
 
+    # Objects creation
+    miner = DataMiner()
+    classifier = Classifier()
+
     # Mining process
     classifier.loadModel(models_folder + sys.argv[2] + ".pickle")
     tweets = miner.getUserTweets(sys.argv[3], sys.argv[4])
@@ -72,6 +75,9 @@ elif (sys.argv[1].lower() == "classify") and (len(sys.argv) == 5):
 
 elif (sys.argv[1].lower() == "search") and (len(sys.argv) == 6):
 
+    # Object creation
+    miner = DataMiner()
+
     tweets = miner.searchTweets(sys.argv[2], sys.argv[3], int(sys.argv[4]))
     Utilities.storeTweets(tweets, datasets_folder + sys.argv[5])
 
@@ -84,11 +90,12 @@ elif (sys.argv[1].lower() == "search") and (len(sys.argv) == 6):
 elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 7):
 
     # Load a trained classifier
+    classifier = Classifier()
     classifier.loadModel(models_folder + sys.argv[2] + ".pickle")
 
     tracks = sys.argv[3].split(',')
     languages = sys.argv[4].split(',')
-    coordinates = sys.argv[6].split(',')
+    coordinates = sys.argv[5].split(',')
     labels = sorted(classifier.MODEL.labels())
 
     if len(coordinates) % 4 != 0:
@@ -99,7 +106,7 @@ elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 7):
 
 
     # Shared array of classifications between both processes
-    prob_buffer = Array('f', int(sys.argv[5]))
+    prob_buffer = Array('f', int(sys.argv[6]))
 
     for i in range(0, len(prob_buffer)):
         prob_buffer[i] = 0.5
@@ -107,6 +114,7 @@ elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 7):
 
     # Creates the stream object and start stream
     stream = TwitterListener()
+    stream.setConnection()
     streamProcess = Process(target = stream.init, args = (classifier, tracks, languages, coordinates, prob_buffer))
     streamProcess.start()
 
