@@ -85,7 +85,7 @@ elif (sys.argv[1].lower() == "search") and (len(sys.argv) == 6):
 
 
 ################## STREAM TEST ##################
-# Arguments: "Stream" <Classifier 1> <Classifier 2> <Buffer size> <Stream query> <Language> <Coordinates>
+# Arguments: "Stream" <Classifier 1> <Classifier 2> <Buffer size> <Query> <Language> <Coordinates>
 
 elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 8):
 
@@ -118,7 +118,8 @@ elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 8):
     # Creates the stream object and start stream
     stream = TwitterListener()
     stream.setConnection()
-    streamProcess = Process(target = stream.init, args = (classifier1, classifier2, buffer_size, tracks, languages, coordinates, shared_dict))
+    streamProcess = Process(target = stream.init,
+                            args = (classifier1, classifier2, buffer_size, tracks, languages, coordinates, shared_dict))
     streamProcess.start()
 
 
@@ -139,7 +140,7 @@ elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 8):
 # In case none of the possible options is selected: error
 else:
     print("ERROR: Invalid arguments. Possible options:")
-    print("Mode 1 arguments: 'Train' <Classifier> <Label 1 file> <Label 2 file>")
-    print("Mode 2 arguments: 'Classify' <Classifier> <Twitter account> <Word>")
-    print("Mode 3 arguments: 'Search' <Search query> <Language> <Search depth> <Storing file>")
-    print("Mode 4 arguments: 'Stream' <Classifier 1> <Classifier 2> <Buffer size> <Stream query> <Language> <Coordinates>")
+    print("Mode 1: 'Train' <Classifier> <Label 1 file> <Label 2 file>")
+    print("Mode 2: 'Classify' <Classifier> <Twitter account> <Word>")
+    print("Mode 3: 'Search' <Search query> <Language> <Search depth> <Storing file>")
+    print("Mode 4: 'Stream' <Classifier 1> <Classifier 2> <Buffer size> <Query> <Language> <Coordinates>")

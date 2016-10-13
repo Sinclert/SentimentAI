@@ -1,8 +1,11 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-import re
+import math, re
+from nltk.classify import util
 from nltk.probability import FreqDist, ConditionalFreqDist
 from nltk.metrics import BigramAssocMeasures as BAM
+from multiprocessing import Pool, cpu_count
+from functools import partial
 
 
 # Indicates tweets confidence percentage
@@ -171,6 +174,44 @@ def getPolarity(classifications, labels):
 	else:
 		print("The input probabilities list is empty")
 		return None
+
+
+
+
+""" Tests the specified classifier applying cross validation """
+def crossValidation(classifier, l1_features, l2_features, folds = 10):
+
+	if folds > 1:
+
+		# Calculating cut offs in both features lists
+		l1_cutoff = math.floor(len(l1_features) / folds)
+		l2_cutoff = math.floor(len(l2_features) / folds)
+
+		func = partial(crossValidationFold, classifier, l1_features, l1_cutoff, l2_features, l2_cutoff, folds)
+
+		# Creating the pool of processes and mapping them to the number of iterations
+		processes = Pool(cpu_count() * 2)
+		processes_output = processes.map(func = func, iterable = range(folds))
+
+		return round((sum(processes_output) / folds), 4)
+
+	else:
+		print("ERROR: The number of cross validation folds must be greater than 1")
+		exit()
+
+
+
+
+""" Perfoms a single iteration of the Cross Validation algorithm """
+def crossValidationFold(classifier, l1_features, l1_cutoff, l2_features, l2_cutoff, folds, i):
+
+	test_features = l1_features[((folds - i - 1) * l1_cutoff):((folds - i) * l1_cutoff)] + \
+					l2_features[((folds - i - 1) * l2_cutoff):((folds - i) * l2_cutoff)]
+
+	train_features = [feature for feature in (l1_features + l2_features) if feature not in test_features]
+
+	model = classifier.train(train_features)
+	return util.accuracy(model, test_features)
 
 
 

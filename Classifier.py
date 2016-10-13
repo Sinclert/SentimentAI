@@ -1,6 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-import Utilities, math, itertools, pickle
+import Utilities, itertools, pickle
 from nltk.tokenize import TweetTokenizer
 from nltk.stem import SnowballStemmer
 from nltk.classify import MaxentClassifier, NaiveBayesClassifier, SklearnClassifier, util
@@ -109,7 +109,7 @@ class Classifier(object):
 
 			print("Naive Bayes training process completed")
 			print("Calculating accuracy...")
-			print("Accuracy:", self.__crossValidation(classifier, l1_features, l2_features), "\n")
+			print("Accuracy:", Utilities.crossValidation(classifier, l1_features, l2_features), "\n")
 
 
 		# Trains the Nu SVC classifier
@@ -120,43 +120,12 @@ class Classifier(object):
 
 			print("Nu SVC training process completed")
 			print("Calculating accuracy...")
-			print("Accuracy:", self.__crossValidation(classifier, l1_features, l2_features), "\n")
+			print("Accuracy:", Utilities.crossValidation(classifier, l1_features, l2_features), "\n")
 
 
 		# In case another option is specified: error
 		else:
 			print("ERROR: Invalid classifier")
-			exit()
-
-
-
-
-	""" Test the specified classifier applying cross validation """
-	@staticmethod
-	def __crossValidation(classifier, l1_features, l2_features, folds = 10):
-
-		if folds > 1:
-
-			# Calculating cut offs in both features lists
-			l1_cutoff = math.floor(len(l1_features) / folds)
-			l2_cutoff = math.floor(len(l2_features) / folds)
-
-			mean_accuracy = 0
-
-			# Calculating each fold accuracy
-			for i in range(folds):
-				test_features = l1_features[((folds - i - 1) * l1_cutoff):((folds - i) * l1_cutoff)] + \
-								l2_features[((folds - i - 1) * l2_cutoff):((folds - i) * l2_cutoff)]
-
-				train_features = [feature for feature in (l1_features + l2_features) if feature not in test_features]
-
-				model = classifier.train(train_features)
-				mean_accuracy += util.accuracy(model, test_features)
-
-			return round((mean_accuracy / folds), 4)
-
-		else:
-			print("ERROR: The number of cross validation folds must be greater than 1")
 			exit()
 
 
