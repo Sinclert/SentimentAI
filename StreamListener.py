@@ -13,7 +13,10 @@ class TwitterListener(StreamListener):
     BUFFER = None
     API = None
 
-    # Attribute to store the line counter for overwriting
+    # Shared variable between this process and the graphic one
+    SHARED_DICT = None
+
+    # Attribute to store the buffer overwriting position
     COUNTER = 0
 
 
@@ -42,9 +45,10 @@ class TwitterListener(StreamListener):
 
 
     """ Set the listener classifier, buffer and connection """
-    def init(self, classifier, query, languages, coordinates, prob_buffer):
+    def init(self, classifier, buffer_size, query, languages, coordinates, shared_dict):
         self.CLASSIFIER = classifier
-        self.BUFFER = prob_buffer
+        self.BUFFER = [None] * buffer_size
+        self.SHARED_DICT = shared_dict
 
         twitterStream = Stream(self.API.auth, self)
         twitterStream.filter(track = query, languages = languages, locations = coordinates)
@@ -85,17 +89,16 @@ class TwitterListener(StreamListener):
 
                 # If the classifier supports probabilities
                 if isinstance(result, dict):
-                    self.BUFFER[self.COUNTER] = result[labels[0]]
 
-                # If not: 1.0 = First label
-                elif result == labels[0]:
-                    self.BUFFER[self.COUNTER] = 1.0
+                    if result[labels[0]] > 0.55:
+                        self.updateBuffers(labels[0])
 
-                # If not: 0.0 = Second label
-                elif result == labels[1]:
-                    self.BUFFER[self.COUNTER] = 0.0
+                    if result[labels[1]] > 0.55:
+                        self.updateBuffers(labels[1])
 
-                self.COUNTER = (self.COUNTER + 1) % len(self.BUFFER)
+                # If the result is just the label
+                else:
+                    self.updateBuffers(result)
 
 
         # In case of tweet limit warning: pass
@@ -109,3 +112,18 @@ class TwitterListener(StreamListener):
     def on_error(self, status):
         print("CONNECTION ERROR:", status)
         exit()
+
+
+
+
+    """ Updates the dictionary counter and the temporal buffer labels """
+    def updateBuffers(self, label):
+
+        try:
+            self.SHARED_DICT[self.BUFFER[self.COUNTER]] -= 1
+        except KeyError:
+            pass
+
+        self.BUFFER[self.COUNTER] = label
+        self.COUNTER = (self.COUNTER + 1) % len(self.BUFFER)
+        self.SHARED_DICT[label] += 1
