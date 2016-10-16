@@ -6,6 +6,7 @@ from nltk.stem import SnowballStemmer
 from nltk.classify import MaxentClassifier, NaiveBayesClassifier, SklearnClassifier, util
 from nltk.metrics import BigramAssocMeasures as BAM
 from nltk.collocations import BigramCollocationFinder as BCF
+from sklearn.linear_model import LogisticRegression
 from sklearn.svm import NuSVC
 
 
@@ -91,8 +92,19 @@ class Classifier(object):
 
 		train_features = l1_features[:] + l2_features[:]
 
+		# Trains the Logistic Regression classifier
+		if classifier_name.lower() == "logistic-regression":
+
+			classifier = SklearnClassifier(LogisticRegression())
+			self.MODEL = classifier.train(train_features)
+
+			print("Naive Bayes training process completed")
+			print("Calculating accuracy...")
+			print("Accuracy:", Utilities.crossValidation(classifier, l1_features, l2_features), "\n")
+
+
 		# Trains the Max Entropy classifier
-		if classifier_name.lower() == "max-entropy":
+		elif classifier_name.lower() == "max-entropy":
 
 			self.MODEL = MaxentClassifier.train(train_features, trace = 0, min_lldelta = 0.005)
 

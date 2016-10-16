@@ -11,13 +11,15 @@ from multiprocessing import Process, Manager
 datasets_folder = "./Datasets/"
 models_folder = "./Models/"
 
+classifiers = ['logistic-regression', 'max-entropy', 'naive-bayes', 'nu-svc']
+
 
 
 
 ################# TRAIN TEST #################
-# Arguments: "Train" <Classifier> <Label 1 file> <Label 2 file>
+# Arguments: "Train" <Classifier> <Label 1 file> <Label 2 file> <Output file>
 
-if (sys.argv[1].lower() == "train") and (len(sys.argv) == 5):
+if (sys.argv[1].lower() == "train") and (len(sys.argv) == 6):
 
     l1_file_path = datasets_folder + sys.argv[3]
     l2_file_path = datasets_folder + sys.argv[4]
@@ -25,18 +27,11 @@ if (sys.argv[1].lower() == "train") and (len(sys.argv) == 5):
     # Object creation
     classifier = Classifier()
 
-    # Divide execution depending on the specified classifier
-    if "max-entropy" in sys.argv[2].lower():
-        classifier.train("max-entropy", l1_file_path, l2_file_path, 1000, 10000)
-        classifier.saveModel(models_folder + sys.argv[2] + ".pickle")
+    # Checks the specified classifier
+    if sys.argv[2].lower() in classifiers:
 
-    elif "naive-bayes" in sys.argv[2].lower():
-        classifier.train("naive-bayes", l1_file_path, l2_file_path, 1000, 10000)
-        classifier.saveModel(models_folder + sys.argv[2] + ".pickle")
-
-    elif "nu-svc" in sys.argv[2].lower():
-        classifier.train("nu-svc", l1_file_path, l2_file_path, 1000, 10000)
-        classifier.saveModel(models_folder + sys.argv[2] + ".pickle")
+        classifier.train(sys.argv[2].lower(), l1_file_path, l2_file_path, 1000, 10000)
+        classifier.saveModel(models_folder + sys.argv[5] + ".pickle")
 
     else:
         print("ERROR: Invalid classifier")
@@ -71,7 +66,7 @@ elif (sys.argv[1].lower() == "classify") and (len(sys.argv) == 5):
 
 
 ################## SEARCH TEST ##################
-# Arguments: "Search" <Search query> <Language> <Search depth> <Storing file>
+# Arguments: "Search" <Search query> <Language> <Search depth> <Output file>
 
 elif (sys.argv[1].lower() == "search") and (len(sys.argv) == 6):
 
@@ -140,7 +135,7 @@ elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 8):
 # In case none of the possible options is selected: error
 else:
     print("ERROR: Invalid arguments. Possible options:")
-    print("Mode 1: 'Train' <Classifier> <Label 1 file> <Label 2 file>")
+    print("Mode 1: 'Train' <Classifier> <Label 1 file> <Label 2 file> <Output file>")
     print("Mode 2: 'Classify' <Classifier> <Twitter account> <Word>")
-    print("Mode 3: 'Search' <Search query> <Language> <Search depth> <Storing file>")
+    print("Mode 3: 'Search' <Search query> <Language> <Search depth> <Output file>")
     print("Mode 4: 'Stream' <Classifier 1> <Classifier 2> <Buffer size> <Query> <Language> <Coordinates>")
