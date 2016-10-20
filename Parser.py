@@ -19,7 +19,7 @@ classifiers = ['logistic-regression', 'max-entropy', 'naive-bayes', 'nu-svc']
 ################# TRAIN TEST #################
 # Arguments: "Train" <Classifier> <Label 1 file> <Label 2 file> <Output file>
 
-if (sys.argv[1].lower() == "train") and (len(sys.argv) == 6):
+if (len(sys.argv) == 6) and (sys.argv[1].lower() == "train"):
 
     l1_file_path = datasets_folder + sys.argv[3]
     l2_file_path = datasets_folder + sys.argv[4]
@@ -43,7 +43,7 @@ if (sys.argv[1].lower() == "train") and (len(sys.argv) == 6):
 ################# CLASSIFY TEST #################
 # Arguments: "Classify" <Classifier> <Twitter account> <Word>
 
-elif (sys.argv[1].lower() == "classify") and (len(sys.argv) == 5):
+elif (len(sys.argv) == 5) and (sys.argv[1].lower() == "classify"):
 
     # Objects creation
     miner = DataMiner()
@@ -55,12 +55,17 @@ elif (sys.argv[1].lower() == "classify") and (len(sys.argv) == 5):
 
     # Obtaining probabilities of each tweet
     sentences = Utilities.getSentences(tweets, sys.argv[4])
-    probabilities = []
+    classifications = dict()
 
+    # Creating the results dictionary
+    for label in sorted(classifier.MODEL.labels()):
+        classifications[label] = 0
+
+    # Storing the classification results
     for sentence in sentences:
-        probabilities.append(classifier.classify(sentence))
+        classifications[classifier.classify(sentence)] += 1
 
-    print(Utilities.getPolarity(probabilities, classifier.MODEL.labels()))
+    print(classifications)
 
 
 
@@ -68,7 +73,7 @@ elif (sys.argv[1].lower() == "classify") and (len(sys.argv) == 5):
 ################## SEARCH TEST ##################
 # Arguments: "Search" <Search query> <Language> <Search depth> <Output file>
 
-elif (sys.argv[1].lower() == "search") and (len(sys.argv) == 6):
+elif (len(sys.argv) == 6) and (sys.argv[1].lower() == "search"):
 
     # Object creation
     miner = DataMiner()
@@ -82,7 +87,7 @@ elif (sys.argv[1].lower() == "search") and (len(sys.argv) == 6):
 ################## STREAM TEST ##################
 # Arguments: "Stream" <Classifier 1> <Classifier 2> <Buffer size> <Query> <Language> <Coordinates>
 
-elif (sys.argv[1].lower() == "stream") and (len(sys.argv) == 8):
+elif (len(sys.argv) == 8) and (sys.argv[1].lower() == "stream"):
 
     # Load both trained classifiers
     classifier1 = Classifier()

@@ -8,10 +8,6 @@ from multiprocessing import Pool, cpu_count
 from functools import partial
 
 
-# Indicates tweets confidence percentage
-confidence_threshold = 0.10
-
-
 ################ FILTERS ################
 emoji_filter  = re.compile(u'['
                              u'\U00002600-\U000027B0'
@@ -108,72 +104,6 @@ def getSentences(tweets, word = None):
 		exit()
 
 	return sentences
-
-
-
-
-""" Gets the polarity of several probability pairs by calculating the averages """
-def getPolarity(classifications, labels):
-
-	if len(classifications) > 0:
-
-		# If the input list contains probabilities
-		if isinstance(classifications[0], dict):
-
-			# Calculating the positive average is enough
-			l1_average = 0
-
-			for prob_pair in classifications:
-				l1_average += prob_pair[labels[0]]
-
-			l1_average /= len(classifications)
-
-
-			# CONFIDENCE THRESHOLD APPLICATION
-			outliers = int(len(classifications) * confidence_threshold)
-
-			# If there are outliers: they are subtracted from the mean
-			if outliers > 0:
-
-				differences = []
-				for prob_pair in classifications:
-					differences.append([prob_pair[labels[0]], abs(l1_average - prob_pair[labels[0]])])
-
-				differences.sort(key = lambda element: element[1], reverse = True)
-				l1_average *= len(classifications)
-
-				for i in range(outliers):
-					l1_average -= differences[i][0]
-
-				l1_average /= (len(classifications) - outliers)
-
-
-			# Finally: label classification result
-			if l1_average >= 0.5:
-				return [labels[0], round(l1_average, 2)]
-			else:
-				return [labels[1], round(1 - l1_average, 2)]
-
-
-		# If the input list does not contain probabilities
-		else:
-			l1_counter = 0
-
-			for classification in classifications:
-				if classification == labels[0]:
-					l1_counter += 1
-
-			# Finally: label classification result
-			if l1_counter >= (len(classifications) - l1_counter):
-				return [labels[0], str(l1_counter) + ":" + str(len(classifications) - l1_counter)]
-			else:
-				return [labels[1], str(l1_counter) + ":" + str(len(classifications) - l1_counter)]
-
-
-	# In case of an empty list: return None
-	else:
-		print("The input probabilities list is empty")
-		return None
 
 
 

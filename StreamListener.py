@@ -1,8 +1,8 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
 import Utilities, json, re
-from tweepy import AppAuthHandler, API, OAuthHandler, StreamListener, Stream
 from Keys import keys
+from tweepy import AppAuthHandler, API, OAuthHandler, StreamListener, Stream
 
 
 """ Class in charge of retrieving live data from the Twitter Streaming API """
@@ -66,7 +66,6 @@ class TwitterListener(StreamListener):
             print("ERROR: TwitterListener requires to call 'init()' first")
             exit()
 
-        labels = sorted(self.CLASSIFIER2.MODEL.labels())
         tweet_dict = json.loads(tweet)
 
 
@@ -90,21 +89,8 @@ class TwitterListener(StreamListener):
                 result = self.CLASSIFIER1.classify(tweet_text)
 
                 # If the tweet is classified as polarized
-                if (isinstance(result, dict) and result['Polarized'] > 0.55) or result == "Polarized":
-                    result = self.CLASSIFIER2.classify(tweet_text)
-
-                    # If the classifier supports probabilities
-                    if isinstance(result, dict):
-
-                        if result[labels[0]] > 0.55:
-                            self.updateBuffers(labels[0])
-
-                        if result[labels[1]] > 0.55:
-                            self.updateBuffers(labels[1])
-
-                    # If the result is just the label
-                    else:
-                        self.updateBuffers(result)
+                if result == "Polarized":
+                    self.updateBuffers(self.CLASSIFIER2.classify(tweet_text))
 
                 # If the tweet is not consider as polarized: neutral
                 else:
