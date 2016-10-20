@@ -127,7 +127,7 @@ elif (len(sys.argv) == 8) and (sys.argv[1].lower() == "stream"):
     from GraphAnimator import animatePieChart, figure
 
     # Animate the graph each milliseconds interval
-    ani = animation.FuncAnimation(figure, animatePieChart, interval = 500, fargs = (labels, shared_dict))
+    ani = animation.FuncAnimation(figure, animatePieChart, interval = 500, fargs = (labels, tracks, shared_dict))
     pyplot.show()
 
     # Finally: kill stream process

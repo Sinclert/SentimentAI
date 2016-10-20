@@ -89,7 +89,7 @@ class TwitterListener(StreamListener):
                 result = self.CLASSIFIER1.classify(tweet_text)
 
                 # If the tweet is classified as polarized
-                if result == "Polarized":
+                if result == 'Polarized':
                     self.updateBuffers(self.CLASSIFIER2.classify(tweet_text))
 
                 # If the tweet is not consider as polarized: neutral
