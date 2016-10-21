@@ -106,7 +106,7 @@ class Classifier(object):
 		# Trains the Max Entropy classifier
 		elif classifier_name.lower() == "max-entropy":
 
-			self.MODEL = MaxentClassifier.train(train_features, trace = 0, min_lldelta = 0.005)
+			self.MODEL = MaxentClassifier.train(train_features, trace = 0, min_lldelta = 0.01)
 
 			print("Max Entropy training process completed")
 			print("Calculating accuracy...")

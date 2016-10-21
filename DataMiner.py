@@ -21,11 +21,16 @@ class DataMiner(object):
         consumer_key = keys['consumer_key']
         consumer_secret = keys['consumer_secret']
 
-        # Application-only authentication creation
-        auth = AppAuthHandler(consumer_key, consumer_secret)
+        try:
+            # Application-only authentication creation
+            auth = AppAuthHandler(consumer_key, consumer_secret)
 
-        # Tweepy API connection creation
-        self.API = API(auth)
+            # Tweepy API connection creation
+            self.API = API(auth)
+
+        except Exception or ConnectionError:
+            print("ERROR: Unable to establish a connection with Twitter")
+            exit()
 
 
 

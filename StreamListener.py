@@ -32,15 +32,20 @@ class TwitterListener(StreamListener):
         access_token = keys['access_token']
         access_token_secret = keys['access_token_secret']
 
-        # AppAuthHandler call is needed due to a OAuth 1.0 bug
-        AppAuthHandler(consumer_key, consumer_secret)
+        try:
+            # AppAuthHandler call is needed due to a OAuth 1.0 bug
+            AppAuthHandler(consumer_key, consumer_secret)
 
-        # Authentication creation using keys and tokens
-        auth = OAuthHandler(consumer_key, consumer_secret)
-        auth.set_access_token(access_token, access_token_secret)
+            # Authentication creation using keys and tokens
+            auth = OAuthHandler(consumer_key, consumer_secret)
+            auth.set_access_token(access_token, access_token_secret)
 
-        # Tweepy API connection creation
-        self.API = API(auth)
+            # Tweepy API connection creation
+            self.API = API(auth)
+
+        except Exception or ConnectionError:
+            print("ERROR: Unable to establish a connection with Twitter")
+            exit()
 
 
 

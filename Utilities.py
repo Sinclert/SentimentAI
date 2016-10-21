@@ -91,6 +91,8 @@ def getSentences(tweets, word = None):
 			for sentence in getSentences(tweet, word):
 				sentences.append(sentence)
 
+		return sentences
+
 	# Base case: individual tweet
 	elif isinstance(tweets, str):
 		sentences = re.split("[.:!?]\s+", str(tweets))
@@ -98,12 +100,12 @@ def getSentences(tweets, word = None):
 		if word is not None:
 			sentences[:] = [sentence for sentence in sentences if word.lower() in sentence.lower()]
 
+		return sentences
+
 	# If what we are processing is neither a list nor a string: error
 	else:
 		print("ERROR: Invalid value in one of the text inputs")
 		exit()
-
-	return sentences
 
 
 
