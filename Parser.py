@@ -30,7 +30,7 @@ if (len(sys.argv) == 6) and (sys.argv[1].lower() == "train"):
     # Checks the specified classifier
     if sys.argv[2].lower() in classifiers:
 
-        classifier.train(sys.argv[2].lower(), l1_file_path, l2_file_path, 1000, 10000)
+        classifier.train(sys.argv[2].lower(), l1_file_path, l2_file_path)
         classifier.saveModel(models_folder + sys.argv[5] + ".pickle")
 
     else:

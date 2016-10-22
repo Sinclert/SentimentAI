@@ -25,9 +25,10 @@ class Classifier(object):
 
 
 
-	""" Stores every word and bigram of the specified file """
+	""" Obtains every sentence with its words and bigrams of the specified file """
 	def __getWordsAndBigrams(self, file):
 
+		sentences = []
 		words = []
 		bigrams = []
 
@@ -36,6 +37,9 @@ class Classifier(object):
 
 			# Each line is tokenize and its words and bigrams are stored in a list
 			for line in sentences_file:
+
+				# Storing the whole line
+				sentences.append(line)
 
 				# Storing all line words after extracting the root
 				sentence_words = self.TOKENIZER.tokenize(line)
@@ -50,7 +54,7 @@ class Classifier(object):
 					bigrams.append(bigram[0] + " " + bigram[1])
 
 			sentences_file.close()
-			return words, bigrams
+			return sentences, words, bigrams
 
 
 		except FileNotFoundError or PermissionError or IsADirectoryError:
@@ -143,58 +147,37 @@ class Classifier(object):
 
 
 
-	""" Train the Naive Bayes Classifier using the specified files """
-	def train(self, classifier, label1_file, label2_file, num_best_words = 100, num_best_bigrams = 1000):
+	""" Trains a classifier using the sentences from the specified files """
+	def train(self, classifier, label1_file, label2_file):
 
 		# Obtaining the labels
 		label1 = label1_file.rsplit('/')[-1].rsplit('.')[0]
 		label2 = label2_file.rsplit('/')[-1].rsplit('.')[0]
 
 
-		# Obtain every word and bigram in both files
-		l1_words, l1_bigrams = self.__getWordsAndBigrams(label1_file)
-		l2_words, l2_bigrams = self.__getWordsAndBigrams(label2_file)
+		# Obtaining every word and bigram in both files
+		l1_sentences, l1_words, l1_bigrams = self.__getWordsAndBigrams(label1_file)
+		l2_sentences, l2_words, l2_bigrams = self.__getWordsAndBigrams(label2_file)
 
-		# Make word lists iterable
+		# Making word lists iterable
 		l1_words = list(itertools.chain(*l1_words))
 		l2_words = list(itertools.chain(*l2_words))
 
 
-		# Obtain best words taking into account the gain of information
-		word_scores = Utilities.getScores(l1_words, l2_words)
-		best_words = Utilities.getBestElements(word_scores, num_best_words)
+		# Obtaining best words and bigrams taking into account their gain of information
+		best_words = Utilities.getBestElements(l1_words, l2_words)
+		best_bigrams = Utilities.getBestElements(l1_bigrams, l2_bigrams)
 
-		# Obtain best bigrams taking into account the gain of information
-		bigrams_scores = Utilities.getScores(l1_bigrams, l2_bigrams)
-		best_bigrams = Utilities.getBestElements(bigrams_scores, num_best_bigrams)
+		# Transforming each sentence into a dictionary of features
+		for i in range(0, len(l1_sentences)):
+			l1_sentences[i] = [self.__getFeatures(l1_sentences[i], best_words, best_bigrams), label1]
 
-
-		# These lists will store lines words with their correspondent label
-		l1_features = []
-		l2_features = []
-
-		try:
-			l1_sentences = open(label1_file, 'r', encoding = "UTF8")
-			l2_sentences = open(label2_file, 'r', encoding = "UTF8")
-
-			# Each line is tokenize and its words and bigrams are used to create label1 features
-			for line in l1_sentences:
-				l1_features.append([self.__getFeatures(line, best_words, best_bigrams), label1])
-
-			# Each line is tokenize and its words and bigrams are used to create label2 features
-			for line in l2_sentences:
-				l2_features.append([self.__getFeatures(line, best_words, best_bigrams), label2])
-
-			l1_sentences.close()
-			l2_sentences.close()
-
-		except FileNotFoundError or PermissionError or IsADirectoryError:
-			print("ERROR: One of the files cannot be opened")
-			exit()
+		for i in range(0, len(l2_sentences)):
+			l2_sentences[i] = [self.__getFeatures(l2_sentences[i], best_words, best_bigrams), label2]
 
 
 		# Trains using the specified classifier
-		self.__performTraining(classifier, l1_features, l2_features)
+		self.__performTraining(classifier, l1_sentences, l2_sentences)
 
 
 

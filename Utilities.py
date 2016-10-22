@@ -23,43 +23,39 @@ user_filter = re.compile('(^|\s+)@\w+')
 
 
 
-""" Give score to every element taking into account the gain of information """
-def getScores(l1_elements, l2_elements):
+""" Finds the best 'number' elements based on their gain of information """
+def getBestElements(l1_elements, l2_elements):
 
 	# Build frequency and conditional distribution within the possible labels
-	freqDist = FreqDist()
-	conditional_freqDist = ConditionalFreqDist()
+	freq_dist = FreqDist()
+	conditional_dist = ConditionalFreqDist()
 
 	for element in l1_elements:
-		freqDist[element] += 1
-		conditional_freqDist['label1'][element] += 1
+		freq_dist[element] += 1
+		conditional_dist['label1'][element] += 1
 
 	for element in l2_elements:
-		freqDist[element] += 1
-		conditional_freqDist['label2'][element] += 1
+		freq_dist[element] += 1
+		conditional_dist['label2'][element] += 1
 
 	# Counts the number of positive and negative words, as well as the total number of them
-	l1_count = conditional_freqDist['label1'].N()
-	l2_count = conditional_freqDist['label2'].N()
+	l1_count = conditional_dist['label1'].N()
+	l2_count = conditional_dist['label2'].N()
 	total_count = l1_count + l2_count
 
 
 	scores = {}
 
 	# Builds a dictionary of scores based on chi-squared test
-	for elem, freq in freqDist.items():
-		l1_score = BAM.chi_sq(conditional_freqDist['label1'][elem], (freq, l1_count), total_count)
-		l2_score = BAM.chi_sq(conditional_freqDist['label2'][elem], (freq, l2_count), total_count)
+	for elem, freq in freq_dist.items():
+		l1_score = BAM.chi_sq(conditional_dist['label1'][elem], (freq, l1_count), total_count)
+		l2_score = BAM.chi_sq(conditional_dist['label2'][elem], (freq, l2_count), total_count)
 		scores[elem] = l1_score + l2_score
 
-	return scores
 
-
-
-
-""" Finds the best 'n' elements based on their scores """
-def getBestElements(scores, number):
-	best_values = sorted(scores.items(), key = lambda element: element[1], reverse = True)[:number]
+	# Order the elements by score and retrieve the first 5% of them
+	values_cut = math.floor(len(freq_dist)/20)
+	best_values = sorted(scores.items(), key = lambda pair: pair[1], reverse = True)[:values_cut]
 	best_elements = set([w for w, s in best_values])
 
 	return best_elements
@@ -137,10 +133,17 @@ def crossValidation(classifier, l1_features, l2_features, folds = 10):
 """ Perfoms a single iteration of the Cross Validation algorithm """
 def crossValidationFold(classifier, l1_features, l1_cutoff, l2_features, l2_cutoff, folds, i):
 
-	test_features = l1_features[((folds - i - 1) * l1_cutoff):((folds - i) * l1_cutoff)] + \
-					l2_features[((folds - i - 1) * l2_cutoff):((folds - i) * l2_cutoff)]
+	# Calculating the required indices to split the features
+	index1 = (folds - i - 1) * l1_cutoff
+	index2 = (folds - i) * l1_cutoff
+	index3 = (folds - i - 1) * l2_cutoff
+	index4 = (folds - i) * l2_cutoff
 
-	train_features = [feature for feature in (l1_features + l2_features) if feature not in test_features]
+	# Splitting the list of features into both train and test sets
+	test_features = l1_features[index1:index2] + l2_features[index3:index4]
+
+	train_features = l1_features[:index1] + l1_features[index2:] + \
+					 l2_features[:index3] + l2_features[index4:]
 
 	model = classifier.train(train_features)
 	return util.accuracy(model, test_features)
