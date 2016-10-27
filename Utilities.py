@@ -24,7 +24,7 @@ user_filter = re.compile('(^|\s+)@\w+')
 
 
 """ Finds the best 'number' elements based on their gain of information """
-def getBestElements(l1_elements, l2_elements):
+def getBestElements(l1_elements, l2_elements, proportion):
 
 	# Build frequency and conditional distribution within the possible labels
 	freq_dist = FreqDist()
@@ -53,8 +53,8 @@ def getBestElements(l1_elements, l2_elements):
 		scores[elem] = l1_score + l2_score
 
 
-	# Order the elements by score and retrieve the first 5% of them
-	values_cut = math.floor(len(freq_dist)/20)
+	# Order the elements by score and retrieve the first '1/proportion' % of them
+	values_cut = math.floor(len(freq_dist) / proportion)
 	best_values = sorted(scores.items(), key = lambda pair: pair[1], reverse = True)[:values_cut]
 	best_elements = set([w for w, s in best_values])
 

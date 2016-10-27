@@ -1,6 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-import Utilities, itertools, pickle
+import Utilities, pickle
 from nltk.tokenize import TweetTokenizer
 from nltk.stem import SnowballStemmer
 from nltk.classify import MaxentClassifier, NaiveBayesClassifier, SklearnClassifier, util
@@ -13,8 +13,10 @@ from sklearn.svm import NuSVC
 """ Class in charge of classifying sentences with a label given a pair of them """
 class Classifier(object):
 
-	# Attribute that stores the trained model
+	# Attributes that stores the trained model, best words and bigrams
 	MODEL = None
+	BEST_WORDS = None
+	BEST_BIGRAMS = None
 
 	# Attribute that stores the tokenizer object
 	TOKENIZER = TweetTokenizer(False, True, True)
@@ -44,7 +46,9 @@ class Classifier(object):
 				# Storing all line words after extracting the root
 				sentence_words = self.TOKENIZER.tokenize(line)
 				sentence_words = [self.LEMMATIZER.stem(word) for word in sentence_words]
-				words.append(sentence_words)
+
+				for word in sentence_words:
+					words.append(word)
 
 				# Storing all line bigrams
 				bigram_finder = BCF.from_words(sentence_words)
@@ -65,7 +69,7 @@ class Classifier(object):
 
 
 	""" Transform a sentence into a features list to train / classify """
-	def __getFeatures(self, sentence, best_words = None, best_bigrams = None):
+	def __getFeatures(self, sentence):
 
 		# Every line word root is obtained
 		sentence_words = self.TOKENIZER.tokenize(sentence)
@@ -75,18 +79,20 @@ class Classifier(object):
 		bigram_finder = BCF.from_words(sentence_words)
 		sentence_bigrams = bigram_finder.nbest(BAM.pmi, None)
 
-		# If the best words / bigrams lists are specified: for training
-		if (best_words is not None) and (best_bigrams is not None):
-			features_list = dict([(word, True) for word in sentence_words if word in best_words])
-			features_list.update([(bigram[0] + " " + bigram[1], True) for bigram in sentence_bigrams
-								  if (bigram[0] + " " + bigram[1]) in best_bigrams])
+		# Transforming each bigram to avoid errors in other classifiers
+		for i in range(0, len(sentence_bigrams)):
+			sentence_bigrams[i] = sentence_bigrams[i][0] + " " + sentence_bigrams[i][1]
 
-		# If any of them is not specified: for classifying
-		else:
-			features_list = dict([(word, True) for word in sentence_words])
-			features_list.update([(bigram[0] + " " + bigram[1], True) for bigram in sentence_bigrams])
 
-		return features_list
+		try:
+			features_list = dict([(word, word in sentence_words) for word in self.BEST_WORDS])
+			features_list.update([(bigram, bigram in sentence_bigrams) for bigram in self.BEST_BIGRAMS])
+
+			return features_list
+
+		except TypeError:
+			print("ERROR: 'None' type detected in some classifier attribute")
+			exit()
 
 
 
@@ -148,32 +154,27 @@ class Classifier(object):
 
 
 	""" Trains a classifier using the sentences from the specified files """
-	def train(self, classifier, label1_file, label2_file):
+	def train(self, classifier, label1_file, label2_file, words_proportion = 20, bigrams_proportion = 100):
 
 		# Obtaining the labels
 		label1 = label1_file.rsplit('/')[-1].rsplit('.')[0]
 		label2 = label2_file.rsplit('/')[-1].rsplit('.')[0]
 
-
 		# Obtaining every word and bigram in both files
 		l1_sentences, l1_words, l1_bigrams = self.__getWordsAndBigrams(label1_file)
 		l2_sentences, l2_words, l2_bigrams = self.__getWordsAndBigrams(label2_file)
 
-		# Making word lists iterable
-		l1_words = list(itertools.chain(*l1_words))
-		l2_words = list(itertools.chain(*l2_words))
-
-
 		# Obtaining best words and bigrams taking into account their gain of information
-		best_words = Utilities.getBestElements(l1_words, l2_words)
-		best_bigrams = Utilities.getBestElements(l1_bigrams, l2_bigrams)
+		self.BEST_WORDS = Utilities.getBestElements(l1_words, l2_words, words_proportion)
+		self.BEST_BIGRAMS = Utilities.getBestElements(l1_bigrams, l2_bigrams, bigrams_proportion)
+
 
 		# Transforming each sentence into a dictionary of features
 		for i in range(0, len(l1_sentences)):
-			l1_sentences[i] = [self.__getFeatures(l1_sentences[i], best_words, best_bigrams), label1]
+			l1_sentences[i] = [self.__getFeatures(l1_sentences[i]), label1]
 
 		for i in range(0, len(l2_sentences)):
-			l2_sentences[i] = [self.__getFeatures(l2_sentences[i], best_words, best_bigrams), label2]
+			l2_sentences[i] = [self.__getFeatures(l2_sentences[i]), label2]
 
 
 		# Trains using the specified classifier
@@ -201,7 +202,7 @@ class Classifier(object):
 
 		try:
 			model_file = open(model_path, 'wb')
-			pickle.dump(self.MODEL, model_file)
+			pickle.dump([self.MODEL, self.BEST_WORDS, self.BEST_BIGRAMS], model_file)
 
 			model_file.close()
 			print("The classifier model has been saved in '", model_path, "'")
@@ -218,7 +219,7 @@ class Classifier(object):
 
 		try:
 			model_file = open(model_path, 'rb')
-			self.MODEL = pickle.load(model_file)
+			self.MODEL, self.BEST_WORDS, self.BEST_BIGRAMS = pickle.load(model_file)
 
 			model_file.close()
 			print("The classifier model has been loaded from '", model_path, "'")
