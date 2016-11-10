@@ -3,10 +3,12 @@
 import Utilities, pickle
 from nltk.tokenize import TweetTokenizer
 from nltk.stem import SnowballStemmer
-from nltk.classify import MaxentClassifier, NaiveBayesClassifier, SklearnClassifier, util
+from nltk.classify import SklearnClassifier
 from nltk.metrics import BigramAssocMeasures as BAM
 from nltk.collocations import BigramCollocationFinder as BCF
+from sklearn.naive_bayes import BernoulliNB
 from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import NuSVC
 
 
@@ -113,20 +115,10 @@ class Classifier(object):
 			print("Accuracy:", Utilities.crossValidation(classifier, l1_features, l2_features), "\n")
 
 
-		# Trains the Max Entropy classifier
-		elif classifier_name.lower() == "max-entropy":
-
-			self.MODEL = MaxentClassifier.train(train_features, trace = 0, min_lldelta = 0.01)
-
-			print("Max Entropy training process completed")
-			print("Calculating accuracy...")
-			print("Accuracy:", round(util.accuracy(self.MODEL, train_features), 4), "\n")
-
-
 		# Trains the Naive Bayes classifier
 		elif classifier_name.lower() == "naive-bayes":
 
-			classifier = NaiveBayesClassifier
+			classifier = SklearnClassifier(BernoulliNB())
 			self.MODEL = classifier.train(train_features)
 
 			print("Naive Bayes training process completed")
@@ -141,6 +133,17 @@ class Classifier(object):
 			self.MODEL = classifier.train(train_features)
 
 			print("Nu SVC training process completed")
+			print("Calculating accuracy...")
+			print("Accuracy:", Utilities.crossValidation(classifier, l1_features, l2_features), "\n")
+
+
+		# Trains the Random Forest classifier
+		elif classifier_name.lower() == "random-forest":
+
+			classifier = SklearnClassifier(RandomForestClassifier(n_estimators = 100))
+			self.MODEL = classifier.train(train_features)
+
+			print("Random Forest training process completed")
 			print("Calculating accuracy...")
 			print("Accuracy:", Utilities.crossValidation(classifier, l1_features, l2_features), "\n")
 

@@ -48,10 +48,7 @@ def getBestElements(l1_elements, l2_elements, proportion):
 
 	# Builds a dictionary of scores based on chi-squared test
 	for elem, freq in freq_dist.items():
-		l1_score = BAM.chi_sq(conditional_dist['label1'][elem], (freq, l1_count), total_count)
-		l2_score = BAM.chi_sq(conditional_dist['label2'][elem], (freq, l2_count), total_count)
-		scores[elem] = l1_score + l2_score
-
+		scores[elem] = BAM.chi_sq(conditional_dist['label1'][elem], (freq, l1_count), total_count)
 
 	# Order the elements by score and retrieve the first '1/proportion' % of them
 	values_cut = math.floor(len(freq_dist) / proportion)
@@ -145,8 +142,10 @@ def crossValidationFold(classifier, l1_features, l1_cutoff, l2_features, l2_cuto
 	train_features = l1_features[:index1] + l1_features[index2:] + \
 					 l2_features[:index3] + l2_features[index4:]
 
-	model = classifier.train(train_features)
-	return util.accuracy(model, test_features)
+	result = util.accuracy(classifier.train(train_features), test_features)
+	print("Fold", i+1, "accuracy rate is", round(result, 4))
+
+	return result
 
 
 

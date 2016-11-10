@@ -11,7 +11,7 @@ from multiprocessing import Process, Manager
 datasets_folder = "./Datasets/"
 models_folder = "./Models/"
 
-classifiers = ['logistic-regression', 'max-entropy', 'naive-bayes', 'nu-svc']
+classifiers = ['logistic-regression', 'naive-bayes', 'nu-svc', 'random-forest']
 
 
 
