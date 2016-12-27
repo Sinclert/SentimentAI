@@ -79,20 +79,20 @@ class DataMiner(object):
             # Each tweet is processed and appended at the end of the list
             for tweet in Cursor(self.API.user_timeline, id = user, count = 200).items(depth):
 
-                # If it is a retweet: the original text is obtained
+                # If it is a retweet: the original tweet is obtained
                 if hasattr(tweet, 'retweeted_status'):
-                    tweet_text = tweet.retweeted_status.text
-                else:
-                    tweet_text = tweet.text
+                    tweet = tweet.retweeted_status
 
                 # If the tweet does not contain the specified word: continue
-                if (word is not None) and (word.lower() not in tweet_text.lower()):
+                if (word is not None) and (word.lower() not in tweet.text.lower()):
                     continue
 
 
                 # If there is any URL or image link in the text: it is removed
                 if (len(tweet.entities['urls']) != 0) or (('media' in tweet.entities) == True):
-                    tweet_text = re.sub("http\S+", "", tweet_text)
+                    tweet_text = re.sub("http\S+", "", tweet.text)
+                else:
+                    tweet_text = tweet.text
 
                 tweets_list.append(Utilities.getCleanTweet(tweet_text))
 
@@ -127,16 +127,16 @@ class DataMiner(object):
             # Each tweet is processed and appended at the end of the list
             for tweet in Cursor(self.API.search, query, lang = language, count = 100).items(depth):
 
-                # If it is a retweet: the original text is obtained
+                # If it is a retweet: the original tweet is obtained
                 if hasattr(tweet, 'retweeted_status'):
-                    tweet_text = tweet.retweeted_status.text
-                else:
-                    tweet_text = tweet.text
+                    tweet = tweet.retweeted_status
 
 
                 # If there is any URL or image link in the text: it is removed
                 if (len(tweet.entities['urls']) != 0) or (('media' in tweet.entities) == True):
-                    tweet_text = re.sub("http\S+", "", tweet_text)
+                    tweet_text = re.sub("http\S+", "", tweet.text)
+                else:
+                    tweet_text = tweet.text
 
                 tweets_list.append(Utilities.getCleanTweet(tweet_text))
 

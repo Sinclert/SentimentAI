@@ -65,25 +65,18 @@ class TwitterListener(StreamListener):
 
     """ Prints live data according to the stream parameters """
     def on_data(self, tweet):
-
-        # In case either the classifier or the buffer is not specified: error
-        if (self.CLASSIFIER1 is None) or (self.CLASSIFIER2 is None) or (self.BUFFER is None):
-            print("ERROR: TwitterListener requires to call 'init()' first")
-            exit()
-
-        tweet_dict = json.loads(tweet)
-
+        tweet = json.loads(tweet)
 
         try:
-            # If it is a retweet: the original text is obtained
-            if tweet_dict.get('retweeted_status'):
-                tweet_text = tweet_dict['retweeted_status']['text']
-            else:
-                tweet_text = tweet_dict['text']
+            # If it is a retweet: the original tweet is obtained
+            if tweet.get('retweeted_status'):
+                tweet = tweet['retweeted_status']
 
             # If there is any URL or image link in the text: it is removed
-            if (len(tweet_dict['entities']['urls']) != 0) or (tweet_dict['entities'].get('media') is not None):
-                tweet_text = re.sub("http\S+", "", tweet_text)
+            if (len(tweet['entities']['urls']) != 0) or (tweet['entities'].get('media') is not None):
+                tweet_text = re.sub("http\S+", "", tweet['text'])
+            else:
+                tweet_text = tweet['text']
 
             # Clean the tweet
             tweet_text = Utilities.getCleanTweet(tweet_text)

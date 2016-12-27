@@ -110,7 +110,7 @@ class Classifier(object):
 			classifier = SklearnClassifier(LogisticRegression())
 			self.MODEL = classifier.train(train_features)
 
-			print("Naive Bayes training process completed")
+			print("Logistic Regression training process completed")
 			print("Calculating accuracy...")
 			print("Accuracy:", Utilities.crossValidation(classifier, l1_features, l2_features), "\n")
 
