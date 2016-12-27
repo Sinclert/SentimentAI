@@ -85,17 +85,17 @@ class DataMiner(object):
                     tweet = tweet['retweeted_status']
 
                 # If the tweet does not contain the specified word: continue
-                if (word is not None) and (word.lower() not in tweet.text.lower()):
+                if (word is not None) and (word.lower() not in tweet['text'].lower()):
                     continue
 
                 tweets_list.append(Utilities.getCleanTweet(tweet))
-
 
             # In case word is specified but there are not tweets with it
             if (word is not None) and (len(tweets_list) == 0):
                 print("There are no tweets from", user, "containing '", word, "'")
 
             return tweets_list
+
 
         except TweepError:
 
@@ -127,12 +127,12 @@ class DataMiner(object):
 
                 tweets_list.append(Utilities.getCleanTweet(tweet))
 
-
             # In case there are not enough tweets: print message
             if len(tweets_list) < depth:
                 print("There are not", depth, "tweets meeting query '", query, "' . Retrieving", len(tweets_list))
 
             return tweets_list
+
 
         except TweepError:
 

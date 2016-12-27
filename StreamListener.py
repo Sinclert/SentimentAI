@@ -75,7 +75,6 @@ class TwitterListener(StreamListener):
             # Clean the tweet
             tweet_text = Utilities.getCleanTweet(tweet)
 
-
             # If it has enough length: write it
             if len(tweet_text) >= 30:
                 result = self.CLASSIFIER1.classify(tweet_text)
@@ -92,6 +91,11 @@ class TwitterListener(StreamListener):
         # In case of tweet limit warning: pass
         except KeyError:
             pass
+
+        # In case of an attribute NoneType error
+        except AttributeError:
+            print("One of the TwitterListener attributes has not been correctly initiated")
+            exit()
 
 
 
