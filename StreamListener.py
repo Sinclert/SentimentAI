@@ -1,6 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-import Utilities, json, re
+import Utilities, json
 from Keys import keys
 from tweepy import AppAuthHandler, API, OAuthHandler, StreamListener, Stream
 
@@ -72,14 +72,8 @@ class TwitterListener(StreamListener):
             if tweet.get('retweeted_status'):
                 tweet = tweet['retweeted_status']
 
-            # If there is any URL or image link in the text: it is removed
-            if (len(tweet['entities']['urls']) != 0) or (tweet['entities'].get('media') is not None):
-                tweet_text = re.sub("http\S+", "", tweet['text'])
-            else:
-                tweet_text = tweet['text']
-
             # Clean the tweet
-            tweet_text = Utilities.getCleanTweet(tweet_text)
+            tweet_text = Utilities.getCleanTweet(tweet)
 
 
             # If it has enough length: write it

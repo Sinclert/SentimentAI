@@ -1,6 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-import Utilities, re
+import Utilities
 from Keys import keys
 from tweepy import AppAuthHandler, API, Cursor, RateLimitError, TweepError
 
@@ -78,23 +78,17 @@ class DataMiner(object):
 
             # Each tweet is processed and appended at the end of the list
             for tweet in Cursor(self.API.user_timeline, id = user, count = 200).items(depth):
+                tweet = tweet._json
 
                 # If it is a retweet: the original tweet is obtained
-                if hasattr(tweet, 'retweeted_status'):
-                    tweet = tweet.retweeted_status
+                if tweet.get('retweeted_status'):
+                    tweet = tweet['retweeted_status']
 
                 # If the tweet does not contain the specified word: continue
                 if (word is not None) and (word.lower() not in tweet.text.lower()):
                     continue
 
-
-                # If there is any URL or image link in the text: it is removed
-                if (len(tweet.entities['urls']) != 0) or (('media' in tweet.entities) == True):
-                    tweet_text = re.sub("http\S+", "", tweet.text)
-                else:
-                    tweet_text = tweet.text
-
-                tweets_list.append(Utilities.getCleanTweet(tweet_text))
+                tweets_list.append(Utilities.getCleanTweet(tweet))
 
 
             # In case word is specified but there are not tweets with it
@@ -102,7 +96,6 @@ class DataMiner(object):
                 print("There are no tweets from", user, "containing '", word, "'")
 
             return tweets_list
-
 
         except TweepError:
 
@@ -126,19 +119,13 @@ class DataMiner(object):
 
             # Each tweet is processed and appended at the end of the list
             for tweet in Cursor(self.API.search, query, lang = language, count = 100).items(depth):
+                tweet = tweet._json
 
                 # If it is a retweet: the original tweet is obtained
-                if hasattr(tweet, 'retweeted_status'):
-                    tweet = tweet.retweeted_status
+                if tweet.get('retweeted_status'):
+                    tweet = tweet['retweeted_status']
 
-
-                # If there is any URL or image link in the text: it is removed
-                if (len(tweet.entities['urls']) != 0) or (('media' in tweet.entities) == True):
-                    tweet_text = re.sub("http\S+", "", tweet.text)
-                else:
-                    tweet_text = tweet.text
-
-                tweets_list.append(Utilities.getCleanTweet(tweet_text))
+                tweets_list.append(Utilities.getCleanTweet(tweet))
 
 
             # In case there are not enough tweets: print message
@@ -146,7 +133,6 @@ class DataMiner(object):
                 print("There are not", depth, "tweets meeting query '", query, "' . Retrieving", len(tweets_list))
 
             return tweets_list
-
 
         except TweepError:
 

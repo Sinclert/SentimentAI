@@ -16,8 +16,8 @@ emoji_filter  = re.compile(u'['
                              u'\U0001F910-\U0001F919]+',
                              re.UNICODE)
 
+html_filter = re.compile('&\w+;')
 spaces_filter = re.compile('\s+')
-
 user_filter = re.compile('(^|\s+)@\w+')
 
 
@@ -62,11 +62,19 @@ def getBestElements(l1_elements, l2_elements, proportion):
 
 """ Returns the tweet text as a common sentence after applying some filters """
 def getCleanTweet(tweet):
-	tweet = tweet.replace("#", "")
-	tweet = emoji_filter.sub("", tweet)
-	tweet = spaces_filter.sub(" ", tweet)
 
-	return tweet
+	# If there is any URL or image link in the text: it is removed
+	if (len(tweet['entities']['urls']) != 0) or (tweet['entities'].get('media') is not None):
+		tweet_text = re.sub("http\S+", "", tweet['text'])
+	else:
+		tweet_text = tweet['text']
+
+	tweet_text = tweet_text.replace("#", "")
+	tweet_text = html_filter.sub("", tweet_text)
+	tweet_text = emoji_filter.sub("", tweet_text)
+	tweet_text = spaces_filter.sub(" ", tweet_text)
+
+	return tweet_text
 
 
 
