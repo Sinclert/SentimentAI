@@ -2,7 +2,7 @@
 
 import Utilities
 from Keys import keys
-from tweepy import AppAuthHandler, API, Cursor, RateLimitError, TweepError
+from tweepy import AppAuthHandler, API, Cursor, TweepError
 
 
 """ Class in charge of retrieving data from the Twitter API """
@@ -30,40 +30,6 @@ class DataMiner(object):
 
         except Exception or ConnectionError:
             print("ERROR: Unable to establish a connection with Twitter")
-            exit()
-
-
-
-
-    """ Returns a list containing friends IDs (up to 5000) """
-    def getFriends(self, user):
-
-        try:
-            return self.API.friends_ids(id = user)
-
-        except RateLimitError:
-            print("RATE LIMIT ERROR: Unable to retrieve friends from", user)
-            exit()
-
-        except TweepError:
-            print("TWEEPY ERROR: Unable to retrieve friends from", user)
-            exit()
-
-
-
-
-    """ Returns a list containing followers IDs (up to 5000) """
-    def getFollowers(self, user):
-
-        try:
-            return self.API.followers_ids(id = user)
-
-        except RateLimitError:
-            print("RATE LIMIT ERROR: Unable to retrieve followers from", user)
-            exit()
-
-        except TweepError:
-            print("TWEEPY ERROR: Unable to retrieve followers from", user)
             exit()
 
 

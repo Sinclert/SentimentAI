@@ -79,11 +79,8 @@ class TwitterListener(StreamListener):
             if len(tweet_text) >= 30:
                 result = self.CLASSIFIER1.classify(tweet_text)
 
-                # If the tweet is classified as polarized
                 if result == 'Polarized':
                     self.updateBuffers(self.CLASSIFIER2.classify(tweet_text))
-
-                # If the tweet is not consider as polarized: neutral
                 else:
                     self.updateBuffers('Neutral')
 

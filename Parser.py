@@ -12,6 +12,7 @@ datasets_folder = "./Datasets/"
 models_folder = "./Models/"
 
 classifiers = ['logistic-regression', 'naive-bayes', 'nu-svc', 'random-forest']
+labels = ['Negative', 'Neutral', 'Positive']
 
 
 
@@ -46,29 +47,35 @@ if (len(sys.argv) == 8) and (sys.argv[1].lower() == "train"):
 
 
 ################# CLASSIFY TEST #################
-# Arguments: "Classify" <Classifier> <Twitter account> <Word>
+# Arguments: "Classify" <Classifier 1> <Classifier 2> <Twitter account> <Word>
 
-elif (len(sys.argv) == 5) and (sys.argv[1].lower() == "classify"):
+elif (len(sys.argv) == 6) and (sys.argv[1].lower() == "classify"):
 
-    # Objects creation
+    # Load both trained classifiers
+    classifier1 = Classifier()
+    classifier2 = Classifier()
+    classifier1.loadModel(models_folder + sys.argv[2] + ".pickle")
+    classifier2.loadModel(models_folder + sys.argv[3] + ".pickle")
+
+    # Obtaining tweets
     miner = DataMiner()
-    classifier = Classifier()
+    tweets = miner.getUserTweets(sys.argv[4], sys.argv[5])
 
-    # Mining process
-    classifier.loadModel(models_folder + sys.argv[2] + ".pickle")
-    tweets = miner.getUserTweets(sys.argv[3], sys.argv[4])
-
-    # Obtaining probabilities of each tweet
-    sentences = Utilities.getSentences(tweets, sys.argv[4])
+    # Splitting the tweets into individual sentences
+    sentences = Utilities.getSentences(tweets, sys.argv[5])
     classifications = dict()
 
     # Creating the results dictionary
-    for label in sorted(classifier.MODEL.labels()):
-        classifications[label] = 0
+    for label in labels: classifications[label] = 0
 
     # Storing the classification results
     for sentence in sentences:
-        classifications[classifier.classify(sentence)] += 1
+        result = classifier1.classify(sentence)
+
+        if result == 'Polarized':
+            classifications[classifier2.classify(sentence)] += 1
+        else:
+            classifications['Neutral'] += 1
 
     print(classifications)
 
@@ -80,10 +87,10 @@ elif (len(sys.argv) == 5) and (sys.argv[1].lower() == "classify"):
 
 elif (len(sys.argv) == 6) and (sys.argv[1].lower() == "search"):
 
-    # Object creation
+    # Obtaining tweets
     miner = DataMiner()
-
     tweets = miner.searchTweets(sys.argv[2], sys.argv[3], int(sys.argv[4]))
+
     Utilities.storeTweets(tweets, datasets_folder + sys.argv[5])
 
 
@@ -99,7 +106,6 @@ elif (len(sys.argv) == 8) and (sys.argv[1].lower() == "stream"):
     classifier2 = Classifier()
     classifier1.loadModel(models_folder + sys.argv[2] + ".pickle")
     classifier2.loadModel(models_folder + sys.argv[3] + ".pickle")
-    labels = ['Negative', 'Neutral', 'Positive']
 
     # Parsing arguments
     buffer_size = int(sys.argv[4])
@@ -116,9 +122,7 @@ elif (len(sys.argv) == 8) and (sys.argv[1].lower() == "stream"):
 
     # Shared dictionary between both processes
     shared_dict = Manager().dict()
-    shared_dict['Negative'] = 0
-    shared_dict['Neutral'] = 0
-    shared_dict['Positive'] = 0
+    for label in labels: shared_dict[label] = 0
 
     # Creates the stream object and start stream
     stream = TwitterListener()
@@ -146,6 +150,6 @@ elif (len(sys.argv) == 8) and (sys.argv[1].lower() == "stream"):
 else:
     print("ERROR: Invalid arguments. Possible options:")
     print("Mode 1: 'Train' <Classifier> <Label 1 file> <Label 2 file> <Words prop> <Bigrams prop> <Output file>")
-    print("Mode 2: 'Classify' <Classifier> <Twitter account> <Word>")
+    print("Mode 2: 'Classify' <Classifier 1> <Classifier 2> <Twitter account> <Word>")
     print("Mode 3: 'Search' <Search query> <Language> <Search depth> <Output file>")
     print("Mode 4: 'Stream' <Classifier 1> <Classifier 2> <Buffer size> <Query> <Language> <Coordinates>")
