@@ -69,7 +69,7 @@ class DataMiner(object):
                 print("TWEEPY ERROR: Unable to retrieve most recent tweets from", user)
                 exit()
             else:
-                print("RATE LIMIT ERROR: Unable to retrieve", depth, "tweets from", user, ". Returning", len(tweets_list))
+                print("RATE LIMIT ERROR: Unable to retrieve", depth, "tweets. Returning", len(tweets_list))
                 return tweets_list
 
 
@@ -95,7 +95,7 @@ class DataMiner(object):
 
             # In case there are not enough tweets: print message
             if len(tweets_list) < depth:
-                print("There are not", depth, "tweets meeting query '", query, "' . Retrieving", len(tweets_list))
+                print("There are not", depth, "tweets meeting the query. Retrieving", len(tweets_list))
 
             return tweets_list
 

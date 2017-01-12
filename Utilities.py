@@ -28,19 +28,19 @@ def getBestElements(l1_elements, l2_elements, proportion):
 
 	# Build frequency and conditional distribution within the possible labels
 	freq_dist = FreqDist()
-	conditional_dist = ConditionalFreqDist()
+	cond_dist = ConditionalFreqDist()
 
 	for element in l1_elements:
 		freq_dist[element] += 1
-		conditional_dist['label1'][element] += 1
+		cond_dist['label1'][element] += 1
 
 	for element in l2_elements:
 		freq_dist[element] += 1
-		conditional_dist['label2'][element] += 1
+		cond_dist['label2'][element] += 1
 
 	# Counts the number of positive and negative words, as well as the total number of them
-	l1_count = conditional_dist['label1'].N()
-	l2_count = conditional_dist['label2'].N()
+	l1_count = cond_dist['label1'].N()
+	l2_count = cond_dist['label2'].N()
 	total_count = l1_count + l2_count
 
 
@@ -48,7 +48,7 @@ def getBestElements(l1_elements, l2_elements, proportion):
 
 	# Builds a dictionary of scores based on chi-squared test
 	for elem, freq in freq_dist.items():
-		scores[elem] = BAM.chi_sq(conditional_dist['label1'][elem], (freq, l1_count), total_count)
+		scores[elem] = BAM.chi_sq(cond_dist['label1'][elem], (freq, l1_count), total_count)
 
 	# Order the elements by score and retrieve the first '1/proportion' % of them
 	values_cut = math.floor(len(freq_dist) / proportion)

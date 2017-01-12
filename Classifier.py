@@ -191,7 +191,12 @@ class Classifier(object):
 
 		if self.MODEL is not None:
 			features_list = self.__getFeatures(sentence)
-			return self.MODEL.classify(features_list)
+
+			# If none of the features give any information: return None
+			if True not in features_list.values():
+				return None
+			else:
+				return self.MODEL.classify(features_list)
 
 		else:
 			print("ERROR: The classifier needs to be trained first")

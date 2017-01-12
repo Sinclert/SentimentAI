@@ -73,8 +73,13 @@ elif (len(sys.argv) == 6) and (sys.argv[1].lower() == "classify"):
         result = classifier1.classify(sentence)
 
         if result == 'Polarized':
-            classifications[classifier2.classify(sentence)] += 1
-        else:
+            try:
+                classifications[classifier2.classify(sentence)] += 1
+            except TypeError:
+                print("Tweet:", sentence)
+                print("Ignored (features lack of information)\n")
+
+        elif result == 'Neutral':
             classifications['Neutral'] += 1
 
     print(classifications)

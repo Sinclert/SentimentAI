@@ -81,7 +81,7 @@ class TwitterListener(StreamListener):
 
                 if result == 'Polarized':
                     self.updateBuffers(self.CLASSIFIER2.classify(tweet_text))
-                else:
+                elif result == 'Neutral':
                     self.updateBuffers('Neutral')
 
 
@@ -108,11 +108,15 @@ class TwitterListener(StreamListener):
     """ Updates the dictionary counter and the temporal buffer labels """
     def updateBuffers(self, label):
 
-        try:
-            self.SHARED_DICT[self.BUFFER[self.COUNTER]] -= 1
-        except KeyError:
-            pass
+        if label is None:
+            print("Tweet ignored (features lack of information)")
 
-        self.BUFFER[self.COUNTER] = label
-        self.COUNTER = (self.COUNTER + 1) % len(self.BUFFER)
-        self.SHARED_DICT[label] += 1
+        else:
+            try:
+                self.SHARED_DICT[self.BUFFER[self.COUNTER]] -= 1
+            except KeyError:
+                pass
+
+            self.BUFFER[self.COUNTER] = label
+            self.COUNTER = (self.COUNTER + 1) % len(self.BUFFER)
+            self.SHARED_DICT[label] += 1
