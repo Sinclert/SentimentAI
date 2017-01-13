@@ -1,6 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-import Utilities, pickle
+import Utilities, pickle, os
 from nltk.tokenize import TweetTokenizer
 from nltk.stem import SnowballStemmer
 from nltk.classify import SklearnClassifier
@@ -206,10 +206,14 @@ class Classifier(object):
 
 
 	""" Saves a trained model into the models folder """
-	def saveModel(self, model_path):
+	def saveModel(self, model_path, model_name):
 
 		try:
-			model_file = open(model_path, 'wb')
+			# If the folder does not exist: it is created
+			if os.path.exists(model_path) is False:
+				os.mkdir(model_path)
+
+			model_file = open(model_path + model_name + ".pickle", 'wb')
 			pickle.dump([self.MODEL, self.BEST_WORDS, self.BEST_BIGRAMS], model_file)
 
 			model_file.close()
@@ -223,10 +227,10 @@ class Classifier(object):
 
 
 	""" Loads a trained model into our classifier object """
-	def loadModel(self, model_path):
+	def loadModel(self, model_path, model_name):
 
 		try:
-			model_file = open(model_path, 'rb')
+			model_file = open(model_path + model_name + ".pickle", 'rb')
 			self.MODEL, self.BEST_WORDS, self.BEST_BIGRAMS = pickle.load(model_file)
 
 			model_file.close()

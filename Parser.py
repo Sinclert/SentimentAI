@@ -33,7 +33,7 @@ if (len(sys.argv) == 8) and (sys.argv[1].lower() == "train"):
 
         try:
             classifier.train(sys.argv[2].lower(), l1_file_path, l2_file_path, int(sys.argv[5]), int(sys.argv[6]))
-            classifier.saveModel(models_folder + sys.argv[7] + ".pickle")
+            classifier.saveModel(models_folder, sys.argv[7])
 
         except ValueError:
             print("ERROR: The words proportion and the bigrams proportion must be integer numbers")
@@ -54,8 +54,8 @@ elif (len(sys.argv) == 6) and (sys.argv[1].lower() == "classify"):
     # Load both trained classifiers
     classifier1 = Classifier()
     classifier2 = Classifier()
-    classifier1.loadModel(models_folder + sys.argv[2] + ".pickle")
-    classifier2.loadModel(models_folder + sys.argv[3] + ".pickle")
+    classifier1.loadModel(models_folder, sys.argv[2])
+    classifier2.loadModel(models_folder, sys.argv[3])
 
     # Obtaining tweets
     miner = DataMiner()
@@ -109,8 +109,8 @@ elif (len(sys.argv) == 8) and (sys.argv[1].lower() == "stream"):
     # Load both trained classifiers
     classifier1 = Classifier()
     classifier2 = Classifier()
-    classifier1.loadModel(models_folder + sys.argv[2] + ".pickle")
-    classifier2.loadModel(models_folder + sys.argv[3] + ".pickle")
+    classifier1.loadModel(models_folder, sys.argv[2])
+    classifier2.loadModel(models_folder, sys.argv[3])
 
     # Parsing arguments
     buffer_size = int(sys.argv[4])
