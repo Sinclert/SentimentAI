@@ -48,16 +48,12 @@ class Classifier(object):
 				# Storing all line words after extracting the root
 				sentence_words = self.TOKENIZER.tokenize(line)
 				sentence_words = [self.LEMMATIZER.stem(word) for word in sentence_words]
-
-				for word in sentence_words:
-					words.append(word)
+				words.extend(sentence_words)
 
 				# Storing all line bigrams
 				bigram_finder = BCF.from_words(sentence_words)
 				sentence_bigrams = bigram_finder.nbest(BAM.pmi, None)
-
-				for bigram in sentence_bigrams:
-					bigrams.append(bigram[0] + " " + bigram[1])
+				bigrams.extend([bigram[0] + " " + bigram[1] for bigram in sentence_bigrams])
 
 			sentences_file.close()
 			return sentences, words, bigrams
@@ -84,7 +80,6 @@ class Classifier(object):
 		# Transforming each bigram to avoid errors in other classifiers
 		for i in range(0, len(sentence_bigrams)):
 			sentence_bigrams[i] = sentence_bigrams[i][0] + " " + sentence_bigrams[i][1]
-
 
 		try:
 			features_list = dict([(word, word in sentence_words) for word in self.BEST_WORDS])
@@ -217,10 +212,10 @@ class Classifier(object):
 			pickle.dump([self.MODEL, self.BEST_WORDS, self.BEST_BIGRAMS], model_file)
 
 			model_file.close()
-			print("The classifier model has been saved in '", model_path, "'")
+			print("Classifier model saved in '", model_path + model_name, "'")
 
 		except FileNotFoundError or PermissionError or IsADirectoryError:
-			print("ERROR: The model cannot be saved into '", model_path, "'")
+			print("ERROR: The model '", model_path + model_name, "' cannot be saved")
 			exit()
 
 
@@ -234,8 +229,8 @@ class Classifier(object):
 			self.MODEL, self.BEST_WORDS, self.BEST_BIGRAMS = pickle.load(model_file)
 
 			model_file.close()
-			print("The classifier model has been loaded from '", model_path, "'")
+			print("Classifier model loaded from '", model_path + model_name, "'")
 
 		except FileNotFoundError or PermissionError or IsADirectoryError:
-			print("ERROR: The model '", model_path, "' cannot be loaded")
+			print("ERROR: The model '", model_path + model_name, "' cannot be loaded")
 			exit()

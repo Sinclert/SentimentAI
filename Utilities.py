@@ -125,6 +125,7 @@ def crossValidation(classifier, l1_features, l2_features, folds = 10):
 		# Creating the pool of processes and mapping them to the number of iterations
 		processes = Pool(cpu_count())
 		processes_output = processes.map(func = func, iterable = range(folds))
+		processes.close()
 
 		return round((sum(processes_output) / folds), 4)
 
