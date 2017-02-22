@@ -78,8 +78,8 @@ class Classifier(object):
 		sentence_bigrams = bigram_finder.nbest(BAM.pmi, None)
 
 		# Transforming each bigram to avoid errors in other classifiers
-		for i in range(0, len(sentence_bigrams)):
-			sentence_bigrams[i] = sentence_bigrams[i][0] + " " + sentence_bigrams[i][1]
+		for i, bigram in enumerate(sentence_bigrams):
+			sentence_bigrams[i] = bigram[0] + " " + bigram[1]
 
 		try:
 			features_list = dict([(word, word in sentence_words) for word in self.BEST_WORDS])
@@ -152,7 +152,7 @@ class Classifier(object):
 
 
 	""" Trains a classifier using the sentences from the specified files """
-	def train(self, classifier, label1_file, label2_file, words_proportion = 20, bigrams_proportion = 100):
+	def train(self, classifier, label1_file, label2_file, words_prop = 20, bigrams_prop = 100):
 
 		# Obtaining the labels
 		label1 = label1_file.rsplit('/')[-1].rsplit('.')[0]
@@ -163,16 +163,16 @@ class Classifier(object):
 		l2_sentences, l2_words, l2_bigrams = self.__getWordsAndBigrams(label2_file)
 
 		# Obtaining best words and bigrams taking into account their gain of information
-		self.BEST_WORDS = Utilities.getBestElements(l1_words, l2_words, words_proportion)
-		self.BEST_BIGRAMS = Utilities.getBestElements(l1_bigrams, l2_bigrams, bigrams_proportion)
+		self.BEST_WORDS = Utilities.getBestElements(l1_words, l2_words, words_prop)
+		self.BEST_BIGRAMS = Utilities.getBestElements(l1_bigrams, l2_bigrams, bigrams_prop)
 
 
 		# Transforming each sentence into a dictionary of features
-		for i in range(0, len(l1_sentences)):
-			l1_sentences[i] = [self.__getFeatures(l1_sentences[i]), label1]
+		for i, sentence in enumerate(l1_sentences):
+			l1_sentences[i] = [self.__getFeatures(sentence), label1]
 
-		for i in range(0, len(l2_sentences)):
-			l2_sentences[i] = [self.__getFeatures(l2_sentences[i]), label2]
+		for i, sentence in enumerate(l2_sentences):
+			l2_sentences[i] = [self.__getFeatures(sentence), label2]
 
 
 		# Trains using the specified classifier
