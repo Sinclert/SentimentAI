@@ -35,7 +35,7 @@ class DataMiner(object):
 
 
 
-    """ Returns a list containing most recent tweets containing the specified word (each 200 is a request) """
+    """ Returns a list of most recent tweets containing the word (each 200 is a request) """
     def getUserTweets(self, user, word = None, depth = 1000):
 
         tweets_list = []
@@ -69,7 +69,7 @@ class DataMiner(object):
                 print("TWEEPY ERROR: Unable to retrieve most recent tweets from", user)
                 exit()
             else:
-                print("RATE LIMIT ERROR: Unable to retrieve", depth, "tweets. Returning", len(tweets_list))
+                print("RATE LIMIT ERROR: Returning", len(tweets_list), "tweets")
                 return tweets_list
 
 
@@ -95,7 +95,7 @@ class DataMiner(object):
 
             # In case there are not enough tweets: print message
             if len(tweets_list) < depth:
-                print("There are not", depth, "tweets meeting the query. Retrieving", len(tweets_list))
+                print("Not enough tweets meeting the query. Retrieving", len(tweets_list))
 
             return tweets_list
 
@@ -106,5 +106,5 @@ class DataMiner(object):
                 print("TWEEPY ERROR: Unable to retrieve tweets from the specified search")
                 exit()
             else:
-                print("RATE LIMIT ERROR: Unable to retrieve", depth, "tweets. Returning", len(tweets_list))
+                print("RATE LIMIT ERROR: Returning", len(tweets_list), "tweets")
                 return tweets_list
