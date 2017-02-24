@@ -32,9 +32,7 @@ class Classifier(object):
 	""" Obtains every sentence with its words and bigrams of the specified file """
 	def __getWordsAndBigrams(self, file):
 
-		sentences = []
-		words = []
-		bigrams = []
+		sentences, words, bigrams = [], [], []
 
 		try:
 			sentences_file = open(file, 'r', encoding = "UTF8")
@@ -82,8 +80,8 @@ class Classifier(object):
 			sentence_bigrams[i] = bigram[0] + " " + bigram[1]
 
 		try:
-			features_list = dict([(word, word in sentence_words) for word in self.BEST_WORDS])
-			features_list.update([(bigram, bigram in sentence_bigrams) for bigram in self.BEST_BIGRAMS])
+			features_list = dict((word, word in sentence_words) for word in self.BEST_WORDS)
+			features_list.update((bigram, bigram in sentence_bigrams) for bigram in self.BEST_BIGRAMS)
 
 			return features_list
 
