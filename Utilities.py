@@ -23,10 +23,10 @@ user_filter = re.compile('(^|\s+)@\w+')
 
 
 
-""" Finds the best 'number' elements based on their gain of information """
+""" Finds the best 'n' elements based on their gain of information """
 def getBestElements(l1_elements, l2_elements, proportion):
 
-	# Build frequency and conditional distribution within the possible labels
+	# Build frequency and conditional distribution within the labels
 	freq_dist = FreqDist()
 	cond_dist = ConditionalFreqDist()
 
@@ -38,7 +38,7 @@ def getBestElements(l1_elements, l2_elements, proportion):
 		freq_dist[element] += 1
 		cond_dist['label2'][element] += 1
 
-	# Counts the number of positive and negative words, as well as the total number of them
+	# Counts the number of l1 and l2 words as well as their combined sum
 	l1_count = cond_dist['label1'].N()
 	l2_count = cond_dist['label2'].N()
 	total_count = l1_count + l2_count
@@ -79,7 +79,7 @@ def getCleanTweet(tweet):
 
 
 
-""" Divides tweets into sentences and returns those containing the specified word """
+""" Divides tweets into sentences and returns those containing the word """
 def getSentences(tweets, word = None):
 
 	# If there is a list of tweets as input
@@ -99,7 +99,7 @@ def getSentences(tweets, word = None):
 		sentences = re.split("[.:!?]\s+", str(tweets))
 
 		if word is not None:
-			sentences[:] = [sentence for sentence in sentences if word.lower() in sentence.lower()]
+			sentences[:] = [s for s in sentences if word.lower() in s.lower()]
 
 		return sentences
 
@@ -120,9 +120,15 @@ def crossValidation(classifier, l1_features, l2_features, folds = 10):
 		l1_cutoff = math.floor(len(l1_features) / folds)
 		l2_cutoff = math.floor(len(l2_features) / folds)
 
-		func = partial(crossValidationFold, classifier, l1_features, l1_cutoff, l2_features, l2_cutoff, folds)
+		func = partial(cvFold,
+		               classifier,
+		               l1_features,
+		               l2_features,
+		               l1_cutoff,
+		               l2_cutoff,
+		               folds)
 
-		# Creating the pool of processes and mapping them to the number of iterations
+		# Creating the pool of processes and mapping them to the folds
 		processes = Pool(cpu_count())
 		processes_output = processes.map(func = func, iterable = range(folds))
 		processes.close()
@@ -136,8 +142,8 @@ def crossValidation(classifier, l1_features, l2_features, folds = 10):
 
 
 
-""" Perfoms a single iteration of the Cross Validation algorithm """
-def crossValidationFold(classifier, l1_features, l1_cutoff, l2_features, l2_cutoff, folds, i):
+""" Performs a single iteration of the Cross Validation algorithm """
+def cvFold(classifier, l1_features, l2_features, l1_cutoff, l2_cutoff, folds, i):
 
 	# Calculating the required indices to split the features
 	index1 = (folds - i - 1) * l1_cutoff

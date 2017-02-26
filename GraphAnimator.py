@@ -16,7 +16,9 @@ def animatePieChart(i, labels, tracks, shared_dict):
 
     try:
         # Labels counters
-        counters = [shared_dict[labels[0]], shared_dict[labels[1]], shared_dict[labels[2]]]
+        counters = [shared_dict[labels[0]],
+                    shared_dict[labels[1]],
+                    shared_dict[labels[2]]]
 
         # In case there is data to show
         if sum(counters) > 0:

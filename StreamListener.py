@@ -8,23 +8,31 @@ from tweepy import AppAuthHandler, API, OAuthHandler, StreamListener, Stream
 """ Class in charge of retrieving live data from the Twitter Streaming API """
 class TwitterListener(StreamListener):
 
-    # Attributes to stores stream classifiers, probabilities buffer and connection
-    CLASSIFIER1 = None
-    CLASSIFIER2 = None
-    BUFFER = None
+    # Attribute that stores the API connection object
     API = None
 
-    # Shared variable between this process and the graphic one
-    SHARED_DICT = None
 
-    # Attribute to store the buffer overwriting position
-    COUNTER = 0
+
+
+    """ Set the listener connection and basic attributes """
+    def __init__(self, classifier1, classifier2, buffer_size, shared_dict):
+
+        # Calling the superclass init method in case it does something
+        super().__init__()
+
+        # Initializing basic instance attributes
+        self.__setConnection()
+        self.classifier1 = classifier1
+        self.classifier2 = classifier2
+        self.buffer = buffer_size * [None]
+        self.shared_dict = shared_dict
+        self.counter = 0
 
 
 
 
     """ Establish Twitter API connection using user authentication """
-    def setConnection(self):
+    def __setConnection(self):
 
         # Obtaining application keys from the Keys file
         consumer_key = keys['consumer_key']
@@ -50,15 +58,32 @@ class TwitterListener(StreamListener):
 
 
 
-    """ Set the listener classifier, buffer and connection """
-    def init(self, classifier1, classifier2, buffer_size, query, languages, coordinates, shared_dict):
-        self.CLASSIFIER1 = classifier1
-        self.CLASSIFIER2 = classifier2
-        self.BUFFER = [None] * buffer_size
-        self.SHARED_DICT = shared_dict
+    """ Updates the dictionary counter and the temporal buffer labels """
+    def __updateBuffers(self, label):
+
+        if label is None:
+            print("Tweet ignored (features lack of information)")
+
+        else:
+            try:
+                self.shared_dict[self.buffer[self.counter]] -= 1
+            except KeyError:
+                pass
+
+            self.buffer[self.counter] = label
+            self.counter = (self.counter + 1) % len(self.buffer)
+            self.shared_dict[label] += 1
+
+
+
+
+    """ Initiates the Twitter streaming given query, languages and locations """
+    def initStream(self, query, languages, coordinates):
 
         twitterStream = Stream(self.API.auth, self)
-        twitterStream.filter(track = query, languages = languages, locations = coordinates)
+        twitterStream.filter(track = query,
+                             languages = languages,
+                             locations = coordinates)
 
 
 
@@ -77,12 +102,12 @@ class TwitterListener(StreamListener):
 
             # If it has enough length: write it
             if len(tweet_text) >= 30:
-                result = self.CLASSIFIER1.classify(tweet_text)
+                result = self.classifier1.classify(tweet_text)
 
                 if result == 'Polarized':
-                    self.updateBuffers(self.CLASSIFIER2.classify(tweet_text))
+                    self.__updateBuffers(self.classifier2.classify(tweet_text))
                 elif result == 'Neutral':
-                    self.updateBuffers('Neutral')
+                    self.__updateBuffers('Neutral')
 
 
         # In case of tweet limit warning: pass
@@ -91,7 +116,7 @@ class TwitterListener(StreamListener):
 
         # In case of an attribute NoneType error
         except AttributeError:
-            print("One of the TwitterListener attributes has not been correctly initiated")
+            print("TwitterListener attributes not correctly initiated")
             exit()
 
 
@@ -101,22 +126,3 @@ class TwitterListener(StreamListener):
     def on_error(self, status):
         print("CONNECTION ERROR:", status)
         exit()
-
-
-
-
-    """ Updates the dictionary counter and the temporal buffer labels """
-    def updateBuffers(self, label):
-
-        if label is None:
-            print("Tweet ignored (features lack of information)")
-
-        else:
-            try:
-                self.SHARED_DICT[self.BUFFER[self.COUNTER]] -= 1
-            except KeyError:
-                pass
-
-            self.BUFFER[self.COUNTER] = label
-            self.COUNTER = (self.COUNTER + 1) % len(self.BUFFER)
-            self.SHARED_DICT[label] += 1

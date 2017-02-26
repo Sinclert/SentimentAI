@@ -130,10 +130,9 @@ elif (len(sys.argv) == 8) and (sys.argv[1].lower() == "stream"):
     for label in labels: shared_dict[label] = 0
 
     # Creates the stream object and start stream
-    stream = TwitterListener()
-    stream.setConnection()
-    streamProcess = Process(target = stream.init,
-                            args = (classifier1, classifier2, buffer_size, tracks, languages, coordinates, shared_dict))
+    stream = TwitterListener(classifier1, classifier2, buffer_size, shared_dict)
+    streamProcess = Process(target = stream.initStream,
+                            args = (tracks, languages, coordinates))
     streamProcess.start()
 
 

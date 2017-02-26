@@ -14,7 +14,7 @@ class DataMiner(object):
 
 
 
-    """ Establish Twitter API connection using application-only authentication """
+    """ Establish Twitter API connection using application authentication """
     def __init__(self):
 
         # Obtaining application keys from the Keys file
@@ -35,7 +35,7 @@ class DataMiner(object):
 
 
 
-    """ Returns a list of most recent tweets containing the word (each 200 is a request) """
+    """ Returns a list of most recent tweets containing the word (request each 200) """
     def getUserTweets(self, user, word = None, depth = 1000):
 
         tweets_list = []
@@ -75,7 +75,7 @@ class DataMiner(object):
 
 
 
-    """ Returns a list containing tweets that fulfill the specified query (each 100 is a request).
+    """ Returns a list containing tweets that fulfill the specified query (request each 100).
         Link to learn about queries: https://dev.twitter.com/rest/public/search """
     def searchTweets(self, query, language, depth = 1000):
 
