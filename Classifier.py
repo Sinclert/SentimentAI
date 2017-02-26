@@ -100,22 +100,20 @@ class Classifier(object):
 	def __performTraining(self, classifier_name, l1_features, l2_features):
 
 		classifier = None
+		classifier_name = classifier_name.lower()
 		train_features = l1_features[:] + l2_features[:]
 
-		# Set the Logistic Regression classifier
-		if classifier_name.lower() == "logistic-regression":
+		# Set the classifier depending on the provided name
+		if classifier_name == "logistic-regression":
 			classifier = SklearnClassifier(LogisticRegression())
 
-		# Set the Naive Bayes classifier
-		elif classifier_name.lower() == "naive-bayes":
+		elif classifier_name == "naive-bayes":
 			classifier = SklearnClassifier(BernoulliNB())
 
-		# Set the Nu SVC classifier
-		elif classifier_name.lower() == "nu-svc":
+		elif classifier_name == "nu-svc":
 			classifier = SklearnClassifier(NuSVC())
 
-		# Set the Random Forest classifier
-		elif classifier_name.lower() == "random-forest":
+		elif classifier_name == "random-forest":
 			classifier = SklearnClassifier(RandomForestClassifier(n_estimators = 100))
 
 		# In case another option is specified: error
@@ -133,7 +131,7 @@ class Classifier(object):
 
 
 	""" Trains a classifier using the sentences from the specified files """
-	def train(self, classifier, label1_file, label2_file, words_prop = 20, bigrams_prop = 100):
+	def train(self, classifier_name, label1_file, label2_file, words_prop = 20, bigrams_prop = 100):
 
 		# Obtaining the labels
 		label1 = label1_file.rsplit('/')[-1].rsplit('.')[0]
@@ -157,7 +155,7 @@ class Classifier(object):
 
 
 		# Trains using the specified classifier
-		self.__performTraining(classifier, l1_sentences, l2_sentences)
+		self.__performTraining(classifier_name, l1_sentences, l2_sentences)
 
 
 
