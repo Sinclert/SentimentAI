@@ -24,7 +24,7 @@ user_filter = re.compile('(^|\s+)@\w+')
 
 
 """ Finds the best 'n' elements based on their gain of information """
-def getBestElements(l1_elements, l2_elements, proportion):
+def getBestElements(l1_elements, l2_elements, percentage):
 
 	# Build frequency and conditional distribution within the labels
 	freq_dist = FreqDist()
@@ -50,8 +50,8 @@ def getBestElements(l1_elements, l2_elements, proportion):
 	for elem, freq in freq_dist.items():
 		scores[elem] = BAM.chi_sq(cond_dist['label1'][elem], (freq, l1_count), total_count)
 
-	# Order the elements by score and retrieve the first '1/proportion' % of them
-	values_cut = math.floor(len(freq_dist) / proportion)
+	# Order the elements by score and retrieve the first 'percentage' % of them
+	values_cut = math.floor(len(freq_dist) * percentage / 100)
 	best_values = sorted(scores.items(), key = lambda pair: pair[1], reverse = True)[:values_cut]
 	best_elements = set([w for w, s in best_values])
 
