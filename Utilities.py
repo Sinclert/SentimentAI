@@ -8,19 +8,6 @@ from multiprocessing import Pool, cpu_count
 from functools import partial
 
 
-################ FILTERS ################
-emoji_filter  = re.compile(u'['
-                             u'\U00002600-\U000027B0'
-                             u'\U0001F300-\U0001F64F'
-                             u'\U0001F680-\U0001F6FF'
-                             u'\U0001F910-\U0001F919]+',
-                             re.UNICODE)
-
-html_filter = re.compile('&\w+;')
-spaces_filter = re.compile('\s+')
-user_filter = re.compile('(^|\s+)@\w+')
-
-
 
 
 """ Finds the best 'n' elements based on their gain of information """
@@ -69,6 +56,18 @@ def getCleanTweet(tweet):
 	else:
 		tweet_text = tweet['text']
 
+	# Defining filters for cleaning the tweet
+	emoji_filter  = re.compile(u'['
+	                             u'\U00002600-\U000027B0'
+	                             u'\U0001F300-\U0001F64F'
+	                             u'\U0001F680-\U0001F6FF'
+	                             u'\U0001F910-\U0001F919]+',
+	                             re.UNICODE)
+
+	html_filter = re.compile('&\w+;')
+	spaces_filter = re.compile('\s+')
+
+	# Tweet cleaning steps
 	tweet_text = tweet_text.replace("#", "")
 	tweet_text = html_filter.sub("", tweet_text)
 	tweet_text = emoji_filter.sub("", tweet_text)
@@ -180,6 +179,7 @@ def storeTweets(tweets, file_name, min_length = 30):
 		file = open(file_name, 'a', encoding = "UTF8")
 
 		# Subtracting user names before storing
+		user_filter = re.compile('(^|\s+)@\w+')
 		tweets = user_filter.sub(" USER", tweets)
 		tweets = tweets.strip()
 

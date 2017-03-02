@@ -25,8 +25,8 @@ if (len(sys.argv) == 8) and (sys.argv[1].lower() == "train"):
     # Checks the specified classifier
     if sys.argv[2].lower() in classifiers:
 
-        l1_file_path = datasets_folder + sys.argv[3]
-        l2_file_path = datasets_folder + sys.argv[4]
+        l1_file = datasets_folder + sys.argv[3]
+        l2_file = datasets_folder + sys.argv[4]
         words_pct, bigrams_pct = 0, 0
 
         # Converting the inputs into real numeric variables
@@ -43,11 +43,11 @@ if (len(sys.argv) == 8) and (sys.argv[1].lower() == "train"):
             exit()
 
         classifier = Classifier()
-        classifier.train(sys.argv[2].lower(),
-                         l1_file_path,
-                         l2_file_path,
-                         words_pct,
-                         bigrams_pct)
+        classifier.train(classifier_name = sys.argv[2].lower(),
+                         label1_file = l1_file,
+                         label2_file = l2_file,
+                         words_pct = words_pct,
+                         bigrams_pct = bigrams_pct)
 
         classifier.saveModel(models_folder, sys.argv[7])
 

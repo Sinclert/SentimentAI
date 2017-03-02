@@ -131,7 +131,7 @@ class Classifier(object):
 
 
 	""" Trains a classifier using the sentences from the specified files """
-	def train(self, classifier_name, label1_file, label2_file, words_prop = 20, bigrams_prop = 100):
+	def train(self, classifier_name, label1_file, label2_file, words_pct = 5, bigrams_pct = 1):
 
 		# Obtaining the labels
 		label1 = label1_file.rsplit('/')[-1].rsplit('.')[0]
@@ -142,8 +142,8 @@ class Classifier(object):
 		l2_sentences, l2_words, l2_bigrams = self.__getWordsAndBigrams(label2_file)
 
 		# Obtaining best words and bigrams taking into account their gain of information
-		self.best_words = Utilities.getBestElements(l1_words, l2_words, words_prop)
-		self.best_bigrams = Utilities.getBestElements(l1_bigrams, l2_bigrams, bigrams_prop)
+		self.best_words = Utilities.getBestElements(l1_words, l2_words, words_pct)
+		self.best_bigrams = Utilities.getBestElements(l1_bigrams, l2_bigrams, bigrams_pct)
 
 
 		# Transforming each sentence into a dictionary of features
