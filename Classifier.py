@@ -1,6 +1,7 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
 import Utilities, pickle, os
+from collections import Counter
 from nltk.tokenize import TweetTokenizer
 from nltk.stem import SnowballStemmer
 from nltk.classify import SklearnClassifier
@@ -36,7 +37,7 @@ class Classifier(object):
 	""" Obtains every sentence, word and bigram from the specified file """
 	def __getWordsAndBigrams(self, file):
 
-		sentences, words, bigrams = [], [], []
+		sentences, words, bigrams = [], Counter(), Counter()
 
 		try:
 			sentences_file = open(file, 'r', encoding = "UTF8")
@@ -50,12 +51,15 @@ class Classifier(object):
 				# Storing all line words after extracting the root
 				sentence_words = self.tokenizer.tokenize(line)
 				sentence_words = [self.lemmatizer.stem(word) for word in sentence_words]
-				words.extend(sentence_words)
+				for word in sentence_words:
+					words[word] += 1
 
 				# Storing all line bigrams
 				bigram_finder = BCF.from_words(sentence_words)
 				sentence_bigrams = bigram_finder.nbest(BAM.pmi, None)
-				bigrams.extend([bigram[0] + " " + bigram[1] for bigram in sentence_bigrams])
+				for bigram in sentence_bigrams:
+					bigrams[bigram[0] + " " + bigram[1]] += 1
+
 
 			sentences_file.close()
 			return sentences, words, bigrams

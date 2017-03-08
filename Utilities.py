@@ -2,7 +2,6 @@
 
 import math, re
 from nltk.classify import util
-from nltk.probability import FreqDist, ConditionalFreqDist
 from nltk.metrics import BigramAssocMeasures as BAM
 from multiprocessing import Pool, cpu_count
 from functools import partial
@@ -13,34 +12,26 @@ from functools import partial
 """ Finds the best 'n' elements based on their gain of information """
 def getBestElements(l1_elements, l2_elements, percentage):
 
-	# Build frequency and conditional distribution within the labels
-	freq_dist = FreqDist()
-	cond_dist = ConditionalFreqDist()
-
-	for element in l1_elements:
-		freq_dist[element] += 1
-		cond_dist['label1'][element] += 1
-
-	for element in l2_elements:
-		freq_dist[element] += 1
-		cond_dist['label2'][element] += 1
-
-	# Counts the number of l1 and l2 words as well as their combined sum
-	l1_count = cond_dist['label1'].N()
-	l2_count = cond_dist['label2'].N()
+	# Counts the number of l1 and l2 elements as well as their sum
+	l1_count = len(l1_elements)
+	l2_count = len(l2_elements)
 	total_count = l1_count + l2_count
 
-
+	# Frequency distribution storing each element total appearances
+	freq_dist = l1_elements + l2_elements
 	scores = {}
 
 	# Builds a dictionary of scores based on chi-squared test
 	for elem, freq in freq_dist.items():
-		scores[elem] = BAM.chi_sq(cond_dist['label1'][elem], (freq, l1_count), total_count)
+		scores[elem] = BAM.chi_sq(l1_elements[elem], (freq, l1_count), total_count)
 
-	# Order the elements by score and retrieve the first 'percentage' % of them
+	best_values = sorted(scores.items(),
+	                     key = lambda pair: pair[1],
+	                     reverse = True)
+
+	# Retrieves the specified percentage of elements with highest scores
 	values_cut = math.floor(len(freq_dist) * percentage / 100)
-	best_values = sorted(scores.items(), key = lambda pair: pair[1], reverse = True)[:values_cut]
-	best_elements = set([w for w, s in best_values])
+	best_elements = set(w for w, s in best_values[:values_cut])
 
 	return best_elements
 
