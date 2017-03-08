@@ -10,20 +10,20 @@ from functools import partial
 
 
 """ Finds the best 'n' elements based on their gain of information """
-def getBestElements(l1_elements, l2_elements, percentage):
+def getBestElements(l1_counter, l2_counter, percentage):
 
 	# Counts the number of l1 and l2 elements as well as their sum
-	l1_count = len(l1_elements)
-	l2_count = len(l2_elements)
-	total_count = l1_count + l2_count
+	l1_total = sum(l1_counter.values())
+	l2_total = sum(l2_counter.values())
+	total = l1_total + l2_total
 
 	# Frequency distribution storing each element total appearances
-	freq_dist = l1_elements + l2_elements
+	freq_dist = l1_counter + l2_counter
 	scores = {}
 
 	# Builds a dictionary of scores based on chi-squared test
 	for elem, freq in freq_dist.items():
-		scores[elem] = BAM.chi_sq(l1_elements[elem], (freq, l1_count), total_count)
+		scores[elem] = BAM.chi_sq(l1_counter[elem], (freq, l1_total), total)
 
 	best_values = sorted(scores.items(),
 	                     key = lambda pair: pair[1],
@@ -126,7 +126,7 @@ def crossValidation(classifier, l1_features, l2_features, folds = 10):
 		return round((sum(processes_output) / folds), 4)
 
 	else:
-		print("ERROR: The number of cross validation folds must be greater than 1")
+		print("ERROR: The number of C.V. folds must be greater than 1")
 		exit()
 
 
