@@ -3,8 +3,8 @@
 import Utilities, sys
 from Classifier import Classifier
 from DataMiner import DataMiner
-from StreamListener import TwitterListener
-from multiprocessing import Process, Manager
+from TwitterListener import TwitterListener
+from multiprocessing import Manager
 
 
 # Folder paths
@@ -143,9 +143,7 @@ elif (len(sys.argv) == 8) and (sys.argv[1].lower() == "stream"):
 
     # Creates the stream object and start stream
     listener = TwitterListener(classifier1, classifier2, buffer_size, stream_dict)
-    stream_process = Process(target = listener.initStream,
-                                args = (tracks, languages, coordinates))
-    stream_process.start()
+    listener.initStream(tracks, languages, coordinates)
 
 
     from matplotlib import pyplot, animation
@@ -155,9 +153,8 @@ elif (len(sys.argv) == 8) and (sys.argv[1].lower() == "stream"):
     ani = animation.FuncAnimation(figure, animatePieChart, interval = 500, fargs = (labels, tracks, stream_dict))
     pyplot.show()
 
-    # Finally: kill stream process
-    if stream_process is not None:
-        stream_process.terminate()
+    # Finally: close the stream process
+    listener.closeStream()
 
 
 

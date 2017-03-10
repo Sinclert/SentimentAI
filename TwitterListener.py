@@ -15,7 +15,7 @@ class TwitterListener(StreamListener):
 
 
     """ Set the listener connection and basic attributes """
-    def __init__(self, classifier1, classifier2, buffer_size, shared_dict):
+    def __init__(self, classifier1, classifier2, buffer_size, stream_dict):
 
         # Calling the superclass init method in case it does something
         super().__init__()
@@ -25,8 +25,9 @@ class TwitterListener(StreamListener):
         self.classifier1 = classifier1
         self.classifier2 = classifier2
         self.buffer = buffer_size * [None]
-        self.shared_dict = shared_dict
         self.counter = 0
+        self.stream = None
+        self.stream_dict = stream_dict
 
 
 
@@ -66,13 +67,13 @@ class TwitterListener(StreamListener):
 
         else:
             try:
-                self.shared_dict[self.buffer[self.counter]] -= 1
+                self.stream_dict[self.buffer[self.counter]] -= 1
             except KeyError:
                 pass
 
             self.buffer[self.counter] = label
             self.counter = (self.counter + 1) % len(self.buffer)
-            self.shared_dict[label] += 1
+            self.stream_dict[label] += 1
 
 
 
@@ -80,10 +81,19 @@ class TwitterListener(StreamListener):
     """ Initiates the Twitter streaming given query, languages and locations """
     def initStream(self, query, languages, coordinates):
 
-        twitterStream = Stream(self.API.auth, self)
-        twitterStream.filter(track = query,
-                             languages = languages,
-                             locations = coordinates)
+        self.stream = Stream(self.API.auth, self)
+        self.stream.filter(track = query,
+                           languages = languages,
+                           locations = coordinates,
+                           async = True)
+
+
+
+
+    """ Closes the Twitter streaming """
+    def closeStream(self):
+        self.stream.disconnect()
+        print("Disconnected from the Twitter streaming")
 
 
 
