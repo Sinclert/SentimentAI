@@ -1,6 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-import Utilities, json
+import Utilities
 from Keys import keys
 from tweepy import AppAuthHandler, API, OAuthHandler, StreamListener, Stream
 
@@ -99,8 +99,8 @@ class TwitterListener(StreamListener):
 
 
     """ Prints live data according to the stream parameters """
-    def on_data(self, tweet):
-        tweet = json.loads(tweet)
+    def on_status(self, tweet):
+        tweet = tweet._json
 
         try:
             # If it is a retweet: the original tweet is obtained
