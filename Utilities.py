@@ -8,12 +8,12 @@ from functools import partial
 
 
 ################ FILTERS ################
-emoji_filter  = re.compile(u'['
-                             u'\U00002600-\U000027B0'
-                             u'\U0001F300-\U0001F64F'
-                             u'\U0001F680-\U0001F6FF'
-                             u'\U0001F910-\U0001F919]+',
-                             re.UNICODE)
+emoji_filter = re.compile(u'['
+                            u'\U00002600-\U000027B0'
+                            u'\U0001F300-\U0001F64F'
+                            u'\U0001F680-\U0001F6FF'
+                            u'\U0001F910-\U0001F919]+',
+                            re.UNICODE)
 
 html_filter = re.compile('&\w+;')
 spaces_filter = re.compile('\s+')

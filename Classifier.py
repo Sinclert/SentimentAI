@@ -135,20 +135,24 @@ class Classifier(object):
 
 
 	""" Trains a classifier using the sentences from the specified files """
-	def train(self, classifier_name, label1_file, label2_file, words_pct = 5, bigrams_pct = 1):
+	def train(self, classifier_name, l1_file, l2_file, words_pct = 5, bigrams_pct = 1):
 
 		# Obtaining the labels
-		label1 = label1_file.rsplit('/')[-1].rsplit('.')[0]
-		label2 = label2_file.rsplit('/')[-1].rsplit('.')[0]
+		label1 = l1_file.rsplit('/')[-1].rsplit('.')[0]
+		label2 = l2_file.rsplit('/')[-1].rsplit('.')[0]
 
 		# Obtaining every word and bigram in both files
-		l1_sentences, l1_words, l1_bigrams = self.__getWordsAndBigrams(label1_file)
-		l2_sentences, l2_words, l2_bigrams = self.__getWordsAndBigrams(label2_file)
+		l1_sentences, l1_words, l1_bigrams = self.__getWordsAndBigrams(l1_file)
+		l2_sentences, l2_words, l2_bigrams = self.__getWordsAndBigrams(l2_file)
 
-		# Obtaining best words and bigrams taking into account their gain of information
-		self.best_words = Utilities.getBestElements(l1_words, l2_words, words_pct)
-		self.best_bigrams = Utilities.getBestElements(l1_bigrams, l2_bigrams, bigrams_pct)
+		# Obtaining best words and bigrams considering the gain of information
+		self.best_words = Utilities.getBestElements(l1_counter = l1_words,
+		                                            l2_counter = l2_words,
+		                                            percentage = words_pct)
 
+		self.best_bigrams = Utilities.getBestElements(l1_counter = l1_bigrams,
+		                                              l2_counter = l2_bigrams,
+		                                              percentage = bigrams_pct)
 
 		# Transforming each sentence into a dictionary of features
 		for i, sentence in enumerate(l1_sentences):
