@@ -168,10 +168,10 @@ class Classifier(object):
 
 
 
-	""" Classify the specified text after obtaining all its words and bigrams """
+	""" Classify the specified text after obtaining all its features """
 	def classify(self, sentence):
 
-		if self.model is not None:
+		try:
 			features = self.__getFeatures(sentence)
 
 			# If none of the features give any information: return None
@@ -180,7 +180,7 @@ class Classifier(object):
 			else:
 				return self.model.classify(features)
 
-		else:
+		except AttributeError:
 			print("ERROR: The classifier needs to be trained first")
 			exit()
 
@@ -199,10 +199,10 @@ class Classifier(object):
 			pickle.dump([self.model, self.best_words, self.best_bigrams], model_file)
 
 			model_file.close()
-			print("Classifier model saved in '", model_path + model_name, "'")
+			print("Classifier model saved in", model_path + model_name)
 
 		except FileNotFoundError or PermissionError or IsADirectoryError:
-			print("ERROR: The model '", model_path + model_name, "' cannot be saved")
+			print("ERROR: The model", model_path + model_name, "cannot be saved")
 			exit()
 
 
@@ -216,8 +216,8 @@ class Classifier(object):
 			self.model, self.best_words, self.best_bigrams = pickle.load(model_file)
 
 			model_file.close()
-			print("Classifier model loaded from '", model_path + model_name, "'")
+			print("Classifier model loaded from", model_path + model_name)
 
 		except FileNotFoundError or PermissionError or IsADirectoryError:
-			print("ERROR: The model '", model_path + model_name, "' cannot be loaded")
+			print("ERROR: The model", model_path + model_name, "cannot be loaded")
 			exit()

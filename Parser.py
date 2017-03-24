@@ -44,8 +44,8 @@ if (len(sys.argv) == 8) and (sys.argv[1].lower() == "train"):
 
         classifier = Classifier()
         classifier.train(classifier_name = sys.argv[2].lower(),
-                         label1_file = l1_file,
-                         label2_file = l2_file,
+                         l1_file = l1_file,
+                         l2_file = l2_file,
                          words_pct = words_pct,
                          bigrams_pct = bigrams_pct)
 
@@ -71,10 +71,10 @@ elif (len(sys.argv) == 6) and (sys.argv[1].lower() == "classify"):
 
     # Obtaining tweets
     miner = DataMiner()
-    tweets = miner.getUserTweets(sys.argv[4], sys.argv[5])
+    tweets = miner.getUserTweets(user = sys.argv[4], word = sys.argv[5])
 
     # Splitting the tweets into individual sentences
-    sentences = Utilities.getSentences(tweets, sys.argv[5])
+    sentences = Utilities.getSentences(tweets = tweets, word = sys.argv[5])
     classifications = dict()
 
     # Creating the results dictionary
@@ -106,7 +106,9 @@ elif (len(sys.argv) == 6) and (sys.argv[1].lower() == "search"):
 
     # Obtaining tweets
     miner = DataMiner()
-    tweets = miner.searchTweets(sys.argv[2], sys.argv[3], int(sys.argv[4]))
+    tweets = miner.searchTweets(query = sys.argv[2],
+                                language = sys.argv[3],
+                                depth = int(sys.argv[4]))
 
     Utilities.storeTweets(tweets, datasets_folder + sys.argv[5])
 
@@ -150,7 +152,10 @@ elif (len(sys.argv) == 8) and (sys.argv[1].lower() == "stream"):
     from GraphAnimator import animatePieChart, figure
 
     # Animate the graph each milliseconds interval
-    ani = animation.FuncAnimation(figure, animatePieChart, interval = 500, fargs = (labels, tracks, stream_dict))
+    ani = animation.FuncAnimation(fig = figure,
+                                  func = animatePieChart,
+                                  interval = 500,
+                                  fargs = (labels, tracks, stream_dict))
     pyplot.show()
 
     # Finally: close the stream process
@@ -162,7 +167,7 @@ elif (len(sys.argv) == 8) and (sys.argv[1].lower() == "stream"):
 # In case none of the possible options is selected: error
 else:
     print("ERROR: Invalid arguments. Possible options:")
-    print("Mode 1: 'Train' <Classifier> <L1 file> <L2 file> <Words pct> <Bigrams pct> <Output>")
-    print("Mode 2: 'Classify' <Classifier 1> <Classifier 2> <Twitter account> <Word>")
-    print("Mode 3: 'Search' <Search query> <Language> <Search depth> <Output>")
-    print("Mode 4: 'Stream' <Classifier 1> <Classifier 2> <Buffer size> <Query> <Language> <Coordinates>")
+    print("1. 'Train' <Classifier> <L1 file> <L2 file> <Words pct> <Bigrams pct> <Output>")
+    print("2. 'Classify' <Classifier 1> <Classifier 2> <Twitter account> <Word>")
+    print("3. 'Search' <Search query> <Language> <Search depth> <Output>")
+    print("4. 'Stream' <Classifier 1> <Classifier 2> <Buffer size> <Query> <Language> <Coordinates>")
