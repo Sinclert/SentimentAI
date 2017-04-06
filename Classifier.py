@@ -66,7 +66,7 @@ class Classifier(object):
 
 
 		except FileNotFoundError or PermissionError or IsADirectoryError:
-			print("ERROR: The file '", file, "' cannot be opened")
+			print("ERROR: The file", file, "cannot be opened")
 			exit()
 
 

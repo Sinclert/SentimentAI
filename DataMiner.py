@@ -2,6 +2,7 @@
 
 import Utilities
 from Keys import keys
+from math import ceil
 from tweepy import AppAuthHandler, API, Cursor, TweepError
 
 
@@ -75,36 +76,41 @@ class DataMiner(object):
 
 
 
-    """ Gets a list of tweets fulfilling the specified query (request each 100).
-        Link to learn about queries: https://dev.twitter.com/rest/public/search """
-    def searchTweets(self, query, language, depth = 1000):
+    """ Stores the tweets fulfilling the specified query (request each 100).
+        To learn about queries: https://dev.twitter.com/rest/public/search """
+    def searchTweets(self, query, language, file, depth = 1000):
 
-        tweets_list = []
+        # They indicate the number of pages and tweets returned
+        num_pages = ceil(depth / 100)
+        tweets_counter = 0
 
         try:
 
-            # Each tweet is processed and appended at the end of the list
-            for tweet in Cursor(self.API.search, query, lang = language, count = 100).items(depth):
-                tweet = tweet._json
+            # Each page is traversed and its tweets appended at the end of the file
+            for page in Cursor(self.API.search, query, lang = language, count = 100).pages(num_pages):
+                tweets_counter += len(page)
+                tweets_list = []
 
-                # If it is a retweet: the original tweet is obtained
-                if tweet.get('retweeted_status'):
-                    tweet = tweet['retweeted_status']
+                # Each tweet in the page is processed
+                for tweet in page:
+                    tweet = tweet._json
 
-                tweets_list.append(Utilities.getCleanTweet(tweet))
+                    # If it is a retweet: the original tweet is obtained
+                    if tweet.get('retweeted_status'):
+                        tweet = tweet['retweeted_status']
 
-            # In case there are not enough tweets: print message
-            if len(tweets_list) < depth:
-                print("Not enough tweets meeting the query. Retrieving", len(tweets_list))
+                    tweets_list.append(Utilities.getCleanTweet(tweet))
 
-            return tweets_list
+                # Storing the tweets for each page
+                Utilities.storeTweets(tweets_list, file)
+
+            print("Tweets stored into", file)
 
 
         except TweepError:
 
-            if len(tweets_list) == 0:
+            if tweets_counter == 0:
                 print("TWEEPY ERROR: Unable to retrieve tweets from the specified search")
                 exit()
             else:
-                print("RATE LIMIT ERROR: Returning", len(tweets_list), "tweets")
-                return tweets_list
+                print("RATE LIMIT ERROR: Returning", tweets_counter, "tweets")

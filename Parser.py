@@ -104,13 +104,12 @@ elif (len(sys.argv) == 6) and (sys.argv[1].lower() == "classify"):
 
 elif (len(sys.argv) == 6) and (sys.argv[1].lower() == "search"):
 
-    # Obtaining tweets
+    # Obtaining tweets and storing them in a file
     miner = DataMiner()
-    tweets = miner.searchTweets(query = sys.argv[2],
-                                language = sys.argv[3],
-                                depth = int(sys.argv[4]))
-
-    Utilities.storeTweets(tweets, datasets_folder + sys.argv[5])
+    miner.searchTweets(query = sys.argv[2],
+                       language = sys.argv[3],
+                       file = datasets_folder + sys.argv[5],
+                       depth = int(sys.argv[4]))
 
 
 

@@ -1,6 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-import math, re
+import re
 from nltk.classify import util
 from nltk.metrics import BigramAssocMeasures as BAM
 from multiprocessing import Pool, cpu_count
@@ -43,7 +43,7 @@ def getBestElements(l1_counter, l2_counter, percentage):
 	                     reverse = True)
 
 	# Retrieves the specified percentage of elements with highest scores
-	values_cut = math.floor(len(freq_dist) * percentage / 100)
+	values_cut = len(freq_dist) * percentage // 100
 	best_elements = set(w for w, s in best_values[:values_cut])
 
 	return best_elements
@@ -109,8 +109,8 @@ def crossValidation(classifier, l1_features, l2_features, folds = 10):
 	if folds > 1:
 
 		# Calculating cut offs in both features lists
-		l1_cutoff = math.floor(len(l1_features) / folds)
-		l2_cutoff = math.floor(len(l2_features) / folds)
+		l1_cutoff = len(l1_features) // folds
+		l2_cutoff = len(l2_features) // folds
 
 		func = partial(cvFold,
 		               classifier,
@@ -157,32 +157,26 @@ def cvFold(classifier, l1_features, l2_features, l1_cutoff, l2_cutoff, folds, i)
 
 
 
-""" Appends the specified tweets at the end of a text file """
+""" Appends the specified tweets (list) at the end of a text file """
 def storeTweets(tweets, file_name, min_length = 30):
 
-	# If there is a list of tweets as input
-	if isinstance(tweets, list):
-		for tweet in tweets:
-			storeTweets(tweet, file_name)
-
-		print("Tweets stored into '", file_name, "'")
-
-	# Base case: individual tweet
-	elif isinstance(tweets, str):
+	try:
 		file = open(file_name, 'a', encoding = "UTF8")
 
-		# Subtracting user names before storing
-		tweets = user_filter.sub(" USER", tweets)
-		tweets = tweets.strip()
+		for tweet in tweets:
 
-		# Store the tweet only if it has enough length
-		if len(tweets) >= min_length:
-			file.write(tweets)
-			file.write("\n")
+			# Subtracting user names before storing
+			tweet = user_filter.sub(" USER", tweet)
+			tweet = tweet.strip()
+
+			# Store the tweet only if it has enough length
+			if len(tweet) >= min_length:
+				file.write(tweet)
+				file.write("\n")
 
 		file.close()
 
-	# If what we are processing is neither a list nor a string: error
-	else:
-		print("ERROR: Invalid value in one of the text inputs")
+
+	except PermissionError or IsADirectoryError:
+		print("ERROR: The file '", file_name, "' cannot be opened")
 		exit()
