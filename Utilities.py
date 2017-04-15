@@ -1,20 +1,21 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
 import re
+from functools import partial
 from nltk.classify import util
 from nltk.metrics import BigramAssocMeasures as BAM
 from multiprocessing import Pool, cpu_count
-from functools import partial
 
 
 ################ FILTERS ################
-emoji_filter = re.compile(u'['
-                            u'\U00002600-\U000027B0'
-                            u'\U0001F300-\U0001F64F'
-                            u'\U0001F680-\U0001F6FF'
-                            u'\U0001F910-\U0001F919]+',
-                            re.UNICODE)
+emoji_filter = re.compile('['
+                          u'\U00002600-\U000027B0'
+                          u'\U0001F300-\U0001F64F'
+                          u'\U0001F680-\U0001F6FF'
+                          u'\U0001F910-\U0001F919]+',
+                          re.UNICODE)
 
+link_filter = re.compile('http\S+')
 html_filter = re.compile('&\w+;')
 spaces_filter = re.compile('\s+')
 user_filter = re.compile('(^|\s+)@\w+')
@@ -54,13 +55,10 @@ def getBestElements(l1_counter, l2_counter, percentage):
 """ Returns the tweet text as a common sentence after applying some filters """
 def getCleanTweet(tweet):
 
-	# If there is any URL or image link in the text: it is removed
-	if (len(tweet['entities']['urls']) != 0) or (tweet['entities'].get('media') is not None):
-		tweet_text = re.sub("http\S+", "", tweet['text'])
-	else:
-		tweet_text = tweet['text']
+	# Removing any URL or image link in the text
+	tweet_text = link_filter.sub("", tweet['text'])
 
-	# Tweet cleaning steps
+	# Other tweet cleaning steps
 	tweet_text = tweet_text.replace("#", "")
 	tweet_text = html_filter.sub("", tweet_text)
 	tweet_text = emoji_filter.sub("", tweet_text)

@@ -80,15 +80,15 @@ class DataMiner(object):
         To learn about queries: https://dev.twitter.com/rest/public/search """
     def searchTweets(self, query, language, file, depth = 1000):
 
-        # They indicate the number of pages and tweets returned
+        # Number of pages and tweets returned
         num_pages = ceil(depth / 100)
-        tweets_counter = 0
+        num_tweets = 0
 
         try:
 
             # Each page is traversed and its tweets appended at the end of the file
             for page in Cursor(self.API.search, query, lang = language, count = 100).pages(num_pages):
-                tweets_counter += len(page)
+                num_tweets += len(page)
                 tweets_list = []
 
                 # Each tweet in the page is processed
@@ -109,8 +109,8 @@ class DataMiner(object):
 
         except TweepError:
 
-            if tweets_counter == 0:
+            if num_tweets == 0:
                 print("TWEEPY ERROR: Unable to retrieve tweets from the specified search")
                 exit()
             else:
-                print("RATE LIMIT ERROR: Returning", tweets_counter, "tweets")
+                print("RATE LIMIT ERROR: Returning", num_tweets, "tweets")
