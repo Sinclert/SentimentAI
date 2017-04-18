@@ -2,11 +2,10 @@
 
 import Utilities, pickle, os
 from collections import Counter
+from nltk import bigrams as getBigrams
 from nltk.tokenize import TweetTokenizer
 from nltk.stem import SnowballStemmer
 from nltk.classify import SklearnClassifier
-from nltk.metrics import BigramAssocMeasures as BAM
-from nltk.collocations import BigramCollocationFinder as BCF
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
@@ -55,8 +54,7 @@ class Classifier(object):
 					words[word] += 1
 
 				# Storing all line bigrams
-				bigram_finder = BCF.from_words(sentence_words)
-				sentence_bigrams = bigram_finder.nbest(BAM.pmi, None)
+				sentence_bigrams = getBigrams(sentence_words)
 				for bigram in sentence_bigrams:
 					bigrams[bigram[0] + " " + bigram[1]] += 1
 
@@ -79,13 +77,9 @@ class Classifier(object):
 		sentence_words = self.tokenizer.tokenize(sentence)
 		sentence_words = [self.lemmatizer.stem(word) for word in sentence_words]
 
-		# Every line bigram is obtained
-		bigram_finder = BCF.from_words(sentence_words)
-		sentence_bigrams = bigram_finder.nbest(BAM.pmi, None)
-
-		# Transforming each bigram to avoid errors in other classifiers
-		for i, bigram in enumerate(sentence_bigrams):
-			sentence_bigrams[i] = bigram[0] + " " + bigram[1]
+		# Every bigram is obtained and transformed (avoiding errors)
+		sentence_bigrams = getBigrams(sentence_words)
+		sentence_bigrams = [b[0] + " " + b[1] for b in sentence_bigrams]
 
 		try:
 			features = dict((word, word in sentence_words) for word in self.best_words)
