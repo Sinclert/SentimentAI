@@ -11,7 +11,7 @@ from multiprocessing import Manager
 datasets_folder = "./Datasets/"
 models_folder = "./Models/"
 
-classifiers = ['logistic-regression', 'naive-bayes', 'nu-svc', 'random-forest']
+classifiers = ['logistic-regression', 'naive-bayes', 'linear-svc', 'random-forest']
 labels = ['Negative', 'Neutral', 'Positive']
 
 

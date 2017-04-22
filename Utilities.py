@@ -1,10 +1,7 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
 import re
-from functools import partial
-from nltk.classify import util
 from nltk.metrics import BigramAssocMeasures as BAM
-from multiprocessing import Pool, cpu_count
 
 
 ################ FILTERS ################
@@ -97,60 +94,6 @@ def getSentences(tweets, word = None):
 	else:
 		print("ERROR: Invalid value in one of the text inputs")
 		exit()
-
-
-
-
-""" Tests the specified classifier applying cross validation """
-def crossValidation(classifier, l1_features, l2_features, folds = 10):
-
-	if folds > 1:
-
-		# Calculating cut offs in both features lists
-		l1_cutoff = len(l1_features) // folds
-		l2_cutoff = len(l2_features) // folds
-
-		func = partial(cvFold,
-		               classifier,
-		               l1_features,
-		               l2_features,
-		               l1_cutoff,
-		               l2_cutoff,
-		               folds)
-
-		# Creating the pool of processes and mapping them to the folds
-		processes = Pool(cpu_count())
-		processes_output = processes.map(func = func, iterable = range(folds))
-		processes.close()
-
-		return round((sum(processes_output) / folds), 4)
-
-	else:
-		print("ERROR: The number of C.V. folds must be greater than 1")
-		exit()
-
-
-
-
-""" Performs a single iteration of the Cross Validation algorithm """
-def cvFold(classifier, l1_features, l2_features, l1_cutoff, l2_cutoff, folds, i):
-
-	# Calculating the required indices to split the features
-	index1 = (folds - i - 1) * l1_cutoff
-	index2 = (folds - i) * l1_cutoff
-	index3 = (folds - i - 1) * l2_cutoff
-	index4 = (folds - i) * l2_cutoff
-
-	# Splitting the list of features into both train and test sets
-	test_features = l1_features[index1:index2] + l2_features[index3:index4]
-
-	train_features = l1_features[:index1] + l1_features[index2:] + \
-					 l2_features[:index3] + l2_features[index4:]
-
-	result = util.accuracy(classifier.train(train_features), test_features)
-	print("Fold", i+1, "accuracy rate is", round(result, 4))
-
-	return result
 
 
 

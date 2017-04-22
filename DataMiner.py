@@ -36,7 +36,7 @@ class DataMiner(object):
 
 
 
-    """ Gets a list of most recent tweets containing the word (request each 200) """
+    """ Gets most recent tweets containing the word (request each 200) """
     def getUserTweets(self, user, word = None, depth = 1000):
 
         tweets_list = []

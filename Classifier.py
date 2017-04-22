@@ -1,15 +1,16 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-import Utilities, pickle, os
+import Utilities, pickle, os, itertools, numpy
 from collections import Counter
 from nltk import bigrams as getBigrams
 from nltk.tokenize import TweetTokenizer
 from nltk.stem import SnowballStemmer
-from nltk.classify import SklearnClassifier
+from sklearn.feature_extraction import DictVectorizer
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.svm import NuSVC
+from sklearn.svm import LinearSVC
+from sklearn.model_selection import cross_val_score
 
 
 """ Class in charge of the binary classification of sentences """
@@ -20,6 +21,9 @@ class Classifier(object):
 
 	# Class attribute to access the lemmatizer object
 	lemmatizer = SnowballStemmer('english')
+
+	# Class attribute to compress feature dictionaries
+	vectorizer = DictVectorizer()
 
 
 
@@ -41,7 +45,7 @@ class Classifier(object):
 		try:
 			sentences_file = open(file, 'r', encoding = "UTF8")
 
-			# Each line is tokenize and its words and bigrams are stored in a list
+			# Each line is tokenize and its words and bigrams stored
 			for line in sentences_file:
 
 				# Storing the whole line
@@ -95,35 +99,40 @@ class Classifier(object):
 
 
 	""" Performs the training process depending on the specified classifier """
-	def __performTraining(self, classifier_name, l1_features, l2_features):
+	def __performTraining(self, classifier_name, features, labels):
 
 		classifier = None
 		classifier_name = classifier_name.lower()
-		train_features = l1_features[:] + l2_features[:]
 
 		# Set the classifier depending on the provided name
 		if classifier_name == "logistic-regression":
-			classifier = SklearnClassifier(LogisticRegression())
+			classifier = LogisticRegression()
 
 		elif classifier_name == "naive-bayes":
-			classifier = SklearnClassifier(BernoulliNB())
+			classifier = BernoulliNB()
 
-		elif classifier_name == "nu-svc":
-			classifier = SklearnClassifier(NuSVC())
+		elif classifier_name == "linear-svc":
+			classifier = LinearSVC()
 
 		elif classifier_name == "random-forest":
-			classifier = SklearnClassifier(RandomForestClassifier(n_estimators = 100))
+			classifier = RandomForestClassifier(n_estimators = 100)
 
-		# In case another option is specified: error
 		else:
 			print("ERROR: Invalid classifier")
 			exit()
 
-		# The training and the cross-validation testing are performed
-		self.model = classifier.train(train_features)
+		# The model is trained and stored
+		self.model = classifier.fit(features, labels)
 		print("Training process completed")
-		print("Calculating accuracy...")
-		print("Accuracy:", Utilities.crossValidation(classifier, l1_features, l2_features), "\n")
+
+		# The model is tested using cross validation
+		results = cross_val_score(estimator = classifier,
+		                          X = features,
+		                          y = labels,
+		                          scoring = 'accuracy',
+		                          cv = 10)
+
+		print("Accuracy:", round(sum(results) / len(results), 4), "\n")
 
 
 
@@ -131,7 +140,7 @@ class Classifier(object):
 	""" Trains a classifier using the sentences from the specified files """
 	def train(self, classifier_name, l1_file, l2_file, words_pct = 5, bigrams_pct = 1):
 
-		# Obtaining the labels
+		# Obtaining the label names
 		label1 = l1_file.rsplit('/')[-1].rsplit('.')[0]
 		label2 = l2_file.rsplit('/')[-1].rsplit('.')[0]
 
@@ -148,16 +157,17 @@ class Classifier(object):
 		                                              l2_counter = l2_bigrams,
 		                                              percentage = bigrams_pct)
 
-		# Transforming each sentence into a dictionary of features
-		for i, sentence in enumerate(l1_sentences):
-			l1_sentences[i] = [self.__getFeatures(sentence), label1]
+		# Getting the labels as a numpy array
+		labels = numpy.array(([label1] * len(l1_sentences)) + ([label2] * len(l2_sentences)))
 
-		for i, sentence in enumerate(l2_sentences):
-			l2_sentences[i] = [self.__getFeatures(sentence), label2]
+		# Transforming each sentence into a dictionary of vectorized features
+		features = itertools.chain(map(self.__getFeatures, l1_sentences),
+		                           map(self.__getFeatures, l2_sentences))
 
+		features = self.vectorizer.fit_transform(features)
 
 		# Trains using the specified classifier
-		self.__performTraining(classifier_name, l1_sentences, l2_sentences)
+		self.__performTraining(classifier_name, features, labels)
 
 
 
@@ -167,12 +177,13 @@ class Classifier(object):
 
 		try:
 			features = self.__getFeatures(sentence)
+			features = self.vectorizer.fit_transform(features)
 
 			# If none of the features give any information: return None
-			if True not in features.values():
+			if True not in features.toarray()[0]:
 				return None
 			else:
-				return self.model.classify(features)
+				return self.model.predict(features)[0]
 
 		except AttributeError:
 			print("ERROR: The classifier needs to be trained first")
