@@ -101,9 +101,6 @@ class Classifier(object):
 	""" Performs the training process depending on the specified classifier """
 	def __performTraining(self, classifier_name, features, labels):
 
-		classifier = None
-		classifier_name = classifier_name.lower()
-
 		# Set the classifier depending on the provided name
 		if classifier_name == "logistic-regression":
 			classifier = LogisticRegression()
@@ -118,6 +115,7 @@ class Classifier(object):
 			classifier = RandomForestClassifier(n_estimators = 100)
 
 		else:
+			classifier = None
 			print("ERROR: Invalid classifier")
 			exit()
 
@@ -180,7 +178,7 @@ class Classifier(object):
 			features = self.vectorizer.fit_transform(features)
 
 			# If none of the features give any information: return None
-			if True not in features.toarray()[0]:
+			if features.getnnz() == 0:
 				return None
 			else:
 				return self.model.predict(features)[0]
