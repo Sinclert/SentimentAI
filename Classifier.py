@@ -1,16 +1,27 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-import Utilities, pickle, os, itertools, numpy
+import pickle, os, itertools, numpy
+from Utilities import getStopWords, getBestElements
 from collections import Counter
 from nltk import bigrams as getBigrams
 from nltk.tokenize import TweetTokenizer
 from nltk.stem import SnowballStemmer
 from sklearn.feature_extraction import DictVectorizer
-from sklearn.naive_bayes import BernoulliNB
 from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.naive_bayes import BernoulliNB
 from sklearn.svm import LinearSVC
+from sklearn.ensemble import RandomForestClassifier as RandomForest
 from sklearn.model_selection import cross_val_score
+
+
+possible_classifiers = {
+	"logistic-regression": LogisticRegression(n_jobs = -1),
+	"naive-bayes": BernoulliNB(),
+	"linear-svc": LinearSVC(),
+	"random-forest": RandomForest(n_estimators = 100, n_jobs = -1)
+}
+
+
 
 
 """ Class in charge of the binary classification of sentences """
@@ -19,9 +30,6 @@ class Classifier(object):
 	# Class attribute to access the tokenizer object
 	tokenizer = TweetTokenizer(False, True, True)
 
-	# Class attribute to access the lemmatizer object
-	lemmatizer = SnowballStemmer('english')
-
 	# Class attribute to compress feature dictionaries
 	vectorizer = DictVectorizer()
 
@@ -29,10 +37,26 @@ class Classifier(object):
 
 
 	""" Initiates variables when the instance is created """
-	def __init__(self):
+	def __init__(self, language = "english"):
+
+		self.lemmatizer = SnowballStemmer(language)
+		self.stopwords = getStopWords(language)
+
 		self.model = None
 		self.best_words = None
 		self.best_bigrams = None
+
+
+
+
+	""" Obtains the processed tokens of the specified sentence """
+	def __getWords(self, sentence):
+
+		sentence_words = self.tokenizer.tokenize(sentence)
+		sentence_words = filter(lambda w: w not in self.stopwords, sentence_words)
+		sentence_words = [self.lemmatizer.stem(word) for word in sentence_words]
+
+		return sentence_words
 
 
 
@@ -51,9 +75,8 @@ class Classifier(object):
 				# Storing the whole line
 				sentences.append(line)
 
-				# Storing all line words after extracting the root
-				sentence_words = self.tokenizer.tokenize(line)
-				sentence_words = [self.lemmatizer.stem(word) for word in sentence_words]
+				# Storing all line words
+				sentence_words = self.__getWords(line)
 				for word in sentence_words:
 					words[word] += 1
 
@@ -77,9 +100,8 @@ class Classifier(object):
 	""" Transform a sentence into a features list to train / classify """
 	def __getFeatures(self, sentence):
 
-		# Every line word root is obtained
-		sentence_words = self.tokenizer.tokenize(sentence)
-		sentence_words = [self.lemmatizer.stem(word) for word in sentence_words]
+		# Every line word is obtained
+		sentence_words = self.__getWords(sentence)
 
 		# Every bigram is obtained and transformed (avoiding errors)
 		sentence_bigrams = getBigrams(sentence_words)
@@ -98,39 +120,26 @@ class Classifier(object):
 
 
 
-	""" Performs the training process depending on the specified classifier """
+	""" Performs the training and testing processes """
 	def __performTraining(self, classifier_name, features, labels):
 
-		# Set the classifier depending on the provided name
-		if classifier_name == "logistic-regression":
-			classifier = LogisticRegression()
+		try:
+			classifier = possible_classifiers[classifier_name]
+			self.model = classifier.fit(features, labels)
+			print("Training process completed")
 
-		elif classifier_name == "naive-bayes":
-			classifier = BernoulliNB()
+			# The model is tested using cross validation
+			results = cross_val_score(estimator = classifier,
+			                          X = features,
+			                          y = labels,
+			                          scoring = 'accuracy',
+			                          cv = 10)
 
-		elif classifier_name == "linear-svc":
-			classifier = LinearSVC()
+			print("Accuracy:", round(sum(results) / len(results), 4), "\n")
 
-		elif classifier_name == "random-forest":
-			classifier = RandomForestClassifier(n_estimators = 100)
-
-		else:
-			classifier = None
+		except KeyError:
 			print("ERROR: Invalid classifier")
 			exit()
-
-		# The model is trained and stored
-		self.model = classifier.fit(features, labels)
-		print("Training process completed")
-
-		# The model is tested using cross validation
-		results = cross_val_score(estimator = classifier,
-		                          X = features,
-		                          y = labels,
-		                          scoring = 'accuracy',
-		                          cv = 10)
-
-		print("Accuracy:", round(sum(results) / len(results), 4), "\n")
 
 
 
@@ -147,13 +156,13 @@ class Classifier(object):
 		l2_sentences, l2_words, l2_bigrams = self.__getWordsAndBigrams(l2_file)
 
 		# Obtaining best words and bigrams considering the gain of information
-		self.best_words = Utilities.getBestElements(l1_counter = l1_words,
-		                                            l2_counter = l2_words,
-		                                            percentage = words_pct)
+		self.best_words = getBestElements(l1_counter = l1_words,
+		                                  l2_counter = l2_words,
+		                                  percentage = words_pct)
 
-		self.best_bigrams = Utilities.getBestElements(l1_counter = l1_bigrams,
-		                                              l2_counter = l2_bigrams,
-		                                              percentage = bigrams_pct)
+		self.best_bigrams = getBestElements(l1_counter = l1_bigrams,
+		                                    l2_counter = l2_bigrams,
+		                                    percentage = bigrams_pct)
 
 		# Getting the labels as a numpy array
 		labels = numpy.array(([label1] * len(l1_sentences)) + ([label2] * len(l2_sentences)))

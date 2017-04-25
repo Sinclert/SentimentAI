@@ -20,6 +20,30 @@ user_filter = re.compile('(^|\s+)@\w+')
 
 
 
+""" Reads the stopwords from the specified language file """
+def getStopWords(language = "english"):
+
+	file_name = "./Stopwords/" + language + ".txt"
+
+	try:
+		file = open(file_name, 'r', encoding = "UTF8")
+		lines = file.read().splitlines()
+		file.close()
+
+		# Storing the words line by line in a list
+		stopwords = []
+		for word in lines:
+			stopwords.append(word)
+
+		return stopwords
+
+	except FileNotFoundError or PermissionError or IsADirectoryError:
+		print("ERROR: The file", file_name, "cannot be opened")
+		exit()
+
+
+
+
 """ Finds the best 'n' elements based on their gain of information """
 def getBestElements(l1_counter, l2_counter, percentage):
 
@@ -49,7 +73,7 @@ def getBestElements(l1_counter, l2_counter, percentage):
 
 
 
-""" Returns the tweet text as a common sentence after applying some filters """
+""" Returns the tweet text after applying some filters """
 def getCleanTweet(tweet):
 
 	# Removing any URL or image link in the text
@@ -74,8 +98,9 @@ def getSentences(tweets, word = None):
 		sentences = []
 
 		for tweet in tweets:
+			tweet = tweet.lower()
 
-			# Recursive call to obtain the sentences of each individual tweet
+			# Recursive call to obtain the sentences of each tweet
 			for sentence in getSentences(tweet, word):
 				sentences.append(sentence)
 
@@ -83,10 +108,10 @@ def getSentences(tweets, word = None):
 
 	# Base case: individual tweet
 	elif isinstance(tweets, str):
-		sentences = re.split("[.:!?]\s+", str(tweets))
+		sentences = re.split("[.:!?]\s+", tweets)
 
 		if word is not None:
-			sentences[:] = [s for s in sentences if word.lower() in s.lower()]
+			sentences[:] = [s for s in sentences if word.lower() in s]
 
 		return sentences
 

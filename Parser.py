@@ -1,7 +1,7 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
 import Utilities, sys
-from Classifier import Classifier
+from Classifier import Classifier, possible_classifiers
 from DataMiner import DataMiner
 from TwitterListener import TwitterListener
 from multiprocessing import Manager
@@ -11,7 +11,6 @@ from multiprocessing import Manager
 datasets_folder = "./Datasets/"
 models_folder = "./Models/"
 
-classifiers = ['logistic-regression', 'naive-bayes', 'linear-svc', 'random-forest']
 labels = ['Negative', 'Neutral', 'Positive']
 
 
@@ -23,7 +22,7 @@ labels = ['Negative', 'Neutral', 'Positive']
 if (len(sys.argv) == 8) and (sys.argv[1].lower() == "train"):
 
     # Checks the specified classifier
-    if sys.argv[2].lower() in classifiers:
+    if sys.argv[2].lower() in possible_classifiers.keys():
 
         l1_file = datasets_folder + sys.argv[3]
         l2_file = datasets_folder + sys.argv[4]
