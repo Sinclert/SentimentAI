@@ -70,30 +70,31 @@ elif (len(sys.argv) == 6) and (sys.argv[1].lower() == "classify"):
 
     # Obtaining tweets
     miner = DataMiner()
-    tweets = miner.getUserTweets(user = sys.argv[4], word = sys.argv[5])
+    tweets = miner.getUserTweets(user = sys.argv[4],
+                                 word = sys.argv[5])
 
     # Splitting the tweets into individual sentences
-    sentences = Utilities.getSentences(tweets = tweets, word = sys.argv[5])
-    classifications = dict()
+    sentences = Utilities.getSentences(tweets = tweets,
+                                       word = sys.argv[5])
 
     # Creating the results dictionary
-    for label in labels: classifications[label] = 0
+    results = dict.fromkeys(labels, 0)
 
     # Storing the classification results
     for sentence in sentences:
-        result = classifier1.classify(sentence)
+        label = classifier1.classify(sentence)
 
-        if result == 'Polarized':
+        if label == 'Polarized':
             try:
-                classifications[classifier2.classify(sentence)] += 1
+                results[classifier2.classify(sentence)] += 1
             except TypeError:
                 print("Tweet:", sentence)
                 print("Ignored (features lack of information)\n")
 
-        elif result == 'Neutral':
-            classifications['Neutral'] += 1
+        elif label == 'Neutral':
+            results['Neutral'] += 1
 
-    print(classifications)
+    print(results)
 
 
 

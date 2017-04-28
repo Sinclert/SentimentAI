@@ -2,7 +2,7 @@
 
 import Utilities
 from Keys import keys
-from tweepy import AppAuthHandler, API, OAuthHandler, StreamListener, Stream
+from tweepy import API, OAuthHandler, StreamListener, Stream
 
 
 """ Class in charge of retrieving live data from the Twitter Streaming API """
@@ -42,9 +42,6 @@ class TwitterListener(StreamListener):
         access_token_secret = keys['access_token_secret']
 
         try:
-            # AppAuthHandler call is needed due to a OAuth 1.0 bug
-            AppAuthHandler(consumer_key, consumer_secret)
-
             # Authentication creation using keys and tokens
             auth = OAuthHandler(consumer_key, consumer_secret)
             auth.set_access_token(access_token, access_token_secret)
