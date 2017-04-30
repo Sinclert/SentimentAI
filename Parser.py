@@ -4,7 +4,6 @@ import Utilities, sys
 from Classifier import Classifier, possible_classifiers
 from DataMiner import DataMiner
 from TwitterListener import TwitterListener
-from multiprocessing import Manager
 
 
 # Folder paths
@@ -138,12 +137,8 @@ elif (len(sys.argv) == 8) and (sys.argv[1].lower() == "stream"):
     coordinates = [float(coord) for coord in coordinates]
 
 
-    # Shared dictionary between both processes
-    stream_dict = Manager().dict()
-    for label in labels: stream_dict[label] = 0
-
     # Creates the stream object and start stream
-    listener = TwitterListener(classifier1, classifier2, buffer_size, stream_dict)
+    listener = TwitterListener(classifier1, classifier2, buffer_size, labels)
     listener.initStream(tracks, languages, coordinates)
 
 
@@ -154,7 +149,7 @@ elif (len(sys.argv) == 8) and (sys.argv[1].lower() == "stream"):
     ani = animation.FuncAnimation(fig = figure,
                                   func = animatePieChart,
                                   interval = 500,
-                                  fargs = (labels, tracks, stream_dict))
+                                  fargs = (labels, tracks, listener.stream_dict))
     pyplot.show()
 
     # Finally: close the stream process

@@ -15,7 +15,7 @@ class TwitterListener(StreamListener):
 
 
     """ Set the listener connection and basic attributes """
-    def __init__(self, classifier1, classifier2, buffer_size, stream_dict):
+    def __init__(self, classifier1, classifier2, buffer_size, labels):
 
         # Calling the superclass init method in case it does something
         super().__init__()
@@ -27,7 +27,7 @@ class TwitterListener(StreamListener):
         self.buffer = buffer_size * [None]
         self.counter = 0
         self.stream = None
-        self.stream_dict = stream_dict
+        self.stream_dict = dict().fromkeys(labels, 0)
 
 
 
