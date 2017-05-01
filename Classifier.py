@@ -27,6 +27,7 @@ possible_classifiers = {
 """ Class in charge of the binary classification of sentences """
 class Classifier(object):
 
+
 	# Class attribute to access the tokenizer object
 	tokenizer = TweetTokenizer(False, True, True)
 

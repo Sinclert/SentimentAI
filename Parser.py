@@ -1,9 +1,10 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-import Utilities, sys
+import sys
 from Classifier import Classifier, possible_classifiers
 from DataMiner import DataMiner
 from TwitterListener import TwitterListener
+from Utilities import getSentences
 
 
 # Folder paths
@@ -73,8 +74,8 @@ elif (len(sys.argv) == 6) and (sys.argv[1].lower() == "classify"):
                                  word = sys.argv[5])
 
     # Splitting the tweets into individual sentences
-    sentences = Utilities.getSentences(tweets = tweets,
-                                       word = sys.argv[5])
+    sentences = getSentences(tweets = tweets,
+                             word = sys.argv[5])
 
     # Creating the results dictionary
     results = dict.fromkeys(labels, 0)

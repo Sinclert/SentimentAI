@@ -1,12 +1,13 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-import Utilities
 from Keys import keys
 from tweepy import API, OAuthHandler, StreamListener, Stream
+from Utilities import getCleanTweet
 
 
 """ Class in charge of retrieving live data from the Twitter Streaming API """
 class TwitterListener(StreamListener):
+
 
     # Attribute that stores the API connection object
     API = None
@@ -75,7 +76,7 @@ class TwitterListener(StreamListener):
 
 
 
-    """ Initiates the Twitter streaming given query, languages and locations """
+    """ Initiates the streaming given query, languages and locations """
     def initStream(self, query, languages, coordinates):
 
         self.stream = Stream(self.API.auth, self)
@@ -105,7 +106,7 @@ class TwitterListener(StreamListener):
                 tweet = tweet['retweeted_status']
 
             # Clean the tweet
-            tweet_text = Utilities.getCleanTweet(tweet)
+            tweet_text = getCleanTweet(tweet)
 
             # If it has enough length: write it
             if len(tweet_text) >= 30:

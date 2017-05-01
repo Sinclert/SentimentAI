@@ -1,13 +1,14 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-import Utilities
 from Keys import keys
 from math import ceil
 from tweepy import AppAuthHandler, API, Cursor, TweepError
+from Utilities import getCleanTweet, storeTweets
 
 
 """ Class in charge of retrieving data from the Twitter API """
 class DataMiner(object):
+
 
     # Attribute that stores the API connection object
     API = None
@@ -42,9 +43,10 @@ class DataMiner(object):
         tweets_list = []
 
         try:
+            cursor = Cursor(self.API.user_timeline, id = user, count = 200)
 
-            # Each tweet is processed and appended at the end of the list
-            for tweet in Cursor(self.API.user_timeline, id = user, count = 200).items(depth):
+            # Each tweet is processed and appended
+            for tweet in cursor.items(depth):
                 tweet = tweet._json
 
                 # If it is a retweet: the original tweet is obtained
@@ -55,7 +57,7 @@ class DataMiner(object):
                 if (word is not None) and (word.lower() not in tweet['text'].lower()):
                     continue
 
-                tweets_list.append(Utilities.getCleanTweet(tweet))
+                tweets_list.append(getCleanTweet(tweet))
 
             # In case word is specified but there are not tweets with it
             if (word is not None) and (len(tweets_list) == 0):
@@ -85,9 +87,10 @@ class DataMiner(object):
         num_tweets = 0
 
         try:
+            cursor = Cursor(self.API.search, query, lang = language, count = 100)
 
-            # Each page is traversed and its tweets appended at the end of the file
-            for page in Cursor(self.API.search, query, lang = language, count = 100).pages(num_pages):
+            # Each page is traversed and its tweets appended
+            for page in cursor.pages(num_pages):
                 num_tweets += len(page)
                 tweets_list = []
 
@@ -99,10 +102,10 @@ class DataMiner(object):
                     if tweet.get('retweeted_status'):
                         tweet = tweet['retweeted_status']
 
-                    tweets_list.append(Utilities.getCleanTweet(tweet))
+                    tweets_list.append(getCleanTweet(tweet))
 
                 # Storing the tweets for each page
-                Utilities.storeTweets(tweets_list, file)
+                storeTweets(tweets_list, file)
 
             print("Tweets stored into", file)
 
