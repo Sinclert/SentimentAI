@@ -75,6 +75,11 @@ def getBestElements(l1_counter, l2_counter, percentage):
 
 """ Returns the tweet text after applying some filters """
 def getCleanTweet(tweet):
+	tweet = tweet._json
+
+	# If it is a retweet: the original tweet is obtained
+	if tweet.get('retweeted_status'):
+		tweet = tweet['retweeted_status']
 
 	# Removing any URL or image link in the text
 	tweet_text = link_filter.sub("", tweet['text'])
@@ -84,6 +89,7 @@ def getCleanTweet(tweet):
 	tweet_text = html_filter.sub("", tweet_text)
 	tweet_text = emoji_filter.sub("", tweet_text)
 	tweet_text = spaces_filter.sub(" ", tweet_text)
+	tweet_text = tweet_text.lower()
 
 	return tweet_text
 

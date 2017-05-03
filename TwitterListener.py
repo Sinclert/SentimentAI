@@ -98,14 +98,8 @@ class TwitterListener(StreamListener):
 
     """ Prints live data according to the stream parameters """
     def on_status(self, tweet):
-        tweet = tweet._json
 
         try:
-            # If it is a retweet: the original tweet is obtained
-            if tweet.get('retweeted_status'):
-                tweet = tweet['retweeted_status']
-
-            # Clean the tweet
             tweet_text = getCleanTweet(tweet)
 
             # If it has enough length: write it
@@ -116,7 +110,6 @@ class TwitterListener(StreamListener):
                     self.__updateBuffers(self.classifier2.classify(tweet_text))
                 elif result == 'Neutral':
                     self.__updateBuffers('Neutral')
-
 
         # In case of tweet limit warning: pass
         except KeyError:

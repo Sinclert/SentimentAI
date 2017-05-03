@@ -47,33 +47,20 @@ class DataMiner(object):
 
             # Each tweet is processed and appended
             for tweet in cursor.items(depth):
-                tweet = tweet._json
-
-                # If it is a retweet: the original tweet is obtained
-                if tweet.get('retweeted_status'):
-                    tweet = tweet['retweeted_status']
+                tweet_text = getCleanTweet(tweet)
 
                 # If the tweet does not contain the specified word: continue
-                if (word is not None) and (word.lower() not in tweet['text'].lower()):
+                if (word is not None) and (word.lower() not in tweet_text):
                     continue
 
-                tweets_list.append(getCleanTweet(tweet))
-
-            # In case word is specified but there are not tweets with it
-            if (word is not None) and (len(tweets_list) == 0):
-                print("There are no tweets from", user, "containing '", word, "'")
+                tweets_list.append(tweet_text)
 
             return tweets_list
 
 
         except TweepError:
-
-            if len(tweets_list) == 0:
-                print("TWEEPY ERROR: Unable to retrieve most recent tweets from", user)
-                exit()
-            else:
-                print("RATE LIMIT ERROR: Returning", len(tweets_list), "tweets")
-                return tweets_list
+            print("TWEEPY ERROR: Unable to retrieve", depth, "tweets from", user)
+            exit()
 
 
 
@@ -96,13 +83,8 @@ class DataMiner(object):
 
                 # Each tweet in the page is processed
                 for tweet in page:
-                    tweet = tweet._json
-
-                    # If it is a retweet: the original tweet is obtained
-                    if tweet.get('retweeted_status'):
-                        tweet = tweet['retweeted_status']
-
-                    tweets_list.append(getCleanTweet(tweet))
+                    tweet_text = getCleanTweet(tweet)
+                    tweets_list.append(tweet_text)
 
                 # Storing the tweets for each page
                 storeTweets(tweets_list, file)
@@ -111,9 +93,5 @@ class DataMiner(object):
 
 
         except TweepError:
-
-            if num_tweets == 0:
-                print("TWEEPY ERROR: Unable to retrieve tweets from the specified search")
-                exit()
-            else:
-                print("RATE LIMIT ERROR: Returning", num_tweets, "tweets")
+            print("TWEEPY ERROR: Unable to retrieve", depth, "tweets from search")
+            exit()
