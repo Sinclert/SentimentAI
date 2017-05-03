@@ -104,7 +104,6 @@ def getSentences(tweets, word = None):
 		sentences = []
 
 		for tweet in tweets:
-			tweet = tweet.lower()
 
 			# Recursive call to obtain the sentences of each tweet
 			for sentence in getSentences(tweet, word):
