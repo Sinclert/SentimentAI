@@ -84,7 +84,7 @@ class Classifier(object):
 				# Storing all line bigrams
 				sentence_bigrams = getBigrams(sentence_words)
 				for bigram in sentence_bigrams:
-					bigrams[bigram[0] + " " + bigram[1]] += 1
+					bigrams[" ".join(bigram)] += 1
 
 
 			sentences_file.close()
@@ -106,7 +106,7 @@ class Classifier(object):
 
 		# Every bigram is obtained and transformed (avoiding errors)
 		sentence_bigrams = getBigrams(sentence_words)
-		sentence_bigrams = [b[0] + " " + b[1] for b in sentence_bigrams]
+		sentence_bigrams = [" ".join(b) for b in sentence_bigrams]
 
 		try:
 			features = dict((word, word in sentence_words) for word in self.best_words)
