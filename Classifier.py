@@ -11,6 +11,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.svm import LinearSVC
 from sklearn.ensemble import RandomForestClassifier as RandomForest
+from sklearn.preprocessing import LabelEncoder
+from sklearn.base import clone
 from sklearn.model_selection import cross_val_score
 
 
@@ -125,18 +127,24 @@ class Classifier(object):
 	def __performTraining(self, classifier_name, features, labels):
 
 		try:
+			# Generating the model that is going to be stored
 			classifier = possible_classifiers[classifier_name]
 			self.model = classifier.fit(features, labels)
 			print("Training process completed")
 
+			# The labels are encoded to perform F1 scoring
+			labels = LabelEncoder().fit_transform(labels)
+			bin_classifier = clone(possible_classifiers[classifier_name])
+			bin_classifier.fit(features, labels)
+
 			# The model is tested using cross validation
-			results = cross_val_score(estimator = classifier,
+			results = cross_val_score(estimator = bin_classifier,
 			                          X = features,
 			                          y = labels,
-			                          scoring = 'accuracy',
+			                          scoring = 'f1',
 			                          cv = 10)
 
-			print("Accuracy:", round(sum(results) / len(results), 4), "\n")
+			print("F1 score:", round(sum(results) / len(results), 4), "\n")
 
 		except KeyError:
 			print("ERROR: Invalid classifier")
