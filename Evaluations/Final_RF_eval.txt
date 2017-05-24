@@ -1,0 +1,123 @@
+############# Evaluating Random-Forest #############
+
+	1% words | 0% bigrams
+		Polarity: 0.8009
+		Sentiment: 0.6578
+
+	1% words | 1% bigrams
+		Polarity: 0.8162
+		Sentiment: 0.6865
+
+	1% words | 2% bigrams
+		Polarity: 0.821
+		Sentiment: 0.6825
+
+	1% words | 3% bigrams
+		Polarity: 0.8248
+		Sentiment: 0.7058
+
+	1% words | 4% bigrams
+		Polarity: 0.8229
+		Sentiment: 0.7208
+
+	1% words | 5% bigrams
+		Polarity: 0.814
+		Sentiment: 0.724
+
+
+	2% words | 0% bigrams
+		Polarity: 0.8184
+		Sentiment: 0.677
+
+	2% words | 1% bigrams
+		Polarity: 0.8344
+		Sentiment: 0.6959
+
+	2% words | 2% bigrams
+		Polarity: 0.8375
+		Sentiment: 0.6933
+
+	2% words | 3% bigrams
+		Polarity: 0.8421
+		Sentiment: 0.7181
+
+	2% words | 4% bigrams
+		Polarity: 0.842
+		Sentiment: 0.7333
+
+	2% words | 5% bigrams
+		Polarity: 0.8383
+		Sentiment: 0.7273
+
+
+	3% words | 0% bigrams
+		Polarity: 0.828
+		Sentiment: 0.7004
+
+	3% words | 1% bigrams
+		Polarity: 0.8385
+		Sentiment: 0.7078
+
+	3% words | 2% bigrams
+		Polarity: 0.8443
+		Sentiment: 0.7121
+
+	3% words | 3% bigrams
+		Polarity: 0.8467
+		Sentiment: 0.727
+
+	3% words | 4% bigrams
+		Polarity: 0.8457
+		Sentiment: 0.7336
+
+	3% words | 5% bigrams
+		Polarity: 0.8435
+		Sentiment: 0.7338
+
+
+	4% words | 0% bigrams
+		Polarity: 0.8296
+		Sentiment: 0.7067
+
+	4% words | 1% bigrams
+		Polarity: 0.8417
+		Sentiment: 0.7064
+
+	4% words | 2% bigrams
+		Polarity: 0.8451
+		Sentiment: 0.7103
+
+	4% words | 3% bigrams
+		Polarity: 0.847
+		Sentiment: 0.7252
+
+	4% words | 4% bigrams
+		Polarity: 0.8431
+		Sentiment: 0.7297
+
+	4% words | 5% bigrams
+		Polarity: 0.8392
+		Sentiment: 0.7328
+
+
+	5% words | 0% bigrams
+		Polarity: 0.8354
+		Sentiment: 0.7067
+
+	5% words | 1% bigrams
+		Polarity: 0.8431
+		Sentiment: 0.7098
+
+	5% words | 2% bigrams
+		Polarity: 0.8471
+		Sentiment: 0.7116
+
+	5% words | 3% bigrams
+		Polarity: 0.848
+		Sentiment: 0.7251
+
+	5% words | 4% bigrams
+		Polarity: 0.848
+		Sentiment: 0.7333
+
+	5% words | 5% bigrams

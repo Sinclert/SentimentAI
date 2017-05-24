@@ -46,7 +46,7 @@ function print_progress() {
 
 	# If it is the first call (0%) avoid the message
 	if [ ${words_pct} != 1 ] || [ ${bigrams_pct} != 0 ]; then
-		completed=$(( (($words_pct-1) * $max_pct) + $bigrams_pct ))
+		completed=$(( (($words_pct-1) * ($max_pct+1)) + $bigrams_pct ))
 		total=$(( $completed * 100 / ($max_pct * ($max_pct+1) ) ))
 		echo "$algorithm: $total%"
 	fi
@@ -85,6 +85,8 @@ function algorithm_eval() {
 			echo >> ${output}
 		done
 	done
+
+	echo "$algorithm: 100%"
 }
 
 
