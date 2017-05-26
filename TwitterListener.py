@@ -1,7 +1,7 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
 from Keys import keys
-from tweepy import API, OAuthHandler, StreamListener, Stream
+from tweepy import API, OAuthHandler, StreamListener, Stream, TweepError
 from Utilities import getCleanTweet
 
 
@@ -50,7 +50,7 @@ class TwitterListener(StreamListener):
             # Tweepy API connection creation
             self.API = API(auth)
 
-        except Exception or ConnectionError:
+        except TweepError:
             print("ERROR: Unable to establish a connection with Twitter")
             exit()
 

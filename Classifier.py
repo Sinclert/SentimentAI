@@ -93,7 +93,7 @@ class Classifier(object):
 			return sentences, words, bigrams
 
 
-		except FileNotFoundError or PermissionError or IsADirectoryError:
+		except (FileNotFoundError, PermissionError, IsADirectoryError):
 			print("ERROR: The file", file, "cannot be opened")
 			exit()
 
@@ -222,7 +222,7 @@ class Classifier(object):
 			model_file.close()
 			print("Classifier model saved in", model_path + model_name)
 
-		except FileNotFoundError or PermissionError or IsADirectoryError:
+		except (FileNotFoundError, PermissionError, IsADirectoryError):
 			print("ERROR: The model", model_path + model_name, "cannot be saved")
 			exit()
 
@@ -239,6 +239,6 @@ class Classifier(object):
 			model_file.close()
 			print("Classifier model loaded from", model_path + model_name)
 
-		except FileNotFoundError or PermissionError or IsADirectoryError:
+		except (FileNotFoundError, PermissionError, IsADirectoryError):
 			print("ERROR: The model", model_path + model_name, "cannot be loaded")
 			exit()

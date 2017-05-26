@@ -30,7 +30,7 @@ class DataMiner(object):
             # Tweepy API connection creation
             self.API = API(auth)
 
-        except Exception or ConnectionError:
+        except TweepError:
             print("ERROR: Unable to establish a connection with Twitter")
             exit()
 

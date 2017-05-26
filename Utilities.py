@@ -37,7 +37,7 @@ def getStopWords(language = "english"):
 
 		return stopwords
 
-	except FileNotFoundError or PermissionError or IsADirectoryError:
+	except (FileNotFoundError, PermissionError, IsADirectoryError):
 		print("ERROR: The file", file_name, "cannot be opened")
 		exit()
 
@@ -148,6 +148,6 @@ def storeTweets(tweets, file_name, min_length = 30):
 		file.close()
 
 
-	except PermissionError or IsADirectoryError:
+	except (FileNotFoundError, PermissionError, IsADirectoryError):
 		print("ERROR: The file '", file_name, "' cannot be opened")
 		exit()
