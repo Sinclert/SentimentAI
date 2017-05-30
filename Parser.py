@@ -1,6 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-import sys
+import sys, os
 from Classifier import Classifier, possible_classifiers
 from DataMiner import DataMiner
 from TwitterListener import TwitterListener
@@ -8,8 +8,8 @@ from Utilities import getSentences
 
 
 # Folder paths
-datasets_folder = "./Datasets/"
-models_folder = "./Models/"
+datasets_folder = "Datasets"
+models_folder = "Models"
 
 labels = ['Negative', 'Neutral', 'Positive']
 
@@ -24,8 +24,8 @@ if (len(sys.argv) == 8) and (sys.argv[1].lower() == "train"):
     # Checks the specified classifier
     if sys.argv[2].lower() in possible_classifiers.keys():
 
-        l1_file = datasets_folder + sys.argv[3]
-        l2_file = datasets_folder + sys.argv[4]
+        l1_file = os.path.join(datasets_folder, sys.argv[3])
+        l2_file = os.path.join(datasets_folder, sys.argv[4])
         words_pct, bigrams_pct = 0, 0
 
         # Converting the inputs into real numeric variables
@@ -104,11 +104,14 @@ elif (len(sys.argv) == 6) and (sys.argv[1].lower() == "classify"):
 
 elif (len(sys.argv) == 6) and (sys.argv[1].lower() == "search"):
 
+    # Creating the storing output final path
+    output_path = os.path.join(datasets_folder, sys.argv[5])
+
     # Obtaining tweets and storing them in a file
     miner = DataMiner()
     miner.searchTweets(query = sys.argv[2],
                        language = sys.argv[3],
-                       file = datasets_folder + sys.argv[5],
+                       file = output_path,
                        depth = int(sys.argv[4]))
 
 

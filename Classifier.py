@@ -157,8 +157,8 @@ class Classifier(object):
 	def train(self, classifier_name, l1_file, l2_file, words_pct = 5, bigrams_pct = 1):
 
 		# Obtaining the label names
-		label1 = l1_file.rsplit('/')[-1].rsplit('.')[0]
-		label2 = l2_file.rsplit('/')[-1].rsplit('.')[0]
+		label1 = os.path.basename(l1_file).rsplit('.')[0]
+		label2 = os.path.basename(l2_file).rsplit('.')[0]
 
 		# Obtaining every word and bigram in both files
 		l1_sentences, l1_words, l1_bigrams = self.__getWordsAndBigrams(l1_file)
@@ -209,36 +209,42 @@ class Classifier(object):
 
 
 	""" Saves a trained model into the models folder """
-	def saveModel(self, model_path, model_name):
+	def saveModel(self, models_folder, model_name):
+
+		# Joining the paths to create the total model path
+		file_path = os.path.join(models_folder, model_name)
 
 		try:
 			# If the folder does not exist: it is created
-			if os.path.exists(model_path) is False:
-				os.mkdir(model_path)
+			if os.path.exists(models_folder) is False:
+				os.mkdir(models_folder)
 
-			model_file = open(model_path + model_name + ".pickle", 'wb')
-			pickle.dump([self.model, self.best_words, self.best_bigrams], model_file)
+			file = open(file_path + ".pickle", 'wb')
+			pickle.dump([self.model, self.best_words, self.best_bigrams], file)
 
-			model_file.close()
-			print("Classifier model saved in", model_path + model_name)
+			file.close()
+			print("Classifier model saved in", file_path)
 
 		except (FileNotFoundError, PermissionError, IsADirectoryError):
-			print("ERROR: The model", model_path + model_name, "cannot be saved")
+			print("ERROR: The model cannot be saved in", file_path)
 			exit()
 
 
 
 
 	""" Loads a trained model into our classifier object """
-	def loadModel(self, model_path, model_name):
+	def loadModel(self, models_folder, model_name):
+
+		# Joining the paths to create the total model path
+		file_path = os.path.join(models_folder, model_name)
 
 		try:
-			model_file = open(model_path + model_name + ".pickle", 'rb')
-			self.model, self.best_words, self.best_bigrams = pickle.load(model_file)
+			file = open(file_path + ".pickle", 'rb')
+			self.model, self.best_words, self.best_bigrams = pickle.load(file)
 
-			model_file.close()
-			print("Classifier model loaded from", model_path + model_name)
+			file.close()
+			print("Classifier model loaded from", file_path)
 
 		except (FileNotFoundError, PermissionError, IsADirectoryError):
-			print("ERROR: The model", model_path + model_name, "cannot be loaded")
+			print("ERROR: The model cannot be loaded from", file_path)
 			exit()

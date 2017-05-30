@@ -51,7 +51,7 @@ class TwitterListener(StreamListener):
             self.API = API(auth)
 
         except TweepError:
-            print("ERROR: Unable to establish a connection with Twitter")
+            print("TWEEPY ERROR: Unable to establish connection with Twitter")
             exit()
 
 
