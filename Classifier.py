@@ -135,7 +135,6 @@ class Classifier(object):
 			# The labels are encoded to perform F1 scoring
 			labels = LabelEncoder().fit_transform(labels)
 			bin_classifier = clone(possible_classifiers[classifier_name])
-			bin_classifier.fit(features, labels)
 
 			# The model is tested using cross validation
 			results = cross_val_score(estimator = bin_classifier,
@@ -144,7 +143,7 @@ class Classifier(object):
 			                          scoring = 'f1',
 			                          cv = 10)
 
-			print("F1 score:", round(sum(results) / len(results), 4), "\n")
+			print("F1 score:", round(results.mean(), 4), "\n")
 
 		except KeyError:
 			print("ERROR: Invalid classifier")
