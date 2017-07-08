@@ -124,7 +124,7 @@ def stream(polarity_cls, sentiment_cls, buffer_size, filter_word, language, coor
 
 	# Creates the stream object and start stream
 	listener = TwitterListener(classifier1, classifier2, buffer_size, labels)
-	listener.initStream(query, language, coordinates)
+	listener.initStream(filter_word, language, coordinates)
 
 	from matplotlib import pyplot, animation
 	from GraphAnimator import animatePieChart, figure
@@ -133,7 +133,7 @@ def stream(polarity_cls, sentiment_cls, buffer_size, filter_word, language, coor
 	animation.FuncAnimation(fig = figure,
 	                        func = animatePieChart,
 	                        interval = 500,
-	                        fargs = (labels, query, listener.stream_dict))
+	                        fargs = (labels, filter_word, listener.stream_dict))
 	pyplot.show()
 
 	# Finally: close the stream process
