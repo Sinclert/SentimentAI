@@ -105,7 +105,7 @@ def search(search_query, language, search_depth, output):
 
 
 """ Performs sentiment analysis over a stream of tweets filter by location """
-def stream(polarity_cls, sentiment_cls, buffer_size, query, language, coordinates):
+def stream(polarity_cls, sentiment_cls, buffer_size, filter_word, language, coordinates):
 
 	# Loading both trained classifiers
 	classifier1 = Classifier()
@@ -218,12 +218,12 @@ if __name__ == '__main__':
 		stream_par.add_argument('-p', required = True)
 		stream_par.add_argument('-s', required = True)
 		stream_par.add_argument('-b', required = True, type = int)
-		stream_par.add_argument('-q', required = True)
+		stream_par.add_argument('-w', required = True)
 		stream_par.add_argument('-l', required = True)
 		stream_par.add_argument('-c', required = True)
 
 		args = stream_par.parse_args(func_args)
-		stream(args.p, args.s, args.b, args.q, args.l, args.c)
+		stream(args.p, args.s, args.b, args.w, args.l, args.c)
 
 
 	# Fourth mode: train
