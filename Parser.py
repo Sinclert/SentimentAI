@@ -113,27 +113,27 @@ def stream(polarity_cls, sentiment_cls, buffer_size, filter_word, language, coor
 	classifier1.loadModel(models_folder, polarity_cls)
 	classifier2.loadModel(models_folder, sentiment_cls)
 
-	# Parsing coordinates
-	coordinates = coordinates.split(',')
+	# Transforming arguments
+	tracks = [filter_word]
+	languages = [language]
 
 	if len(coordinates) % 4 != 0:
 		print("ERROR: The number of coordinates must be a multiple of 4")
 		exit()
 
-	coordinates = [float(coord) for coord in coordinates]
 
 	# Creates the stream object and start stream
 	listener = TwitterListener(classifier1, classifier2, buffer_size, labels)
-	listener.initStream(filter_word, language, coordinates)
+	listener.initStream(tracks, languages, coordinates)
 
 	from matplotlib import pyplot, animation
 	from GraphAnimator import animatePieChart, figure
 
 	# Animate the graph each milliseconds interval
-	animation.FuncAnimation(fig = figure,
-	                        func = animatePieChart,
-	                        interval = 500,
-	                        fargs = (labels, filter_word, listener.stream_dict))
+	ani = animation.FuncAnimation(fig = figure,
+	                              func = animatePieChart,
+	                              interval = 500,
+	                              fargs = (labels, tracks, listener.stream_dict))
 	pyplot.show()
 
 	# Finally: close the stream process
@@ -142,7 +142,7 @@ def stream(polarity_cls, sentiment_cls, buffer_size, filter_word, language, coor
 
 
 
-""" Main method that parses the arguments and call the proper function """
+""" Main method to parse the arguments and call the proper function """
 if __name__ == '__main__':
 
 	# Creating the top-level parser
@@ -220,7 +220,7 @@ if __name__ == '__main__':
 		stream_par.add_argument('-b', required = True, type = int)
 		stream_par.add_argument('-w', required = True)
 		stream_par.add_argument('-l', required = True)
-		stream_par.add_argument('-c', required = True)
+		stream_par.add_argument('-c', required = True, type = float, nargs = '+')
 
 		args = stream_par.parse_args(func_args)
 		stream(args.p, args.s, args.b, args.w, args.l, args.c)
