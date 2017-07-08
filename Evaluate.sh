@@ -72,11 +72,11 @@ function algorithm_eval() {
 			# For each classifier type (polarized VS sentiment)
 			for ((i = 0 ; i < ${#cls_types[@]} ; i++)); do
 				files=${cls_files[$i]}
-				score=$(python3 Parser.py Train ${algorithm} \
-												${files} \
-												${words_pct} \
-												${bigrams_pct} \
-												None)
+				score=$(python3 Parser.py train -n ${algorithm} \
+												-f ${files} \
+												-w ${words_pct} \
+												-b ${bigrams_pct} \
+												-o None)
 
 				score=$(echo ${score} | cut -d" " -f 6)
 				echo "		${cls_types[$i]}: $score" >> ${output}

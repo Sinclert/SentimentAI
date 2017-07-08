@@ -168,14 +168,13 @@ if __name__ == '__main__':
 		              "            -b <buffer size>\n"
 		              "            -w <filter word>\n"
 		              "            -l <language>\n"
-		              "            -c <coordinates>\n"
+		              "            -c <coord 1> <coord 2> <coord 3> <coord 4>\n"
 		              "  \n"
 		              "  train: trains and store the specified ML model\n"
 		              "            -n <classifier name>\n"
-		              "            -f1 <first dataset>\n"
-		              "            -f2 <second dataset>\n"
-		              "            -w <words percentage as features>\n"
-		              "            -b <bigrams percentage as features>\n"
+		              "            -f <first dataset> <second dataset>\n"
+		              "            -w <words percentage>\n"
+		              "            -b <bigrams percentage>\n"
 		              "            -o <output name>\n",
 		formatter_class = RawDescriptionHelpFormatter)
 
@@ -231,11 +230,10 @@ if __name__ == '__main__':
 
 		train_par = ArgumentParser(usage = "Use 'Parser.py -h' for help")
 		train_par.add_argument('-n', required = True)
-		train_par.add_argument('-f1', required = True)
-		train_par.add_argument('-f2', required = True)
+		train_par.add_argument('-f', required = True, nargs = 2)
 		train_par.add_argument('-w', required = True, type = int)
 		train_par.add_argument('-b', required = True, type = int)
-		train_par.add_argument('-o')
+		train_par.add_argument('-o', required = True)
 
 		args = train_par.parse_args(func_args)
-		train(args.n, args.f1, args.f2, args.w, args.b, args.o)
+		train(args.n, args.f[0], args.f[1], args.w, args.b, args.o)
