@@ -60,18 +60,14 @@ class TwitterListener(StreamListener):
     """ Updates the dictionary counter and the temporal buffer labels """
     def __updateBuffers(self, label):
 
-        if label is None:
-            print("Tweet ignored (features lack of information)")
+        try:
+            self.stream_dict[self.buffer[self.counter]] -= 1
+        except KeyError:
+            pass
 
-        else:
-            try:
-                self.stream_dict[self.buffer[self.counter]] -= 1
-            except KeyError:
-                pass
-
-            self.buffer[self.counter] = label
-            self.counter = (self.counter + 1) % len(self.buffer)
-            self.stream_dict[label] += 1
+        self.buffer[self.counter] = label
+        self.counter = (self.counter + 1) % len(self.buffer)
+        self.stream_dict[label] += 1
 
 
 
@@ -104,12 +100,16 @@ class TwitterListener(StreamListener):
 
             # If it has enough length: write it
             if len(tweet_text) >= 30:
-                result = self.classifier1.classify(tweet_text)
+                label = self.classifier1.classify(tweet_text)
 
-                if result == 'Polarized':
-                    self.__updateBuffers(self.classifier2.classify(tweet_text))
-                elif result == 'Neutral':
-                    self.__updateBuffers('Neutral')
+                if label == 'Polarized':
+                    label = self.classifier2.classify(tweet_text)
+
+                # In case there is no relevant features it is ignored
+                if label is None:
+                    print(tweet_text, "(Tweet ignored)")
+                else:
+                    self.__updateBuffers(label)
 
         # In case of tweet limit warning: pass
         except KeyError:

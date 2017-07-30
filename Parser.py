@@ -74,14 +74,13 @@ def classify(polarity_cls, sentiment_cls, account, filter_word):
 		label = classifier1.classify(sentence)
 
 		if label == 'Polarized':
-			try:
-				results[classifier2.classify(sentence)] += 1
-			except TypeError:
-				print("Tweet:", sentence)
-				print("Ignored (features lack of information)\n")
+			label = classifier2.classify(sentence)
 
-		elif label == 'Neutral':
-			results['Neutral'] += 1
+		# In case there is no relevant features it is ignored
+		if label is None:
+			print(sentence, "(Tweet ignored)")
+		else:
+			results[label] += 1
 
 	print(results)
 
