@@ -17,7 +17,7 @@ from sklearn.model_selection import cross_val_score
 
 
 possible_classifiers = {
-	"logistic-regression": LogisticRegression(n_jobs = -1),
+	"logistic-regression": LogisticRegression(),
 	"naive-bayes": BernoulliNB(),
 	"linear-svc": LinearSVC(),
 	"random-forest": RandomForest(n_estimators = 100, n_jobs = -1)
