@@ -141,7 +141,8 @@ class Classifier(object):
 			                          X = features,
 			                          y = labels,
 			                          scoring = 'f1',
-			                          cv = 10)
+			                          cv = 10,
+			                          n_jobs = -1)
 
 			print("F1 score:", round(results.mean(), 4), "\n")
 
