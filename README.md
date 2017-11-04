@@ -71,7 +71,7 @@ The repository contains:
 
 ## Usage:
 
-<b>DISCLAIMER:</b> Before using some of the following functionalities, you will need to provide application and user keys in the "Keys.py" file. They can be obtained by <b>creating a <a href="https://apps.twitter.com">Twitter Application</a></b> (necessary to use the Twitter API).
+<b>DISCLAIMER:</b> Before using some of the following functionalities, you will need to provide application and user keys in the <i>"Keys.py"</i> file. They can be obtained by <b>creating a <a href="https://apps.twitter.com">Twitter Application</a></b> (necessary to use the Twitter API).
 <br>
 <br>
 The main file from which all functionalities are called is <i>"Parser.py"</i>. The execute syntax is as follows:
@@ -100,7 +100,7 @@ $ python3 Parser.py train Logistic-Regression Positive.txt Negative.txt 5 1 Pos-
 <br>
 
 ### Search for tweets:
-In this case the Twitter API is used to search for tweets fulfilling a specific query and save them to build a different dataset. The expected arguments are:
+In this case the <a href="https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets">Twitter Search API</a> is used to search for tweets fulfilling a specific query and build a different dataset. The expected arguments are:
 1. <b>Query:</b> words or hashtags that the tweets must contain.
 2. <b>Language:</b> language in which the tweets are searched.
 3. <b>Depth:</b> number of tweets to retrieve.
