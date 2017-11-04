@@ -50,7 +50,7 @@ From all the ML algorithms, only a set of them were trained and compared to each
 <br>
 
 ### ML algorithms evaluation:
-The comparison in order to select the best algorithm to solve this problem uses <b>10 Folds Cross Validation</b>, which divides the training sets in 10 folds, performing 10 training iterations where 9 are used for training and only 1 for testing.
+The evaluation and comparison among the different models in order to find out which is the one that better solves this classification problem has been done using <b>10 Folds Cross Validation</b>. This method divides the training sets in 10 folds, performing 10 training iterations where 9 are used for training and only 1 for testing.
 <br><br>
 Additionally, choosing a good fitness metric is basic to perform a good comparison. In this project, the chosen metric has been the <b>F-score</b>. This measure is better than common accuracy because it considers unbalance classification between labels (<a href="https://www.r-bloggers.com/accuracy-versus-f-score-machine-learning-for-the-rna-polymerases/">Explanation here</a>)
 
@@ -62,7 +62,7 @@ The repository contains:
 - <b>Datasets folder:</b> contains the NLTK datasets.
 - <b>Evaluations folder:</b> contains the F-scores of the different ML algorithms.
 - <b>Stopwords folder:</b> contains the stop words of different languages.
-- <b>Evaluate.sh:</b> shell script that performs the testing, saving the results in the <i>"Evaluations"</i> folder.
+- <b>Evaluate.sh:</b> shell script that performs the evaluation, saving the results in the <i>"Evaluations"</i> folder.
 - <b>Python files:</b> contains the code supporting the functionalities. The most relevant file is <i>"Parser.py"</i> because is the one you will need to execute. The relation among them and the different folders is as follows:
 
 <img src="https://github.com/Sinclert/SentimentAI/blob/master/Images/Architecture.png"/>
@@ -140,7 +140,7 @@ $ python3 Parser.py stream Neu-Pol Pos-Neg 500 Obama en -122,36,-121,38
 <br>
 
 ## Requirements:
-This project uses the third version of Python (Python 3) in order to interpret the instructions. Furthermore, additional packages are needed to perform all the steps in the ML training model process. This packages are:
+This project uses Python 3 interpreter 🐍. Furthermore, additional packages are needed to perform all the steps in the ML training model process. This packages are:
 - <a href="https://matplotlib.org">Matplotlib</a>
 - <a href="http://www.nltk.org">NLTK</a>
 - <a href="http://www.numpy.org">Numpy</a>
