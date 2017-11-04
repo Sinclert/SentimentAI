@@ -70,6 +70,10 @@ The repository contains:
 <br>
 
 ## Usage:
+
+<b>DISCLAIMER:</b> Before using some of the following functionalities, you will need to provide application and user keys in the "Keys.py" file. They can be obtained by <b>creating a <a href="https://apps.twitter.com">Twitter Application</a></b> (necessary to use the Twitter API).
+<br>
+<br>
 The main file from which all functionalities are called is <i>"Parser.py"</i>. The execute syntax is as follows:
 ```shell
 $ python3 Parser.py <Functionality> <Arguments> 
