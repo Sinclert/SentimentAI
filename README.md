@@ -41,7 +41,7 @@ Using this method, it is important to differenciate the 2 types of ML models we 
 <br>
 
 ### Considered ML algorithms:
-From all the algorithms offered by Scikit-learn, only a set of them were trained and compared to each other using their <a href="https://en.wikipedia.org/wiki/F1_score">F-scores</a>. The following algorithms were considered <b>without modifying any of the Scikit learn default parameters</b>, but in the case of Random Forest (number of trees incresed up to 100):
+From all the ML algorithms, only a set of them were trained and compared to each other using their <a href="https://en.wikipedia.org/wiki/F1_score">F-scores</a>. The following algorithms were considered <b>without modifying any of the Scikit learn default parameters</b>, but in the case of Random Forest (number of trees incresed up to 100):
 1. Bernoulli Naïve Bayes.
 2. Linear SVM.
 3. Logistic Regression.
