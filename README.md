@@ -25,16 +25,16 @@ On the one hand, we need to train ML models:<br>
 On the other hand, we need to extract the tweets we want to classify:<br>
 <b>6. Tweets preprocessing:</b> remove stopwords, transform everything into lowcase...<br>
 <b>7. Features vectors:</b> they are built and prepared to be classified.<br>
-<b>8. Classification:</b> give them to the trained model and obtain labels for them.<br>
+<b>8. Classification:</b> the trained models assign a label to them.<br>
 
 <br>
 
 ### Classification process:
-In order to classify tweets among 3 possible labels, the project is designed to perform a hierarchical classification, instead of a multilabel one. This approach make more sense considering the domain in which we are classifying:
+In order to classify tweets among 3 possible labels, the project is designed to perform a hierarchical classification, instead of a multilabel one. This approach makes more sense considering the domain in which we are classifying:
 <br>
 <img src="https://github.com/Sinclert/SentimentAI/blob/master/Images/Classification%20scheme.png" width="500" height="400"/>
 
-Using this method, it is important to differenciate the 2 types of ML models we can train:
+Using this method, it is important to realize that there exist 2 types of ML models:
 - <b>Polarity models:</b> classify between <i>"Neutral"</i> and <i>"Polarized"</i> categories.
 - <b>Sentiment models:</b> classify between <i>"Positive"</i> and <i>"Negative"</i> categories.
 
@@ -140,7 +140,7 @@ $ python3 Parser.py stream Neu-Pol Pos-Neg 500 Obama en -122,36,-121,38
 <br>
 
 ## Requirements:
-This project uses Python 3 interpreter 🐍. Furthermore, additional packages are needed to perform all the steps in the ML training model process. This packages are:
+This project uses Python 3 interpreter 🐍. Furthermore, additional packages are needed to perform all the steps in the ML training model process. These packages are:
 - <a href="https://matplotlib.org">Matplotlib</a>
 - <a href="http://www.nltk.org">NLTK</a>
 - <a href="http://www.numpy.org">Numpy</a>
