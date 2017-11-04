@@ -5,7 +5,7 @@ The <a href="http://scikit-learn.org/stable/">Scikit-learn</a> Machine Learning 
 <br><br>
 Additionally, there is a web application hosted in Google Cloud that uses some of the trained ML models using this code.
 <br><br>
-<a href="https://sentiment-ai-183521.appspot.com">Click here to use the web application</a>
+<a target="_blank" href="https://sentiment-ai-183521.appspot.com">Click here to use the web application</a>
 
 <br>
 
@@ -39,7 +39,7 @@ Using this method, it is important to differenciate the 2 types of ML models we 
 
 <br>
 
-### ML algorithms considered:
+### Considered ML algorithms:
 From all the algorithms offered by Scikit-learn, only a set of them were trained and tested. They were tested and compared to each other using their <a href="https://en.wikipedia.org/wiki/F1_score">F-scores</a>. The results can be checked in the <i>"Evaluations"</i> folder. In a nutshell:
 1. Bernoulli Naïve Bayes.
 2. Linear SVM.
