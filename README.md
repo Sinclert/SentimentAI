@@ -41,7 +41,7 @@ Using this method, it is important to differenciate the 2 types of ML models we 
 <br>
 
 ### Considered ML algorithms:
-From all the ML algorithms, only a set of them were trained and compared to each other using their <a href="https://en.wikipedia.org/wiki/F1_score">F-scores</a>. The following algorithms were considered <b>without modifying any of the Scikit learn default parameters</b>, but in the case of Random Forest (number of trees incresed up to 100):
+From all the ML algorithms, only a set of them were trained and compared to each other using their <a href="https://en.wikipedia.org/wiki/F1_score">F-scores</a>. These algorithms were considered <b>without modifying any of the Scikit learn default parameters</b>, but in the case of Random Forest (number of trees incresed up to 100):
 1. Bernoulli Naïve Bayes.
 2. Linear SVM.
 3. Logistic Regression.
@@ -50,7 +50,7 @@ From all the ML algorithms, only a set of them were trained and compared to each
 <br>
 
 ### ML algorithms evaluation:
-The comparison in order to select the best algorithm to solve this problem uses <b>10 Folds Cross Validation</b>, which divides the training sets in 10 folds, performing 10 training iterations where 9 are used for training and ony 1 for testing.
+The comparison in order to select the best algorithm to solve this problem uses <b>10 Folds Cross Validation</b>, which divides the training sets in 10 folds, performing 10 training iterations where 9 are used for training and only 1 for testing.
 <br><br>
 Additionally, choosing a good fitness metric is basic to perform a good comparison. In this project, the chosen metric has been the <b>F-score</b>. This measure is better than common accuracy because it considers unbalance classification between labels (<a href="https://www.r-bloggers.com/accuracy-versus-f-score-machine-learning-for-the-rna-polymerases/">Explanation here</a>)
 
