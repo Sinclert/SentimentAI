@@ -16,14 +16,14 @@ Additionally, there is a hosted web application that uses Python packages such a
 <img src="https://github.com/Sinclert/SentimentAI/blob/master/Images/Project%20scheme.png"/>
 
 On the one hand, we need to train ML models:<br>
-<b>1. Datasets:</b> they are obtained from the <a href="http://www.nltk.org"><b>NLTK</b></a> corpus.<br>
+<b>1. Datasets:</b> they are obtained from the <a href="http://www.nltk.org">NLTK</a> corpus.<br>
 <b>2. Datasets Preprocessing:</b> remove stopwords, transform every word into lower case...<br>
-<b>3. Features selection:</b> using <a href="http://www.nltk.org"><b>NLTK</b></a> Chi-square scoring, get the most relevant features (indicated by a percentage).<br>
+<b>3. Features selection:</b> using <a href="http://www.nltk.org">NLTK</a> Chi-square scoring, get the most relevant features (indicated by a percentage).<br>
 <b>4. Features vectors:</b> they are built and prepared to train an algorithm.<br>
-<b>5. Training:</b> using <a href="http://scikit-learn.org/stable/"><b>Scikit-learn</b></a> algorithms (Bernoulli Naïve Bayes, Logistic Regression, Linear SVM & Random Forest).<br>
+<b>5. Training:</b> using <a href="http://scikit-learn.org/stable/">Scikit-learn</a> algorithms (Bernoulli Naïve Bayes, Logistic Regression, Linear SVM & Random Forest).<br>
 <br>
 On the other hand, we need to extract the tweets we want to classify:<br>
-<b>6. Tweets extraction:</b> obtain tweets using <a href="http://www.tweepy.org"><b>Tweepy</b></a>.<br>
+<b>6. Tweets extraction:</b> obtain tweets using <a href="http://www.tweepy.org">Tweepy</a>.<br>
 <b>7. Tweets preprocessing:</b> remove stopwords, transform everything into lower case...<br>
 <b>8. Features vectors:</b> they are built and prepared to be classified.<br>
 <b>9. Classification:</b> the trained models assign a label to them.<br>
