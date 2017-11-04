@@ -7,26 +7,26 @@ Additionally, there is a web application hosted in Google Cloud that uses some o
 <br><br>
 <a href="https://sentiment-ai-183521.appspot.com">Click here to use the web application</a>
 
+<br>
 
 ## How does it work?
-This section will be divided in smaller subsections in order to explain the most important concepts:
 
 ### General scheme:
 <img src="https://github.com/Sinclert/SentimentAI/blob/master/Images/Project%20scheme.png"/>
 
-On the one hand, trained ML models are required to perform the analysis.
-1. Training datasets: they are obtained from the NLTK corpus.
-2. Datasets preprocessing: remove stopwords, transform every word into lower case...
-3. Features selection: using NLTK Chi-square scoring, get the most relevant features (indicated by a percentage).
-4. Vectors of features: they are built and prepared to train an algorithm.
-5. Train the models: using algorithms such as: Bernoulli Naïve Bayes, Logistic Regression, Linear SVM or Random Forest.
-<br><br>
-On the other hand, we need to extract the tweets we want to classify. The Twitter API has 2 major branches: <b>REST API</b> and <b>Streaming API</b>. The difference between them is that the first one provides historic tweets from a given account, and the second one provides real time tweets given a set of coordinates (location).
-6. Tweets preprocessing: remove stopwords, transform everything into lowcase...<br>
-7. Vectors of features: they are built and prepared to be classified.<br>
-8. Classify them: give them to the trained model and obtain labels for them.<br>
+On the one hand, we need to train ML models:<br>
+<b>1. Datasets:</b> they are obtained from the NLTK corpus.<br>
+<b>2. Datasets Preprocessing:</b> remove stopwords, transform every word into lower case...<br>
+<b>3. Features selection:</b> using NLTK Chi-square scoring, get the most relevant features (indicated by a percentage).<br>
+<b>4. Features vectors:</b> they are built and prepared to train an algorithm.<br>
+<b>5. Training:</b> using algorithms such as: Bernoulli Naïve Bayes, Logistic Regression, Linear SVM or Random Forest.<br>
+<br>
+On the other hand, we need to extract the tweets we want to classify:<br>
+<b>6. Tweets preprocessing:</b> remove stopwords, transform everything into lowcase...<br>
+<b>7. Features vectors:</b> they are built and prepared to be classified.<br>
+<b>8. Classification:</b> give them to the trained model and obtain labels for them.<br>
 
-<IMG>
+<br>
 
 ### Classification process:
 In order to classify tweets among 3 possible labels, the project is designed to perform a hierarchical classification, instead of a multilabel one. This approach make more sense considering the domain in which we are classifying:
@@ -34,8 +34,10 @@ In order to classify tweets among 3 possible labels, the project is designed to 
 <img src="https://github.com/Sinclert/SentimentAI/blob/master/Images/Classification%20scheme.png" width="500" height="400"/>
 
 Using this method, it is important to differenciate the 2 types of ML models we can train:
-- <b>Polarity models:</b> classify between "Neutral" and "Polarized" categories.
-- <b>Sentiment models:</b> classify between "Positive" and "Negative" categories.
+- <b>Polarity models:</b> classify between <i>"Neutral"</i> and <i>"Polarized"</i> categories.
+- <b>Sentiment models:</b> classify between <i>"Positive"</i> and <i>"Negative"</i> categories.
+
+<br>
 
 ### ML algorithms considered:
 From all the algorithms offered by Scikit-learn, only a set of them were trained and tested. They were tested and compared to each other using their <a href="https://en.wikipedia.org/wiki/F1_score">F-scores</a>. The results can be checked in the <i>"Evaluations"</i> folder. In a nutshell:
@@ -44,12 +46,14 @@ From all the algorithms offered by Scikit-learn, only a set of them were trained
 3. Logistic Regression.
 4. Random Forest.
 
+<br>
 
-### How the ML algorithms are tested:
-The comparison and testing process in order to select the best algorithm to solve tihs problem uses <b>10 Folds Cross Validation</b>, which divides the training sets in 10 folds, performing 10 training iterations where 9 are used for training and ony 1 for testing.
+### ML algorithms comparison:
+The comparison in order to select the best algorithm to solve this problem uses <b>10 Folds Cross Validation</b>, which divides the training sets in 10 folds, performing 10 training iterations where 9 are used for training and ony 1 for testing.
 <br><br>
 Additionally, choosing a good fitness metric is basic to perform a good comparison. In this project, the chosen metric has been the <b>F-score</b>. This measure is better than common accuracy because it considers unbalance classification between labels (<a href="https://www.r-bloggers.com/accuracy-versus-f-score-machine-learning-for-the-rna-polymerases/">Explanation here</a>)
 
+<br>
 
 ## What is in the repository?
 The repository contains:
@@ -62,6 +66,7 @@ The repository contains:
 
 <img src="https://github.com/Sinclert/SentimentAI/blob/master/Images/Architecture.png"/>
 
+<br>
 
 ## Usage:
 The main file from which all functionalities are called is "Parser.py". The execute syntax is as follows:
@@ -69,7 +74,9 @@ The main file from which all functionalities are called is "Parser.py". The exec
 $ python3 Parser.py <Functionality> <Arguments> 
 ```
 
-Depending on the chosen functionality, the arguments are different. List of possible functionalities with their expected arguments:
+Depending on the chosen functionality, the arguments are different. Here is the list of possible functionalities:
+
+<br>
 
 ### Train a model:
 In this case a trained model will be saved into the <i>"Models"</i> folder. This folder will be created in case it does not exist. The expected arguments are:
@@ -85,6 +92,8 @@ Example:
 $ python3 Parser.py train Logistic-Regression Positive.txt Negative.txt 5 1 Pos-Neg
 ```
 
+<br>
+
 ### Search for tweets:
 In this case the Twitter API is used to search for tweets fulfilling a specific query and save them to build a different dataset. The expected arguments are:
 1. <b>Query:</b> words or hashtags that the tweets must contain.
@@ -97,6 +106,8 @@ Example:
 $ python3 Parser.py search “#optimistic OR #happy” en 1000 PosTweets.txt
 ```
 
+<br>
+
 ### Classify tweets from an account:
 In this case, the <a href="https://developer.twitter.com/en/docs/tweets/timelines/api-reference/get-statuses-user_timeline">Twitter REST API</a> is used to extract historic tweets from one specific account, and classify them using a pair of ML models (one polarity model and one sentiment model). The expected arguments are:
 1. <b>Model 1:</b> polarity trained model.
@@ -108,6 +119,8 @@ Example:
 ```shell
 $ python3 Parser.py classify Neu-Pol Pos-Neg David_Cameron brexit
 ```
+
+<br>
 
 ### Classify real-time tweets from a location:
 In this case, the <a href="https://developer.twitter.com/en/docs/tweets/filter-realtime/api-reference/post-statuses-filter">Twitter Streaming API</a> is used to extract real time tweets from one specific location, and classify them using a pair of ML models (one polarity model and one sentiment model). The expected arguments are:
@@ -123,6 +136,7 @@ Example:
 $ python3 Parser.py stream Neu-Pol Pos-Neg 500 Obama en -122,36,-121,38
 ```
 
+<br>
 
 ## Requirements:
 This project uses the third version of Python (Python 3) in order to interpret the instructions. Furthermore, additional packages are needed to perform all the steps in the ML training model process. This packages are:
