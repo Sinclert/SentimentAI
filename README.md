@@ -12,7 +12,7 @@ Additionally, there is a web application hosted in Google Cloud that uses some o
 This section will be divided in smaller subsections in order to explain the most important concepts:
 
 ### General scheme:
-<img src="../Images/Project%20scheme.png" width="600" height="450"/>
+<img src="https://github.com/Sinclert/SentimentAI/blob/master/Images/Project%20scheme.png"/>
 
 On the one hand, trained ML models are required to perform the analysis.
 1. Training datasets: they are obtained from the NLTK corpus.
@@ -30,7 +30,8 @@ On the other hand, we need to extract the tweets we want to classify. The Twitte
 
 ### Classification process:
 In order to classify tweets among 3 possible labels, the project is designed to perform a hierarchical classification, instead of a multilabel one. This approach make more sense considering the domain in which we are classifying:
-<img src="../Images/Classification%20scheme.png" width="600" height="450"/>
+<br>
+<img src="https://github.com/Sinclert/SentimentAI/blob/master/Images/Classification%20scheme.png" width="500" height="400"/>
 
 Using this method, it is important to differenciate the 2 types of ML models we can train:
 - <b>Polarity models:</b> classify between "Neutral" and "Polarized" categories.
@@ -59,7 +60,7 @@ The repository contains:
 - <b>Evaluate.sh:</b> shell script that performs the testing, saving the results in the <i>"Evaluations"</i> folder.
 - <b>Python files:</b> contains the code supporting the functionalities. The most relevant file is "Parser.py" because is the one you will need to execute. The relation among them and the different folders is as follows:
 
-<img src="../Images/Architecture.png" width="600" height="450"/>
+<img src="https://github.com/Sinclert/SentimentAI/blob/master/Images/Architecture.png"/>
 
 
 ## Usage:
