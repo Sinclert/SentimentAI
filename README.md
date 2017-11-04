@@ -1,12 +1,12 @@
 # Sentiment AI 📊
 
-This project contains the code I used in my CS Bachelor's thesis research. Its main goal is to provide a simple sentiment analysis tool that can be used joinly with the Twitter API in order to classify tweets, depending on the sentiment, as <i>"positive"</i>, <i>"negative"</i> or <i>"neutral"</i>.
+This project contains some of the code I used in my CS Bachelor's thesis research. Its main goal is to provide a simple sentiment analysis tool that can be used joinly with the Twitter API in order to classify tweets, depending on the sentiment, as <i>"positive"</i>, <i>"negative"</i> or <i>"neutral"</i>.
 <br><br>
 The <a href="http://scikit-learn.org/stable/">Scikit-learn</a> Machine Learning package includes a wide range of techniques that provide computers with the ability to learn without being explicitly programmed. Machine Learning (ML) plays a significant role in the analysis process because it help us to automate and generate a quicker response than the case of processing each piece of information (or tweet) individually by a person.
 <br><br>
 Additionally, there is a hosted web application that uses Python packages such as <a href="http://flask.pocoo.org/docs/0.12/">Flask</a> and <a href="http://gunicorn.org">Gunicorn</a>, in addition to some trained ML models, to provide an accesible graphical interface.
 <br><br>
-<a target="_blank" href="https://sentiment-ai-183521.appspot.com">CHECK OUT THE WEB APPLICATION HERE</a>
+<b><a target="_blank" href="https://sentiment-ai-183521.appspot.com">Check out the Web Application here!</a></b>
 
 <br>
 
