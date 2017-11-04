@@ -60,16 +60,16 @@ The repository contains:
 
 - <b>Datasets folder:</b> contains the NLTK datasets.
 - <b>Evaluations folder:</b> contains the F-scores of the different ML algorithms.
-- <b>Stopwords folder:</b> contains the stop words of different languages (only English ones are used).
+- <b>Stopwords folder:</b> contains the stop words of different languages.
 - <b>Evaluate.sh:</b> shell script that performs the testing, saving the results in the <i>"Evaluations"</i> folder.
-- <b>Python files:</b> contains the code supporting the functionalities. The most relevant file is "Parser.py" because is the one you will need to execute. The relation among them and the different folders is as follows:
+- <b>Python files:</b> contains the code supporting the functionalities. The most relevant file is <i>"Parser.py"</i> because is the one you will need to execute. The relation among them and the different folders is as follows:
 
 <img src="https://github.com/Sinclert/SentimentAI/blob/master/Images/Architecture.png"/>
 
 <br>
 
 ## Usage:
-The main file from which all functionalities are called is "Parser.py". The execute syntax is as follows:
+The main file from which all functionalities are called is <i>"Parser.py"</i>. The execute syntax is as follows:
 ```shell
 $ python3 Parser.py <Functionality> <Arguments> 
 ```
@@ -79,7 +79,7 @@ Depending on the chosen functionality, the arguments are different. Here is the 
 <br>
 
 ### Train a model:
-In this case a trained model will be saved into the <i>"Models"</i> folder. This folder will be created in case it does not exist. The expected arguments are:
+Trained models are saved in the <i>"Models"</i> folder (created if it does not exist). The expected arguments are:
 1. <b>Classifier:</b> {Naive-Bayes, Logistic-Regression, Linear-SVM, Random-Forest}
 2. <b>File 1:</b> File inside "Datasets" containing the label 1 training examples.
 3. <b>File 2:</b> File inside "Datasets" containing the label 2 training examples.
@@ -103,7 +103,7 @@ In this case the Twitter API is used to search for tweets fulfilling a specific 
 
 Example:
 ```shell
-$ python3 Parser.py search “#optimistic OR #happy” en 1000 PosTweets.txt
+$ python3 Parser.py search '#optimistic OR #happy' en 1000 PosTweets.txt
 ```
 
 <br>
