@@ -238,7 +238,7 @@ if __name__ == '__main__':
 		train_par = ArgumentParser(usage = "Use 'Parser.py -h' for help")
 		train_par.add_argument('-n', required = True)
 		train_par.add_argument('-d', required = True, nargs = 2)
-		train_par.add_argument('-f', required = True, type = int)
+		train_par.add_argument('-f', required = True, type = float)
 		train_par.add_argument('-o', required = True)
 
 		args = train_par.parse_args(func_args)

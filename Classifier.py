@@ -2,6 +2,8 @@
 
 import pickle, os, itertools, numpy
 from Utilities import getFileContents
+from nltk.tokenize import TweetTokenizer
+from nltk.stem import SnowballStemmer
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_selection import SelectPercentile, chi2
 from sklearn.linear_model import LogisticRegression
@@ -23,10 +25,25 @@ possible_classifiers = {
 
 
 
+""" Class in charge of tokenizing and stemming the features """
+class LemmaTokenizer(object):
+
+
+	def __init__(self):
+		self.tokenizer = TweetTokenizer(False, True, True)
+		self.lemmatizer = SnowballStemmer("english")
+
+
+	def __call__(self, sentence):
+		return [self.lemmatizer.stem(t) for t in self.tokenizer.tokenize(sentence)]
+
+
+
+
+
+
 """ Class in charge of the binary classification of sentences """
 class Classifier(object):
-
-
 
 
 	""" Initiates variables when the instance is created """
@@ -37,6 +54,7 @@ class Classifier(object):
 
 		stopwords_path = os.path.join("Stopwords", language + ".txt")
 		self.vectorizer = CountVectorizer(
+			tokenizer = LemmaTokenizer(),
 			stop_words = getFileContents(stopwords_path),
 			ngram_range = (1,2)
 		)
