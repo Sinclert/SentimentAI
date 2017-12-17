@@ -27,13 +27,8 @@ def getStopWords(language = "english"):
 
 	try:
 		file = open(file_name, 'r', encoding = "UTF8")
-		lines = file.read().splitlines()
+		stopwords = file.read().splitlines()
 		file.close()
-
-		# Storing the words line by line in a list
-		stopwords = []
-		for word in lines:
-			stopwords.append(word)
 
 		return stopwords
 
