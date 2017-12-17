@@ -1,12 +1,9 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
 import pickle, os, itertools, numpy
-from Utilities import getStopWords, getBestElements
-from collections import Counter
-from nltk import bigrams as getBigrams
-from nltk.tokenize import TweetTokenizer
-from nltk.stem import SnowballStemmer
-from sklearn.feature_extraction import DictVectorizer
+from Utilities import getFileContents
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_selection import SelectPercentile, chi2
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.svm import LinearSVC
@@ -30,160 +27,69 @@ possible_classifiers = {
 class Classifier(object):
 
 
-	# Class attribute to access the tokenizer object
-	tokenizer = TweetTokenizer(False, True, True)
-
-	# Class attribute to compress feature dictionaries
-	vectorizer = DictVectorizer()
-
-
 
 
 	""" Initiates variables when the instance is created """
 	def __init__(self, language = "english"):
 
-		self.lemmatizer = SnowballStemmer(language)
-		self.stopwords = getStopWords(language)
-
 		self.model = None
-		self.best_words = None
-		self.best_bigrams = None
+		self.selector = None
 
-
-
-
-	""" Obtains the processed tokens of the specified sentence """
-	def __getWords(self, sentence):
-
-		sentence_words = self.tokenizer.tokenize(sentence)
-		sentence_words = filter(lambda w: w not in self.stopwords, sentence_words)
-		sentence_words = [self.lemmatizer.stem(word) for word in sentence_words]
-
-		return sentence_words
-
-
-
-
-	""" Obtains every sentence, word and bigram from the specified file """
-	def __getWordsAndBigrams(self, file):
-
-		sentences, words, bigrams = [], Counter(), Counter()
-
-		try:
-			sentences_file = open(file, 'r', encoding = "UTF8")
-
-			# Each line is tokenize and its words and bigrams stored
-			for line in sentences_file:
-
-				# Storing the whole line
-				sentences.append(line)
-
-				# Storing all line words
-				sentence_words = self.__getWords(line)
-				for word in sentence_words:
-					words[word] += 1
-
-				# Storing all line bigrams
-				sentence_bigrams = getBigrams(sentence_words)
-				for bigram in sentence_bigrams:
-					bigrams[" ".join(bigram)] += 1
-
-
-			sentences_file.close()
-			return sentences, words, bigrams
-
-
-		except (FileNotFoundError, PermissionError, IsADirectoryError):
-			print("ERROR: The file", file, "cannot be opened")
-			exit()
-
-
-
-
-	""" Transform a sentence into a features list to train / classify """
-	def __getFeatures(self, sentence):
-
-		# Every line word is obtained
-		sentence_words = self.__getWords(sentence)
-
-		# Every bigram is obtained and transformed (avoiding errors)
-		sentence_bigrams = getBigrams(sentence_words)
-		sentence_bigrams = [" ".join(b) for b in sentence_bigrams]
-
-		try:
-			features = dict((word, word in sentence_words) for word in self.best_words)
-			features.update((bigram, bigram in sentence_bigrams) for bigram in self.best_bigrams)
-
-			return features
-
-		except TypeError:
-			print("ERROR: 'None' type detected in some classifier attribute")
-			exit()
-
-
-
-
-	""" Performs the training and testing processes """
-	def __performTraining(self, classifier_name, features, labels):
-
-		try:
-			# Generating the model that is going to be stored
-			classifier = possible_classifiers[classifier_name]
-			self.model = classifier.fit(features, labels)
-			print("Training process completed")
-
-			# The labels are encoded to perform F1 scoring
-			labels = LabelEncoder().fit_transform(labels)
-			bin_classifier = clone(possible_classifiers[classifier_name])
-
-			# The model is tested using cross validation
-			results = cross_val_score(estimator = bin_classifier,
-			                          X = features,
-			                          y = labels,
-			                          scoring = 'f1',
-			                          cv = 10,
-			                          n_jobs = -1)
-
-			print("F1 score:", round(results.mean(), 4), "\n")
-
-		except KeyError:
-			print("ERROR: Invalid classifier")
-			exit()
+		stopwords_path = os.path.join("Stopwords", language + ".txt")
+		self.vectorizer = CountVectorizer(
+			stop_words = getFileContents(stopwords_path),
+			ngram_range = (1,2)
+		)
 
 
 
 
 	""" Trains a classifier using the sentences from the specified files """
-	def train(self, classifier_name, l1_file, l2_file, words_pct = 5, bigrams_pct = 1):
+	def train(self, classifier_name, l1_file, l2_file, features_pct):
 
 		# Obtaining the label names
 		label1 = os.path.basename(l1_file).rsplit('.')[0]
 		label2 = os.path.basename(l2_file).rsplit('.')[0]
 
-		# Obtaining every word and bigram in both files
-		l1_sentences, l1_words, l1_bigrams = self.__getWordsAndBigrams(l1_file)
-		l2_sentences, l2_words, l2_bigrams = self.__getWordsAndBigrams(l2_file)
-
-		# Obtaining best words and bigrams considering the gain of information
-		self.best_words = getBestElements(l1_counter = l1_words,
-		                                  l2_counter = l2_words,
-		                                  percentage = words_pct)
-
-		self.best_bigrams = getBestElements(l1_counter = l1_bigrams,
-		                                    l2_counter = l2_bigrams,
-		                                    percentage = bigrams_pct)
+		# Obtaining every sentence inside both files
+		l1_sentences = getFileContents(l1_file)
+		l2_sentences = getFileContents(l2_file)
 
 		# Getting the labels as a numpy array
 		labels = numpy.array(([label1] * len(l1_sentences)) + ([label2] * len(l2_sentences)))
 
-		# Transforming each sentence into a dictionary of vectorized features
-		features = itertools.chain(map(self.__getFeatures, l1_sentences),
-		                           map(self.__getFeatures, l2_sentences))
+		# Creating the feature selector object
+		self.selector = SelectPercentile(
+			score_func = chi2,
+			percentile = features_pct
+		)
 
+		# Extracting and selecting the best features
+		features = itertools.chain(l1_sentences, l2_sentences)
 		features = self.vectorizer.fit_transform(features)
+		features = self.selector.fit_transform(features, labels)
 
-		# Trains using the specified classifier
-		self.__performTraining(classifier_name, features, labels)
+
+		# Training process
+		classifier = possible_classifiers[classifier_name]
+		self.model = classifier.fit(features, labels)
+		print("Training process completed")
+
+		# The labels are encoded to perform F1 scoring
+		labels = LabelEncoder().fit_transform(labels)
+		bin_classifier = clone(possible_classifiers[classifier_name])
+
+		# The model is tested using cross validation
+		results = cross_val_score(
+			estimator = bin_classifier,
+			X = features,
+			y = labels,
+			scoring = 'f1',
+			cv = 10,
+			n_jobs = -1
+		)
+
+		print("F1 score:", round(results.mean(), 4), "\n")
 
 
 
@@ -220,7 +126,7 @@ class Classifier(object):
 				os.mkdir(models_folder)
 
 			file = open(file_path + ".pickle", 'wb')
-			pickle.dump([self.model, self.best_words, self.best_bigrams], file)
+			pickle.dump([self.model, self.selector, self.vectorizer], file)
 
 			file.close()
 			print("Classifier model saved in", file_path)
@@ -240,7 +146,7 @@ class Classifier(object):
 
 		try:
 			file = open(file_path + ".pickle", 'rb')
-			self.model, self.best_words, self.best_bigrams = pickle.load(file)
+			self.model, self.selector, self.vectorizer = pickle.load(file)
 
 			file.close()
 			print("Classifier model loaded from", file_path)
