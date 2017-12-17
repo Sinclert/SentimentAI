@@ -98,8 +98,8 @@ class Classifier(object):
 	def classify(self, sentence):
 
 		try:
-			features = self.__getFeatures(sentence)
-			features = self.vectorizer.fit_transform(features)
+			features = self.vectorizer.transform([sentence])
+			features = self.selector.transform(features)
 
 			# If none of the features give any information: return None
 			if features.getnnz() == 0:
