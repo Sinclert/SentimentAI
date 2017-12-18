@@ -69,25 +69,18 @@ class DataMiner(object):
         To learn about queries: https://dev.twitter.com/rest/public/search """
     def searchTweets(self, query, language, file, depth = 1000):
 
-        # Number of pages and tweets returned
+        # Number of pages returned
         num_pages = ceil(depth / 100)
-        num_tweets = 0
 
         try:
             cursor = Cursor(self.API.search, query, lang = language, count = 100)
 
             # Each page is traversed and its tweets appended
             for page in cursor.pages(num_pages):
-                num_tweets += len(page)
-                tweets_list = []
 
-                # Each tweet in the page is processed
-                for tweet in page:
-                    tweet_text = getCleanTweet(tweet)
-                    tweets_list.append(tweet_text)
-
-                # Storing the tweets for each page
-                storeTweets(tweets_list, file)
+                # Each tweet in the page is processed and stored
+                tweet_texts = map(getCleanTweet, page)
+                storeTweets(tweet_texts, file)
 
             print("Tweets stored into", file)
 
