@@ -29,13 +29,22 @@ possible_classifiers = {
 class LemmaTokenizer(object):
 
 
-	def __init__(self):
+	def __init__(self, language = "english"):
+
+		stopwords_path = os.path.join("Stopwords", language + ".txt")
+		self.stopwords = set(getFileContents(stopwords_path))
+
 		self.tokenizer = TweetTokenizer(False, True, True)
 		self.lemmatizer = SnowballStemmer("english")
 
 
 	def __call__(self, sentence):
-		return [self.lemmatizer.stem(t) for t in self.tokenizer.tokenize(sentence)]
+
+		tokens = self.tokenizer.tokenize(sentence)
+		tokens = filter(lambda t: t not in self.stopwords, tokens)
+		tokens = [self.lemmatizer.stem(token) for token in tokens]
+
+		return tokens
 
 
 
@@ -47,15 +56,12 @@ class Classifier(object):
 
 
 	""" Initiates variables when the instance is created """
-	def __init__(self, language = "english"):
+	def __init__(self):
 
 		self.model = None
 		self.selector = None
-
-		stopwords_path = os.path.join("Stopwords", language + ".txt")
 		self.vectorizer = CountVectorizer(
 			tokenizer = LemmaTokenizer(),
-			stop_words = getFileContents(stopwords_path),
 			ngram_range = (1,2)
 		)
 
