@@ -75,7 +75,7 @@ class DataMiner(object):
         try:
             cursor = Cursor(self.API.search, query, lang = language, count = 100)
 
-            # Each page is traversed and its tweets appended
+            # Each page is traversed
             for page in cursor.pages(num_pages):
 
                 # Each tweet in the page is processed and stored

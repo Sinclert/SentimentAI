@@ -19,11 +19,11 @@ labels = ['Negative', 'Neutral', 'Positive']
 
 
 """ Trains and stores the specified ML algorithm after been trained """
-def train(classifier_name, l1_file, l2_file, words_pct, bigrams_pct, output):
+def train(classifier_name, l1_file, l2_file, features_pct, output):
 
 	# Checks the validity of the percentages
-	if (words_pct < 0) or (bigrams_pct < 0):
-		print("ERROR: The specified percentages must be positive")
+	if (features_pct < 0) or (features_pct > 100):
+		print("ERROR: The specified percentage is invalid")
 		exit()
 
 	# Checks the specified classifier
@@ -33,11 +33,12 @@ def train(classifier_name, l1_file, l2_file, words_pct, bigrams_pct, output):
 		l2_file = os.path.join(datasets_folder, l2_file)
 
 		classifier = Classifier()
-		classifier.train(classifier_name = classifier_name.lower(),
-		                 l1_file = l1_file,
-		                 l2_file = l2_file,
-		                 words_pct = words_pct,
-		                 bigrams_pct = bigrams_pct)
+		classifier.train(
+			classifier_name = classifier_name.lower(),
+			l1_file = l1_file,
+			l2_file = l2_file,
+			features_pct = features_pct
+		)
 
 		classifier.saveModel(models_folder, output)
 
@@ -59,12 +60,16 @@ def classify(polarity_cls, sentiment_cls, account, filter_word):
 
 	# Obtaining tweets
 	miner = DataMiner()
-	tweets = miner.getUserTweets(user = account,
-	                             word = filter_word)
+	tweets = miner.getUserTweets(
+		user = account,
+		word = filter_word
+	)
 
-	# Splitting the tweets into individual sentences
-	sentences = getSentences(tweets = tweets,
-	                         word = filter_word)
+	# Splitting the tweets into sentences
+	sentences = getSentences(
+		tweets = tweets,
+		word = filter_word
+	)
 
 	# Creating the results dictionary
 	results = dict.fromkeys(labels, 0)
@@ -95,10 +100,12 @@ def search(search_query, language, search_depth, output):
 
 	# Obtaining tweets and storing them in a file
 	miner = DataMiner()
-	miner.searchTweets(query = search_query,
-	                   language = language,
-	                   file = output_path,
-	                   depth = search_depth)
+	miner.searchTweets(
+		query = search_query,
+		language = language,
+		file = output_path,
+		depth = search_depth
+	)
 
 
 
@@ -129,10 +136,12 @@ def stream(polarity_cls, sentiment_cls, buffer_size, filter_word, language, coor
 	from GraphAnimator import animatePieChart, figure
 
 	# Animate the graph each milliseconds interval
-	ani = animation.FuncAnimation(fig = figure,
-	                              func = animatePieChart,
-	                              interval = 500,
-	                              fargs = (labels, tracks, listener.stream_dict))
+	ani = animation.FuncAnimation(
+		fig = figure,
+		func = animatePieChart,
+		interval = 500,
+		fargs = (labels, tracks, listener.stream_dict)
+	)
 	pyplot.show()
 
 	# Finally: close the stream process
@@ -171,9 +180,8 @@ if __name__ == '__main__':
 		              "  \n"
 		              "  train: trains and store the specified ML model\n"
 		              "            -n <classifier name>\n"
-		              "            -f <first dataset> <second dataset>\n"
-		              "            -w <words percentage>\n"
-		              "            -b <bigrams percentage>\n"
+		              "            -d <first dataset> <second dataset>\n"
+		              "            -f <features percentage>\n"
 		              "            -o <output name>\n",
 		formatter_class = RawDescriptionHelpFormatter)
 
@@ -229,10 +237,9 @@ if __name__ == '__main__':
 
 		train_par = ArgumentParser(usage = "Use 'Parser.py -h' for help")
 		train_par.add_argument('-n', required = True)
-		train_par.add_argument('-f', required = True, nargs = 2)
-		train_par.add_argument('-w', required = True, type = int)
-		train_par.add_argument('-b', required = True, type = int)
+		train_par.add_argument('-d', required = True, nargs = 2)
+		train_par.add_argument('-f', required = True, type = float)
 		train_par.add_argument('-o', required = True)
 
 		args = train_par.parse_args(func_args)
-		train(args.n, args.f[0], args.f[1], args.w, args.b, args.o)
+		train(args.n, args.d[0], args.d[1], args.f, args.o)

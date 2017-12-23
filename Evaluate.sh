@@ -30,7 +30,7 @@ cls_files=(	"Neutral.txt Polarized.txt"
 			"Positive.txt Negative.txt")
 
 folder="Evaluations"
-max_pct=5
+max_pct=10
 
 
 ############################## CREATING THE FOLDER #############################
@@ -41,12 +41,11 @@ mkdir ${folder}
 ############################# FUNCTIONS DECLARATION ############################
 function print_progress() {
 	algorithm=$1
-	words_pct=$2
-	bigrams_pct=$3
+	features_pct=$2
 
 	# If it is the first call (0%) avoid the message
-	if [ ${words_pct} != 1 ] || [ ${bigrams_pct} != 0 ]; then
-		completed=$(( (($words_pct-1) * ($max_pct+1)) + $bigrams_pct ))
+	if [ ${features_pct} != 1 ]; then
+		completed=$(( (($features_pct-1) * ($max_pct+1)) ))
 		total=$(( $completed * 100 / ($max_pct * ($max_pct+1) ) ))
 		echo "$algorithm: $total%"
 	fi
@@ -60,29 +59,23 @@ function algorithm_eval() {
 	echo "Starting $algorithm evaluation"
 	echo "############# Evaluating $algorithm #############" >> ${output}
 
-	# While word percentage is lower than the max
-	for ((words_pct = 1 ; words_pct <= $max_pct ; words_pct++)); do
+	# While the features percentage is lower than the max
+	for ((features_pct = 1 ; features_pct <= $max_pct ; features_pct++)); do
 		echo >> ${output}
 
-		# While bigram percentage is lower than the max
-		for ((bigrams_pct = 0 ; bigrams_pct <= $max_pct ; bigrams_pct++)); do
-			print_progress ${algorithm} ${words_pct} ${bigrams_pct}
-			echo "	$words_pct% words | $bigrams_pct% bigrams" >> ${output}
+		print_progress ${algorithm} ${features_pct}
+		echo "	$features_pct% features" >> ${output}
 
-			# For each classifier type (polarized VS sentiment)
-			for ((i = 0 ; i < ${#cls_types[@]} ; i++)); do
-				files=${cls_files[$i]}
-				score=$(python3 Parser.py train -n ${algorithm} \
-												-f ${files} \
-												-w ${words_pct} \
-												-b ${bigrams_pct} \
-												-o None)
+		# For each classifier type (polarized VS sentiment)
+		for ((i = 0 ; i < ${#cls_types[@]} ; i++)); do
+			files=${cls_files[$i]}
+			score=$(python3 Parser.py train -n ${algorithm} \
+			                                -d ${files} \
+			                                -f ${features_pct} \
+			                                -o None)
 
-				score=$(echo ${score} | cut -d" " -f 6)
-				echo "		${cls_types[$i]}: $score" >> ${output}
-			done
-
-			echo >> ${output}
+			score=$(echo ${score} | cut -d" " -f 6)
+			echo "		${cls_types[$i]}: $score" >> ${output}
 		done
 	done
 
