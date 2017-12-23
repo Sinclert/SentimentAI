@@ -16,8 +16,8 @@ Additionally, there is a hosted web application that uses Python packages such a
 On the one hand, we need to train ML models:<br>
 <b>1. Datasets:</b> they are obtained from the <a href="http://www.nltk.org">NLTK</a> corpus.<br>
 <b>2. Datasets Preprocessing:</b> remove stopwords, transform every word into lower case...<br>
-<b>3. Features selection:</b> using <a href="http://www.nltk.org">NLTK</a> Chi-square scoring, get the most relevant features (indicated by a percentage).<br>
-<b>4. Features vectors:</b> they are built and prepared to train an algorithm.<br>
+<b>3. Features vectors:</b> features are vectorized.<br>
+<b>4. Features selection:</b> using <a href="http://www.nltk.org">NLTK</a> Chi-square scoring, get the most relevant features (indicated by a percentage).<br>
 <b>5. Training:</b> using <a href="http://scikit-learn.org/stable/">Scikit-learn</a> algorithms (Bernoulli Naïve Bayes, Logistic Regression, Linear SVM & Random Forest).<br>
 <br>
 On the other hand, we need to extract the tweets we want to classify:<br>
@@ -84,60 +84,58 @@ Depending on the chosen functionality, the arguments are different. Here is the 
 
 ### Train a model:
 Trained models are saved in the <i>"Models"</i> folder (created if it does not exist). The expected arguments are:
-1. <b>Classifier:</b> {Naive-Bayes, Logistic-Regression, Linear-SVM, Random-Forest}
-2. <b>File 1:</b> File inside "Datasets" containing the label 1 training examples.
-3. <b>File 2:</b> File inside "Datasets" containing the label 2 training examples.
-4. <b>Words percentage:</b> Percentage of words to keep.
-5. <b>Bigrams percentage:</b> Percentage of bigrams (pairs of words) to keep.
-6. <b>Output:</b> Name of the output model.
+- <b>-n classifier_name:</b> {Naive-Bayes, Logistic-Regression, Linear-SVM, Random-Forest}
+- <b>-d dataset_1 dataset_2:</b> Files inside "Datasets" containing the training examples.
+- <b>-f features:</b> Percentage of most relevant features to keep.
+- <b>-o output:</b> Name of the output model.
 
 Example:
 ```shell
-$ python3 Parser.py train Logistic-Regression Positive.txt Negative.txt 5 1 Pos-Neg
+$ python3 Parser.py train -n Logistic-Regression -d Positive.txt Negative.txt -f 5 -o Pos-Neg
 ```
 
 <br>
 
 ### Search for tweets:
 In this case the <a href="https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets">Twitter Search API</a> is used to search for tweets fulfilling a specific query and build a different dataset. The expected arguments are:
-1. <b>Query:</b> words or hashtags that the tweets must contain.
-2. <b>Language:</b> language in which the tweets are searched.
-3. <b>Depth:</b> number of tweets to retrieve.
-4. <b>Output:</b> name of the output file containing all the tweets.
+- <b>-q query:</b> words or hashtags that the tweets must contain.
+- <b>-l language:</b> language in which the tweets are searched.
+- <b>-d search_depth:</b> number of tweets to retrieve.
+- <b>-o output:</b> name of the output file containing all the tweets.
 
 Example:
 ```shell
-$ python3 Parser.py search '#optimistic OR #happy' en 1000 PosTweets.txt
+$ python3 Parser.py search -q '#optimistic OR #happy' -l en -d 1000 -o PosTweets.txt
 ```
 
 <br>
 
 ### Classify account tweets:
 In this case, the <a href="https://developer.twitter.com/en/docs/tweets/timelines/api-reference/get-statuses-user_timeline">Twitter REST API</a> is used to extract historic tweets from one specific account, and classify them using a pair of ML models (one polarity model and one sentiment model). The expected arguments are:
-1. <b>Model 1:</b> polarity trained model.
-2. <b>Model 2:</b> sentiment trained model.
-3. <b>Account:</b> account to analyse.
-4. <b>Filter word:</b> word that has to be present in the retrieved tweets.
+- <b>-p polarity_classifier:</b> polarity trained model.
+- <b>-s sentiment_classifier:</b> sentiment trained model.
+- <b>-a account:</b> Twitter account to analyse.
+- <b>-w filter_word:</b> word that has to be present in the retrieved tweets.
 
 Example:
 ```shell
-$ python3 Parser.py classify Neu-Pol Pos-Neg David_Cameron brexit
+$ python3 Parser.py classify -p Neu-Pol -s Pos-Neg -a David_Cameron -w brexit
 ```
 
 <br>
 
 ### Classify real-time tweets:
 In this case, the <a href="https://developer.twitter.com/en/docs/tweets/filter-realtime/api-reference/post-statuses-filter">Twitter Streaming API</a> is used to extract real time tweets from one specific location, and classify them using a pair of ML models (one polarity model and one sentiment model). The expected arguments are:
-1. <b>Model 1:</b> polarity trained model.
-2. <b>Model 2:</b> sentiment trained model.
-3. <b>Buffer size:</b> number of tweets to represent into a live graph.
-4. <b>Filter word:</b> word that has to be present in the retrieved tweets.
-5. <b>Language:</b> language of the retrieved tweets.
-6. <b>Coordinates:</b> coordinates of the desired location. <b>Tip:</b> use <a href="https://developers.google.com/maps/documentation/geocoding/intro">Google Geocoding API</a>
+- <b>-p polarity_classifier:</b> polarity trained model.
+- <b>-s sentiment_classifier:</b> sentiment trained model.
+- <b>-b buffer_size:</b> number of tweets to represent into a live graph.
+- <b>-w filter_word:</b> word that has to be present in the retrieved tweets.
+- <b>-l language:</b> language of the retrieved tweets.
+- <b>-c coord_1 coord_2 coord_3 coord_4:</b> coordinates of the desired location. <b>Tip:</b> use <a href="https://developers.google.com/maps/documentation/geocoding/intro">Google Geocoding API</a>
 
 Example:
 ```shell
-$ python3 Parser.py stream Neu-Pol Pos-Neg 500 Obama en -122,36,-121,38
+$ python3 Parser.py stream -p Neu-Pol -s Pos-Neg -b 500 -w Obama -l en -c -122 36 -121 38
 ```
 
 <br>
