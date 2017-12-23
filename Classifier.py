@@ -1,6 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-import pickle, os, itertools, numpy
+import os, pickle, numpy
 from Utilities import getFileContents
 from nltk.tokenize import TweetTokenizer
 from nltk.stem import SnowballStemmer
@@ -89,7 +89,7 @@ class Classifier(object):
 		)
 
 		# Extracting and selecting the best features
-		features = itertools.chain(l1_sentences, l2_sentences)
+		features = numpy.array(l1_sentences + l2_sentences)
 		features = self.vectorizer.fit_transform(features)
 		features = self.selector.fit_transform(features, labels)
 
