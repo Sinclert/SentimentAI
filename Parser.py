@@ -60,10 +60,7 @@ def classify(polarity_cls, sentiment_cls, account, filter_word):
 
 	# Obtaining tweets
 	miner = DataMiner()
-	tweets = miner.getUserTweets(
-		user = account,
-		word = filter_word
-	)
+	tweets = miner.getUserTweets(user = account)
 
 	# Splitting the tweets into sentences
 	sentences = getSentences(
