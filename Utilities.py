@@ -63,7 +63,7 @@ def getCleanTweet(tweet):
 def getSentences(tweets, word = None):
 
 	# If there is a list of tweets as input
-	if isinstance(tweets, list):
+	if not isinstance(tweets, str):
 		sentences = []
 
 		for tweet in tweets:
@@ -79,7 +79,7 @@ def getSentences(tweets, word = None):
 		sentences = re.split("[.:!?]\s+", tweets)
 
 		if word is not None:
-			sentences[:] = [s for s in sentences if word.lower() in s]
+			sentences = filter(lambda s: word.lower() in s, sentences)
 
 		return sentences
 
