@@ -4,7 +4,7 @@ import os
 from Classifier import Classifier, possible_classifiers
 from DataMiner import DataMiner
 from TwitterListener import TwitterListener
-from Utilities import getSentences
+from Utilities import filterTweets
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
 
@@ -63,7 +63,7 @@ def classify(polarity_cls, sentiment_cls, account, filter_word):
 	tweets = miner.getUserTweets(user = account)
 
 	# Splitting the tweets into sentences
-	sentences = getSentences(
+	sentences = filterTweets(
 		tweets = tweets,
 		word = filter_word
 	)

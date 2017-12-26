@@ -59,33 +59,22 @@ def getCleanTweet(tweet):
 
 
 
-""" Divides tweets into sentences and returns those containing the word """
-def getSentences(tweets, word = None):
+""" Splits tweets into sentences and returns those containing the word """
+def filterTweets(tweets, word):
 
-	# If there is a list of tweets as input
-	if not isinstance(tweets, str):
-		sentences = []
+	try:
+		word = word.lower()
 
 		for tweet in tweets:
+			sentences = re.split("[.:!?]\s+", tweet)
+			sentences = filter(lambda s: word in s, sentences)
 
-			# Recursive call to obtain the sentences of each tweet
-			for sentence in getSentences(tweet, word):
-				sentences.append(sentence)
+			for sentence in sentences:
+				yield sentence
 
-		return sentences
-
-	# Base case: individual tweet
-	elif isinstance(tweets, str):
-		sentences = re.split("[.:!?]\s+", tweets)
-
-		if word is not None:
-			sentences = filter(lambda s: word.lower() in s, sentences)
-
-		return sentences
-
-	# If what we are processing is neither a list nor a string: error
-	else:
-		print("ERROR: Invalid value in one of the text inputs")
+	# If the word is not a string or tweets not a iterable
+	except (AttributeError, TypeError):
+		print("ERROR: Invalid arguments")
 		exit()
 
 
