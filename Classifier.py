@@ -55,15 +55,19 @@ class LemmaTokenizer(object):
 class Classifier(object):
 
 
+	vectorizer = CountVectorizer(
+		tokenizer = LemmaTokenizer(),
+		ngram_range = (1, 2)
+	)
+
+
+
+
 	""" Initiates variables when the instance is created """
 	def __init__(self):
 
 		self.model = None
 		self.selector = None
-		self.vectorizer = CountVectorizer(
-			tokenizer = LemmaTokenizer(),
-			ngram_range = (1,2)
-		)
 
 
 
@@ -149,8 +153,8 @@ class Classifier(object):
 			if os.path.exists(models_folder) is False:
 				os.mkdir(models_folder)
 
-			file = open(file_path + ".pickle", 'wb')
-			pickle.dump([self.model, self.selector, self.vectorizer], file)
+			file = open(file_path, 'wb')
+			pickle.dump([self.model, self.selector], file)
 
 			file.close()
 			print("Classifier model saved in", file_path)
@@ -169,8 +173,8 @@ class Classifier(object):
 		file_path = os.path.join(models_folder, model_name)
 
 		try:
-			file = open(file_path + ".pickle", 'rb')
-			self.model, self.selector, self.vectorizer = pickle.load(file)
+			file = open(file_path, 'rb')
+			self.model, self.selector = pickle.load(file)
 
 			file.close()
 			print("Classifier model loaded from", file_path)
