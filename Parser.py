@@ -1,7 +1,8 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
 import os
-from Classifier import Classifier, possible_classifiers
+from Node_cls import Classifier, possible_classifiers
+from Hierarchical_cls import Hierarchical_cls
 from DataMiner import DataMiner
 from TwitterListener import TwitterListener
 from Utilities import filterTweets
@@ -11,6 +12,7 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 # Folder paths
 datasets_folder = "Datasets"
 models_folder = "Models"
+profiles_folder = "Profiles"
 
 functions = ['classify', 'search', 'stream', 'train']
 labels = ['Negative', 'Neutral', 'Positive']
@@ -50,13 +52,10 @@ def train(classifier_name, l1_file, l2_file, features_pct, output):
 
 
 """ Performs sentiment analysis over the specified Twitter account """
-def classify(polarity_cls, sentiment_cls, account, filter_word):
+def classify(cls_profile, account, filter_word):
 
-	# Loading both trained classifiers
-	classifier1 = Classifier()
-	classifier2 = Classifier()
-	classifier1.loadModel(models_folder, polarity_cls)
-	classifier2.loadModel(models_folder, sentiment_cls)
+	# Loading classifiers
+	h_cls = Hierarchical_cls(os.path.join(profiles_folder, cls_profile))
 
 	# Obtaining tweets
 	miner = DataMiner()
@@ -73,15 +72,9 @@ def classify(polarity_cls, sentiment_cls, account, filter_word):
 
 	# Storing the classification results
 	for sentence in sentences:
-		label = classifier1.classify(sentence)
+		label = h_cls.predict(sentence)
 
-		if label == 'Polarized':
-			label = classifier2.classify(sentence)
-
-		# In case there is no relevant features it is ignored
-		if label is None:
-			print(sentence, "(Tweet ignored)")
-		else:
+		if label is not None:
 			results[label] += 1
 
 	print(results)
@@ -108,13 +101,10 @@ def search(search_query, language, search_depth, output):
 
 
 """ Performs sentiment analysis over a stream of tweets filter by location """
-def stream(polarity_cls, sentiment_cls, buffer_size, filter_word, language, coordinates):
+def stream(cls_profile, buffer_size, filter_word, language, coordinates):
 
-	# Loading both trained classifiers
-	classifier1 = Classifier()
-	classifier2 = Classifier()
-	classifier1.loadModel(models_folder, polarity_cls)
-	classifier2.loadModel(models_folder, sentiment_cls)
+	# Loading classifiers
+	h_cls = Hierarchical_cls(os.path.join(profiles_folder, cls_profile))
 
 	# Transforming arguments
 	tracks = [filter_word]
@@ -126,7 +116,7 @@ def stream(polarity_cls, sentiment_cls, buffer_size, filter_word, language, coor
 
 
 	# Creates the stream object and start stream
-	listener = TwitterListener(classifier1, classifier2, buffer_size, labels)
+	listener = TwitterListener(h_cls, buffer_size, labels)
 	listener.initStream(tracks, languages, coordinates)
 
 	from matplotlib import pyplot, animation
@@ -156,8 +146,7 @@ if __name__ == '__main__':
 		description = "modes and arguments:\n"
 		              "  \n"
 		              "  classify: analyses tweets of a Twitter account\n"
-		              "            -p <polarity classifier>\n"
-		              "            -s <sentiment classifier>\n"
+		              "            -p <classification profile>\n"
 		              "            -a <Twitter account>\n"
 		              "            -w <filter word>\n"
 		              "  \n"
@@ -168,8 +157,7 @@ if __name__ == '__main__':
 		              "            -o <dataset output>\n"
 		              "  \n"
 		              "  stream: analyses tweets of a Twitter stream\n"
-		              "            -p <polarity classifier>\n"
-		              "            -s <sentiment classifier>\n"
+		              "            -p <classification profile>\n"
 		              "            -b <buffer size>\n"
 		              "            -w <filter word>\n"
 		              "            -l <language>\n"
@@ -193,12 +181,11 @@ if __name__ == '__main__':
 
 		classify_par = ArgumentParser(usage = "Use 'Parser.py -h' for help")
 		classify_par.add_argument('-p', required = True)
-		classify_par.add_argument('-s', required = True)
 		classify_par.add_argument('-a', required = True)
 		classify_par.add_argument('-w', required = True)
 
 		args = classify_par.parse_args(func_args)
-		classify(args.p, args.s, args.a, args.w)
+		classify(args.p, args.a, args.w)
 
 
 	# Second mode: search
@@ -219,14 +206,13 @@ if __name__ == '__main__':
 
 		stream_par = ArgumentParser(usage = "Use 'Parser.py -h' for help")
 		stream_par.add_argument('-p', required = True)
-		stream_par.add_argument('-s', required = True)
 		stream_par.add_argument('-b', required = True, type = int)
 		stream_par.add_argument('-w', required = True)
 		stream_par.add_argument('-l', required = True)
 		stream_par.add_argument('-c', required = True, type = float, nargs = '+')
 
 		args = stream_par.parse_args(func_args)
-		stream(args.p, args.s, args.b, args.w, args.l, args.c)
+		stream(args.p, args.b, args.w, args.l, args.c)
 
 
 	# Fourth mode: train

@@ -1,0 +1,16 @@
+{
+    "cls_name": "Neu-Pol.pickle",
+    "cls_labels": [
+        "Neutral",
+        "Polarized"
+    ],
+    "cls_children": {
+        "Polarized": {
+            "cls_name": "Pos-Neg.pickle",
+            "cls_labels": [
+                "Negative",
+                "Positive"
+            ]
+        }
+	}
+}
