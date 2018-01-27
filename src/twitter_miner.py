@@ -1,8 +1,8 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-from Keys import keys
+from keys import keys
 from tweepy import AppAuthHandler, API, Cursor, TweepError
-from Utilities import getCleanTweet, storeTweets
+from utils import getCleanTweet, storeTweets
 
 
 """ Class in charge of retrieving data from the Twitter API """

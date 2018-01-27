@@ -1,8 +1,8 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-from Keys import keys
+from keys import keys
 from tweepy import API, OAuthHandler, StreamListener, Stream, TweepError
-from Utilities import getCleanTweet
+from utils import getCleanTweet
 
 
 """ Class in charge of retrieving live data from the Twitter Streaming API """

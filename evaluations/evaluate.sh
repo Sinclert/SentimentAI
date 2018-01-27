@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Program to evaluate the algorithms changing the number of features
-# Usage: ./Evaluate.sh
+# Usage: ./evaluate.sh
 
 # Adding trap in case of cancelling this script
 trap "kill -15 -$$" SIGHUP SIGINT SIGQUIT SIGABRT SIGTERM
@@ -26,10 +26,10 @@ eval_files=("LR_eval.txt"
 cls_types=(	"Polarity"
 			"Sentiment")
 
-cls_files=(	"Neutral.txt Polarized.txt"
-			"Positive.txt Negative.txt")
+cls_files=(	"neutral.txt polarized.txt"
+			"positive.txt negative.txt")
 
-folder="Evaluations"
+folder="evaluations"
 max_pct=10
 
 

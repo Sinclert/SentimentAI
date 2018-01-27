@@ -1,7 +1,7 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
 import os, pickle, numpy
-from Utilities import getFileLines
+from utils import getFileLines
 from nltk.tokenize import TweetTokenizer
 from nltk.stem import SnowballStemmer
 from sklearn.feature_extraction.text import CountVectorizer
@@ -31,7 +31,7 @@ class LemmaTokenizer(object):
 
 	def __init__(self, language = "english"):
 
-		stopwords_path = os.path.join("Stopwords", language + ".txt")
+		stopwords_path = os.path.join("stopwords", language + ".txt")
 		self.stopwords = set(getFileLines(stopwords_path))
 
 		self.tokenizer = TweetTokenizer(False, True, True)
@@ -73,7 +73,7 @@ class Classifier(object):
 
 
 	""" Trains a classifier using the sentences from the specified files """
-	def train(self, classifier_name, l1_file, l2_file, features_pct):
+	def train(self, clf_name, l1_file, l2_file, features_pct):
 
 		# Obtaining the label names
 		label1 = os.path.basename(l1_file).rsplit('.')[0]
@@ -99,13 +99,13 @@ class Classifier(object):
 
 
 		# Training process
-		classifier = possible_classifiers[classifier_name]
+		classifier = possible_classifiers[clf_name]
 		self.model = classifier.fit(features, labels)
 		print("Training process completed")
 
 		# The labels are encoded to perform F1 scoring
 		labels = LabelEncoder().fit_transform(labels)
-		bin_classifier = clone(possible_classifiers[classifier_name])
+		bin_classifier = clone(possible_classifiers[clf_name])
 
 		# The model is tested using cross validation
 		results = cross_val_score(

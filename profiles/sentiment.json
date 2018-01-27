@@ -1,13 +1,13 @@
 {
-    "cls_name": "Neu-Pol.pickle",
-    "cls_labels": [
+    "clf_name": "neu-pol.pickle",
+    "clf_labels": [
         "Neutral",
         "Polarized"
     ],
-    "cls_children": {
+    "clf_children": {
         "Polarized": {
-            "cls_name": "Pos-Neg.pickle",
-            "cls_labels": [
+            "clf_name": "neg-pos.pickle",
+            "clf_labels": [
                 "Negative",
                 "Positive"
             ]

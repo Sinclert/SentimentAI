@@ -1,18 +1,18 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
 import os
-from Node_cls import Classifier, possible_classifiers
-from Hierarchical_cls import Hierarchical_cls
-from DataMiner import DataMiner
-from TwitterListener import TwitterListener
-from Utilities import filterTweets
+from clf_model import Classifier, possible_classifiers
+from clf_hierarchy import Hierarchical_cls
+from twitter_miner import DataMiner
+from twitter_stream import TwitterListener
+from utils import filterTweets
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
 
 # Folder paths
-datasets_folder = "Datasets"
-models_folder = "Models"
-profiles_folder = "Profiles"
+datasets_folder = "datasets"
+models_folder = "models"
+profiles_folder = "profiles"
 
 functions = ['classify', 'search', 'stream', 'train']
 labels = ['Negative', 'Neutral', 'Positive']
@@ -120,7 +120,7 @@ def stream(cls_profile, buffer_size, filter_word, language, coordinates):
 	listener.initStream(tracks, languages, coordinates)
 
 	from matplotlib import pyplot, animation
-	from GraphAnimator import animatePieChart, figure
+	from src.graph_animation import animatePieChart, figure
 
 	# Animate the graph each milliseconds interval
 	ani = animation.FuncAnimation(
@@ -142,7 +142,7 @@ if __name__ == '__main__':
 
 	# Creating the top-level parser
 	global_parser = ArgumentParser(
-		usage = "Parser.py [mode] [arguments]",
+		usage = "main.py [mode] [arguments]",
 		description = "modes and arguments:\n"
 		              "  \n"
 		              "  classify: analyses tweets of a Twitter account\n"
@@ -179,7 +179,7 @@ if __name__ == '__main__':
 	# First mode: classify
 	if arg.mode == "classify":
 
-		classify_par = ArgumentParser(usage = "Use 'Parser.py -h' for help")
+		classify_par = ArgumentParser(usage = "Use 'main.py -h' for help")
 		classify_par.add_argument('-p', required = True)
 		classify_par.add_argument('-a', required = True)
 		classify_par.add_argument('-w', required = True)
@@ -191,7 +191,7 @@ if __name__ == '__main__':
 	# Second mode: search
 	elif arg.mode == "search":
 
-		search_par = ArgumentParser(usage = "Use 'Parser.py -h' for help")
+		search_par = ArgumentParser(usage = "Use 'main.py -h' for help")
 		search_par.add_argument('-q', required = True)
 		search_par.add_argument('-l', required = True)
 		search_par.add_argument('-d', required = True, type = int)
@@ -204,7 +204,7 @@ if __name__ == '__main__':
 	# Third mode: stream
 	elif arg.mode == "stream":
 
-		stream_par = ArgumentParser(usage = "Use 'Parser.py -h' for help")
+		stream_par = ArgumentParser(usage = "Use 'main.py -h' for help")
 		stream_par.add_argument('-p', required = True)
 		stream_par.add_argument('-b', required = True, type = int)
 		stream_par.add_argument('-w', required = True)
@@ -218,7 +218,7 @@ if __name__ == '__main__':
 	# Fourth mode: train
 	elif arg.mode == "train":
 
-		train_par = ArgumentParser(usage = "Use 'Parser.py -h' for help")
+		train_par = ArgumentParser(usage = "Use 'main.py -h' for help")
 		train_par.add_argument('-n', required = True)
 		train_par.add_argument('-d', required = True, nargs = 2)
 		train_par.add_argument('-f', required = True, type = float)
