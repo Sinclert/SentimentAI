@@ -2,15 +2,11 @@
 
 
 from tweepy import API
-from tweepy import AppAuthHandler
 from tweepy import Cursor
 from tweepy import OAuthHandler
 from tweepy import TweepError
 
-from constants import CONSUMER_KEY as CK
-from constants import CONSUMER_SECRET as CS
-from constants import TOKEN_KEY as TK
-from constants import TOKEN_SECRET as TS
+from twitter_keys import APP_KEYS
 
 from utils import clean_text
 from utils import get_tweet_text
@@ -29,47 +25,27 @@ class TwitterMiner(object):
 
 
 
-	def __init__(self):
+	def __init__(self, token_key, token_secret):
 
-		""" Creates the Twitter miner object """
-
-		self.API = None
-		self.__set_API(TK, TS)
-
-
-
-
-	def __set_API(self, token_key, token_secret, mode = 'app'):
-
-		""" Sets the instance API attribute using global keys
+		""" Creates the Twitter miner object
 
 		Arguments
 		---------
-		mode : string (optional) {app, user}
-			specifies if the API should connect as application or as user
-
 		token_key : string
-			string that identifies a token
+			string that identifies a user token
 
 		token_secret : string
-			string that accompany the specified token
+			string that accompany the user token
 		"""
 
 		try:
+			consumer_key = APP_KEYS['consumer_key']
+			consumer_secret = APP_KEYS['consumer_secret']
 
-			# App authentication
-			if mode == 'app':
-				auth = AppAuthHandler(CK, CS)
-				self.API = API(auth)
+			auth = OAuthHandler(consumer_key, consumer_secret)
+			auth.set_access_token(token_key, token_secret)
 
-			# User authentication
-			elif mode == 'user':
-				auth = OAuthHandler(CK, CS)
-				auth.set_access_token(token_key, token_secret)
-				self.API = API(auth)
-
-			else:
-				exit('Invalid mode. Only "app" and "user" are valid')
+			self.API = API(auth)
 
 		except TweepError:
 			exit('Unable to create the tweepy API object')

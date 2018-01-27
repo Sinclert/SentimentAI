@@ -9,10 +9,7 @@ from tweepy import StreamListener
 from tweepy import Stream
 from tweepy import TweepError
 
-from constants import CONSUMER_KEY as CK
-from constants import CONSUMER_SECRET as CS
-from constants import TOKEN_KEY as TK
-from constants import TOKEN_SECRET as TS
+from twitter_keys import APP_KEYS
 
 from utils import clean_text
 from utils import get_tweet_text
@@ -46,12 +43,18 @@ class TwitterListener(StreamListener):
 
 
 
-    def __init__(self, buffer_size, clf):
+    def __init__(self, token_key, token_secret, buffer_size, clf):
 
         """ Creates the Twitter listener object
 
         Arguments
 		---------
+		token_key : string
+			string that identifies a user token
+
+		token_secret : string
+			string that accompany the user token
+
 		buffer_size : int
 			size of the label circular buffer
 
@@ -61,39 +64,23 @@ class TwitterListener(StreamListener):
 
         super().__init__()
 
-        self.API = None
-        self.stream = None
-        self.buffer = buffer_size * [None]
-        self.index = 0
-        self.clf = clf
-        self.counters = Counter()
-
-        self.__set_API(TK, TS)
-
-
-
-
-    def __set_API(self, token_key, token_secret):
-
-        """ Sets the instance API attribute using global keys
-
-        Arguments
-		---------
-		token_key : string
-			string that identifies a token
-
-		token_secret : string
-		    string that accompany the specified token
-        """
-
         try:
-            auth = OAuthHandler(CK, CS)
+            consumer_key = APP_KEYS['consumer_key']
+            consumer_secret = APP_KEYS['consumer_secret']
+
+            auth = OAuthHandler(consumer_key, consumer_secret)
             auth.set_access_token(token_key, token_secret)
 
             self.API = API(auth)
 
         except TweepError:
             exit('Unable to create the tweepy API object')
+
+        self.stream = None
+        self.buffer = buffer_size * [None]
+        self.index = 0
+        self.clf = clf
+        self.counters = Counter()
 
 
 

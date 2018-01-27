@@ -5,15 +5,38 @@ import json
 import re
 
 from matplotlib import pyplot
-from matplotlib import style
-from constants import CLEANING_FILTERS
 
 
-style.use('ggplot')
+cleaning_filters = [
+    {
+        'pattern': 'http\S+',
+        'replace': ''
+    },
+    {
+        'pattern': '#',
+        'replace': ''
+    },{
+        'pattern': '&\w+;',
+        'replace': ''
+    },
+    {
+        'pattern':
+            '[\U00002600-\U000027B0'
+            '\U0001F300-\U0001F64F'
+            '\U0001F680-\U0001F6FF'
+            '\U0001F910-\U0001F919]+',
+        'replace': ''
+    },
+    {
+        'pattern': '\s+',
+        'replace': ' '
+    },
+]
 
 
 
-def clean_text(text, filters = CLEANING_FILTERS):
+
+def clean_text(text, filters = cleaning_filters):
 
 	""" Cleans the text applying regex substitution specified by the filters
 
