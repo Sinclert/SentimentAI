@@ -11,20 +11,22 @@ class HierarchicalClassif(object):
 
 	""" Represents a hierarchical classification tree
 
-	Attributes
+	Attributes:
 	----------
-	keys : list
-		required keys in each JSON tree node
+		keys:
+			type: list
+			info: required keys in each JSON tree node
 
-	tree : dict
-		represents a tree structure in which each node has:
+		tree:
+			type: dict
+			info: tree structure in which each node has:
+				- clf_name (string)
+				- clf_object (NodeClassif)
+				- clf_children (dict)
 
-		- clf_name : string
-		- clf_object : classifier object
-		- clf_children : dict
-
-	labels : dict
-		classification labels with their hexadecimal colors
+		labels:
+			type: dict
+			info: labels with their hexadecimal colors
 	"""
 
 
@@ -38,10 +40,11 @@ class HierarchicalClassif(object):
 
 		""" Loads the JSON profile models into the tree attribute
 
-		Arguments
-		---------
-		profile_path : string
-			relative path to the JSON file containing the classifiers info
+		Arguments:
+		----------
+			profile_path:
+				type: string
+				info: relative path to the JSON profile file
 		"""
 
 		profile = get_file_json(profile_path)
@@ -62,10 +65,11 @@ class HierarchicalClassif(object):
 
 		""" Recursively check and load classifier objects into 'clf_object'
 
-		Arguments
-		---------
-		node : dict
-			current tree node to load the classifier specified by 'clf_name'
+		Arguments:
+		----------
+			node:
+				type: dict
+				info: current tree node to load the 'clf_name' classifier
 		"""
 
 		if not all(k in node for k in self.keys):
@@ -93,7 +97,14 @@ class HierarchicalClassif(object):
 
 	def get_labels(self):
 
-		""" Gets the label names """
+		""" Gets the label names
+
+		Returns:
+		----------
+			labels:
+				type: list
+				info: labels names
+		"""
 
 		try:
 			return self.labels.keys()
@@ -105,7 +116,14 @@ class HierarchicalClassif(object):
 
 	def get_colors(self):
 
-		""" Gets the label colors """
+		""" Gets the label colors
+
+		Returns:
+		----------
+			colors:
+				type: list
+				info: labels associated colors
+		"""
 
 		try:
 			return self.labels.values()
@@ -119,15 +137,17 @@ class HierarchicalClassif(object):
 
 		""" Predicts the label of a sentence using the loaded classifiers
 
-		Arguments
-		---------
-		sentence : string
-			text to classify
+		Arguments:
+		----------
+			sentence:
+				type: string
+				info: text to classify
 
-		Returns
-		---------
-		label : string / None
-			predicted sentence label. None if it could not be classified
+		Returns:
+		----------
+			label:
+				type: string / None
+				info: predicted sentence label
 		"""
 
 		node = self.tree

@@ -18,10 +18,11 @@ class TwitterMiner(object):
 
 	""" Represents a Twitter data miner
 
-	Attributes
+	Attributes:
 	----------
-	API : tweepy API
-		object used to make connection with Twitter end point
+		API:
+		    type: tweepy.API
+		    info: object used to make connection with Twitter
 	"""
 
 
@@ -31,13 +32,15 @@ class TwitterMiner(object):
 
 		""" Creates a Twitter miner object
 
-		Arguments
-		---------
-		token_key : string
-			string that identifies a user token
+		Arguments:
+		----------
+			token_key:
+				type: string
+				info: identifies the user
 
-		token_secret : string
-			string that accompany the user token
+			token_secret:
+				type: string
+				info: accompanies the token key
 		"""
 
 		try:
@@ -59,21 +62,25 @@ class TwitterMiner(object):
 
 		""" Generator that returns the 'depth' most recent user tweets
 
-		Arguments
-		---------
-		user : string
-			Twitter user account without the '@'
+		Arguments:
+		----------
+			user:
+				type: string
+				info: Twitter user account without the '@'
 
-		depth : int (optional)
-			number of tweets to retrieve
+			depth:
+				type: int (optional)
+				info: number of tweets to retrieve
+
+		Yield:
+		----------
+			tweet_text:
+				type: string
+				info: cleaned tweet text
 		"""
 
 		try:
-			cursor = Cursor(
-				method = self.API.user_timeline,
-				id = user,
-				count = 200
-			)
+			cursor = Cursor(self.API.user_timeline, user, count = 200)
 
 			for tweet in cursor.items(depth):
 				tweet_text = get_tweet_text(tweet)
@@ -89,27 +96,31 @@ class TwitterMiner(object):
 
 	def search_tweets(self, query, lang, depth = 1000):
 
-		""" Generator that returns 'depth' tweets fulfilling the query
+		""" Generator that returns the 'depth' most recent user tweets
 
-		Arguments
-		---------
-		query : string
-			string with logic operations (AND, OR...) to search
+		Arguments:
+		----------
+			query:
+				type: string
+				info: string with logic operations (AND, OR...)
 
-		lang : string
-			abbreviation that indicates the desired tweets language
+			lang:
+				type: string
+				info: language abbreviation to filter the tweets
 
-		depth : int (optional)
-			number of tweets to retrieve
+			depth:
+				type: int (optional)
+				info: number of tweets to retrieve
+
+		Yield:
+		----------
+			tweet_text:
+				type: string
+				info: cleaned tweet text
 		"""
 
 		try:
-			cursor = Cursor(
-				method = self.API.search,
-				query = query,
-				lang = lang,
-				count = 100
-			)
+			cursor = Cursor(self.API.search, query, lang, count = 100)
 
 			for tweet in cursor.items(depth):
 				tweet_text = get_tweet_text(tweet)

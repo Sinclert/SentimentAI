@@ -21,25 +21,31 @@ class TwitterListener(StreamListener):
 
     """ Represents a Twitter stream listener
 
-    Attributes
-	----------
-	API : tweepy API
-		object used to make connection with Twitter end point
+    Attributes:
+    ----------
+	    API:
+	        type: tweepy.API
+	        info: object used to make connection with Twitter
 
-    stream : tweepy Stream
-        Twitter stream end point. Only works with OAuth
+	    stream:
+	        type: tweepy.Stream
+	        info: Twitter stream end point
 
-	buffer : list
-	    circular buffer containing the latest label predictions
+	    buffer:
+	        type: list
+	        info: circular buffer containing the latest predictions
 
-	index : int
-	    buffer index to the next position to be replaced
+	    index:
+	        type: int
+	        info: buffer index to the next position to be replaced
 
-	clf: HierarchicalClassif
-	    hierarchical classifier to predict tweets labels
+	    clf:
+	        type: HierarchicalClassif
+	        info: hierarchical classifier to predict labels
 
-	counters: dict
-	    label counters
+	    counters
+	        type: dict
+	        info: label counters
     """
 
 
@@ -49,19 +55,23 @@ class TwitterListener(StreamListener):
 
         """ Creates a Twitter listener object
 
-        Arguments
-		---------
-		token_key : string
-			string that identifies a user token
+        Arguments:
+		----------
+		    token_key:
+		        type: string
+		        info: identifies the user
 
-		token_secret : string
-			string that accompany the user token
+		    token_secret:
+		        type: string
+			    info: accompanies the token key
 
-		buffer_size : int
-			size of the label circular buffer
+		    buffer_size:
+		        type: int
+			    info: size of the label circular buffer
 
-		clf: HierarchicalClassif object
-		    hierarchical classifier to predict tweets labels
+		    clf:
+		        type: HierarchicalClassif
+		        info: hierarchical classifier to predict labels
 		"""
 
         super().__init__()
@@ -91,10 +101,11 @@ class TwitterListener(StreamListener):
 
         """ Replace the self.index position by the specified label
 
-        Arguments
-		---------
-		label : string
-			label to the replace the one in self.index position
+        Arguments:
+		----------
+		    label:
+		        type: string
+		        info: label to the replace the one in self.index position
         """
 
         try:
@@ -113,24 +124,27 @@ class TwitterListener(StreamListener):
 
         """ Starts the Twitter stream
 
-        Arguments
-		---------
-		queries : string
-			comma separated queries to filter the stream
+        Arguments:
+		----------
+		    queries:
+		        type: string
+			    info: comma separated queries
 
-		languages: string
-		    comma separated language codes to filter the stream
+		    languages:
+		        type: string
+		        info: comma separated language codes
 
-		coordinates : string
-		    comma separated groups of 4 coordinates to filter the stream
+		    coordinates
+		        type: string
+		        info: comma separated groups of 4 coordinates:
+		            1. South-West longitude
+		            2. South-West latitude
+		            3. North-East longitude
+		            4. North-East latitude
 
-		    1. South-West longitude
-		    2. South-West latitude
-		    3. North-East longitude
-		    4. North-East latitude
-
-		timeout : int (optional)
-		    number of seconds to launch an exception due to lack of data
+		    timeout:
+		        type: int (optional)
+		        info: number of seconds to launch an exception
         """
 
         self.stream = Stream(
@@ -163,10 +177,11 @@ class TwitterListener(StreamListener):
 
         """ Process received tweet
 
-        Arguments
-		---------
-	    tweet : dictionary
-		    dict object containing all the fields of a tweet
+        Arguments:
+		----------
+		    tweet:
+		        type: dict
+		        info: dict object containing all the fields of a tweet
         """
 
         tweet_text = get_tweet_text(tweet)
@@ -194,10 +209,11 @@ class TwitterListener(StreamListener):
 
         """ Prints error code
 
-        Arguments
-		---------
-		code : int
-			stream error code
+        Arguments:
+		----------
+		    code:
+		        type: int
+		        info: stream error code
         """
 
         exit('Twitter stream error: ' + code)

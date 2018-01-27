@@ -41,21 +41,23 @@ def clean_text(text, filters = cleaning_filters):
 
 	""" Cleans the text applying regex substitution specified by the filters
 
-	Arguments
-	---------
-	text : string
-		text in which the regex substitutions are going to be applied
+	Arguments:
+	----------
+		text:
+		    type: string
+		    info: text where the regex substitutions will be applied
 
-	filters : list (optional)
-		list containing dictionaries with the following keys:
+		filters:
+		    type: list
+		    info: list containing dictionaries with the following keys:
+		        1. pattern (regular expression)
+				2. replace (string)
 
-		- pattern : regular expression
-		- replace : string
-
-	Returns
-	---------
-	text : string
-		lowercase cleaned text
+	Returns:
+	----------
+		text:
+			type: string
+			info: lowercase cleaned text
 	"""
 
 	for f in filters:
@@ -72,22 +74,27 @@ def draw_pie_chart(i, labels, colors, counters, title):
 
 	""" Draws a pie chart
 
-	Arguments
-	---------
-	i : int (not used)
-		frame index indicated by the animator function
+	Arguments:
+	----------
+		i:
+			type: int (not used)
+			info: animator function frame index
 
-	labels : list
-		labels in which the pie is going to be split
+		labels:
+			type: list
+			info: pie slices ordered labels
 
-	colors: list
-		hexadecimal colors in which the slices will be painted
+		colors:
+			type: list
+			info: pie slices ordered hexadecimal colors
 
-	counters: list
-		numerical values to indicate pie slices proportions
+		counters:
+			type: list
+			info: pie slices proportions
 
-	title: string
-		pie chart title
+		title:
+			type: string
+			info: pie chart title
 	"""
 
 	try:
@@ -111,20 +118,23 @@ def draw_pie_chart(i, labels, colors, counters, title):
 
 def filter_text(text, word):
 
-	""" Filters the received text by returning sentences containing the word
+	""" Filters the text sentences given a word
 
-	Arguments
-	---------
-	text : string (lowercase)
-		text which may have several sentences
+	Arguments:
+	----------
+		text:
+			type: string (lowercase)
+			info: text which may have several sentences
 
-	word : string (lowercase)
-		string which is going to be used to filter the text sentences
+		word:
+			type: string (lowercase)
+			info: string which is going to be used to filter
 
-	Returns
-	---------
-	filtered_text : string
-		text containing the sentences in which the word is present
+	Returns:
+	----------
+		text:
+			type: string
+			info: text containing the sentences in which the word is present
 	"""
 
 	sentences = re.split('[.:!?]\s+', text)
@@ -139,15 +149,17 @@ def get_file_lines(file_path):
 
 	""" Reads the lines of a file and returns them inside a list
 
-	Arguments
-	---------
-	file_path : string
-		path to the readable file
+	Arguments:
+	----------
+		file_path:
+			type: string
+			info: relative path to the readable file
 
-	Returns
-	---------
-	lines : list
-		lines of the file separated by the new line character
+	Returns:
+	----------
+		lines:
+			type: list
+			info: file lines (separated by the new line character)
 	"""
 
 	try:
@@ -165,17 +177,19 @@ def get_file_lines(file_path):
 
 def get_file_json(file_path):
 
-	""" Reads a JSON file and returns it as a dictionary
+	""" Reads the lines of a file and returns them inside a list
 
-	Arguments
-	---------
-	file_path : string
-		path to the readable file
+	Arguments:
+	----------
+		file_path:
+			type: string
+			info: relative path to the readable file
 
-	Returns
-	---------
-	json_dict : dict
-		dictionary containing the parsed JSON file
+	Returns:
+	----------
+		json_dict:
+			type: dict
+			info: dictionary containing the parsed JSON file
 	"""
 
 	try:
@@ -193,17 +207,19 @@ def get_file_json(file_path):
 
 def get_tweet_text(tweet):
 
-	""" Extracts the text from a tweet object (dictionary)
+	""" Reads the lines of a file and returns them inside a list
 
-	Arguments
-	---------
-	tweet : dictionary
-		dict object containing all the fields of a tweet
+	Arguments:
+	----------
+		tweet:
+			type: dict
+			info: dictionary containing all the fields of a tweet
 
-	Returns
-	---------
-	text : string
-		original tweet text
+	Returns:
+	----------
+		text:
+			type: string
+			info: original tweet text
 	"""
 
 	if tweet.get('retweeted_status'):
@@ -218,36 +234,40 @@ def store_texts(texts, file_path, min_length = 0):
 
 	""" Appends the specified texts at the end of the given file
 
-	Arguments
-	---------
-	texts : list
-		contains the strings to be appended at the end of the file
+	Arguments:
+	----------
+		texts:
+			type: list
+			info: strings to be appended at the end of the file
 
-	file_path : string
-		path to the appendable file
+		file_path:
+			type: string
+			info: relative path to the appendable file
 
-	min_length : int (optional)
-		minimum length to append a text to the file
+		min_length:
+			type: int (optional)
+			info: minimum length to append a text to the file
 
-	Returns
-	---------
-	num_of_skips : int
-		number of text that did not fulfill the length requirement
+	Returns:
+	----------
+		skipped_num:
+			type: int
+			info: number of text that did not fulfill the length requirement
 	"""
 
 	try:
 		file = open(file_path, 'a', encoding = 'utf-8')
-		num_of_skips = 0
+		skipped_num = 0
 
 		for text in texts:
 
 			if len(text) >= min_length:
 				file.write(text + '\n')
 			else:
-				num_of_skips += 1
+				skipped_num += 1
 
 		file.close()
-		return num_of_skips
+		return skipped_num
 
 	except IOError:
 		exit('The file ' + file_path + ' cannot be opened')

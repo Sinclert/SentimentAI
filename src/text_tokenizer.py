@@ -22,16 +22,19 @@ class TextTokenizer(object):
 
 	""" Represents the text lemmatizer and tokenizer class
 
-	Attributes
+	Attributes:
 	----------
-	lemmatizer : NLTK object
-		allows us to extract the root of every word
+		lemmatizer:
+		    type: SnowballStemmer
+		    info: use to extract the root of every word
 
-	tokenizer : NLTK object
-		allows us to split a text into individual tokens
+		tokenizer:
+		    type: TweetTokenizer
+		    info: use to split a text into individual tokens
 
-	stopwords: set
-		set of irrelevant words to filter
+		stopwords:
+		    type: set
+		    info: irrelevant words to filter
 	"""
 
 
@@ -41,10 +44,11 @@ class TextTokenizer(object):
 
 		""" Creates a text tokenizer object
 
-		Attributes
+		Arguments:
 		----------
-		lang : string
-			language in which the tokenizing process is going to be done
+			lang:
+				type: string
+				info: language to perform the tokenizer process
 		"""
 
 		if lang not in languages:
@@ -65,17 +69,19 @@ class TextTokenizer(object):
 
 	def __call__(self, text):
 
-		""" Each time the instance is called
+		""" Tokenize the specified text
 
-		Attributes
+		Arguments:
 		----------
-		text : string
-			text that is going to be tokenize
+			text:
+				type: string
+				info: text that is going to be tokenize
 
-		Returns
+		Returns:
 		----------
-		tokens : list
-			tokens of the specified text (without stopwords)
+			tokens:
+				type: list
+				info: text tokens (without stopwords)
 		"""
 
 		tokens = self.tokenizer.tokenize(text)
