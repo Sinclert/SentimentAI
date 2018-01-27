@@ -3,11 +3,16 @@
         "clf_name": "neu-pol.pickle",
         "clf_object": null,
         "clf_children": {
-            "Polarized": {
+            "polarized": {
                 "clf_name": "neg-pos.pickle",
                 "clf_object": null,
                 "clf_children": {}
             }
-	    }
+        }
+    },
+    "labels": {
+        "neutral": "#A9A9A9",
+        "negative": "DD0000",
+        "positive": "#00DD00"
     }
 }
