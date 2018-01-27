@@ -1,7 +1,7 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
 import os
-from clf_model import Classifier, possible_classifiers
+from clf_node import Classifier, possible_classifiers
 from clf_hierarchy import Hierarchical_cls
 from twitter_miner import DataMiner
 from twitter_stream import TwitterListener

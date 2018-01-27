@@ -15,7 +15,8 @@ cleaning_filters = [
     {
         'pattern': '#',
         'replace': ''
-    },{
+    },
+	{
         'pattern': '&\w+;',
         'replace': ''
     },

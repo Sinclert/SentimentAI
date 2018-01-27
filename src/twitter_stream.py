@@ -15,6 +15,8 @@ from utils import clean_text
 from utils import get_tweet_text
 
 
+
+
 class TwitterListener(StreamListener):
 
     """ Represents a Twitter stream listener
@@ -45,7 +47,7 @@ class TwitterListener(StreamListener):
 
     def __init__(self, token_key, token_secret, buffer_size, clf):
 
-        """ Creates the Twitter listener object
+        """ Creates a Twitter listener object
 
         Arguments
 		---------

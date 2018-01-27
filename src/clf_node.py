@@ -1,11 +1,13 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-import os, pickle, numpy
-from utils import getFileLines
-from nltk.tokenize import TweetTokenizer
-from nltk.stem import SnowballStemmer
+
+import numpy
+import os
+import pickle
+
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_selection import SelectPercentile, chi2
+from sklearn.feature_selection import chi2
+from sklearn.feature_selection import SelectPercentile
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.svm import LinearSVC
@@ -14,8 +16,12 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.base import clone
 from sklearn.model_selection import cross_val_score
 
+from utils import get_file_lines
 
-possible_classifiers = {
+
+models_folder = "models"
+
+algorithms = {
 	"logistic-regression": LogisticRegression(),
 	"naive-bayes": BernoulliNB(),
 	"linear-svc": LinearSVC(),
@@ -25,49 +31,26 @@ possible_classifiers = {
 
 
 
-""" Class in charge of tokenizing and stemming the features """
-class LemmaTokenizer(object):
+class NodeClassif(object):
+	""" Class in charge of the binary classification of sentences
 
-
-	def __init__(self, language = "english"):
-
-		stopwords_path = os.path.join("stopwords", language + ".txt")
-		self.stopwords = set(getFileLines(stopwords_path))
-
-		self.tokenizer = TweetTokenizer(False, True, True)
-		self.lemmatizer = SnowballStemmer("english")
-
-
-	def __call__(self, sentence):
-
-		tokens = self.tokenizer.tokenize(sentence)
-		tokens = filter(lambda t: t not in self.stopwords, tokens)
-		tokens = [self.lemmatizer.stem(token) for token in tokens]
-
-		return tokens
-
-
-
-
-
-
-""" Class in charge of the binary classification of sentences """
-class Classifier(object):
-
-
-	vectorizer = CountVectorizer(
-		tokenizer = LemmaTokenizer(),
-		ngram_range = (1, 2)
-	)
+	"""
 
 
 
 
 	""" Initiates variables when the instance is created """
-	def __init__(self):
+	def __init__(self, name = None):
+
+		#if name != null:
+		#	load
 
 		self.model = None
 		self.selector = None
+		self.vectorizer = CountVectorizer(
+			tokenizer=LemmaTokenizer(),
+			ngram_range=(1, 2)
+		)
 
 
 

@@ -5,6 +5,8 @@ from clf_node import NodeClassif
 from utils import get_file_json
 
 
+
+
 class HierarchicalClassif(object):
 
 	""" Represents a hierarchical classification tree

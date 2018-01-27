@@ -12,6 +12,8 @@ from utils import clean_text
 from utils import get_tweet_text
 
 
+
+
 class TwitterMiner(object):
 
 	""" Represents a Twitter data miner
@@ -27,7 +29,7 @@ class TwitterMiner(object):
 
 	def __init__(self, token_key, token_secret):
 
-		""" Creates the Twitter miner object
+		""" Creates a Twitter miner object
 
 		Arguments
 		---------
