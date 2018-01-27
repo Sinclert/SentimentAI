@@ -16,15 +16,14 @@ class TwitterListener(StreamListener):
 
 
     """ Set the listener connection and basic attributes """
-    def __init__(self, classifier1, classifier2, buffer_size, labels):
+    def __init__(self, h_cls, buffer_size, labels):
 
         # Calling the superclass init method in case it does something
         super().__init__()
 
         # Initializing basic instance attributes
         self.__setConnection()
-        self.classifier1 = classifier1
-        self.classifier2 = classifier2
+        self.hierarchical_cls = h_cls
         self.buffer = buffer_size * [None]
         self.counter = 0
         self.stream = None
@@ -97,19 +96,10 @@ class TwitterListener(StreamListener):
 
         try:
             tweet_text = getCleanTweet(tweet)
+            label = self.hierarchical_cls.predict(tweet_text)
 
-            # If it has enough length: write it
-            if len(tweet_text) >= 30:
-                label = self.classifier1.classify(tweet_text)
-
-                if label == 'Polarized':
-                    label = self.classifier2.classify(tweet_text)
-
-                # In case there is no relevant features it is ignored
-                if label is None:
-                    print(tweet_text, "(Tweet ignored)")
-                else:
-                    self.__updateBuffers(label)
+            if label is not None:
+                self.__updateBuffers(label)
 
         # In case of tweet limit warning: pass
         except KeyError:
