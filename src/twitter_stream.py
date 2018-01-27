@@ -1,5 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
+
 from collections import Counter
 
 from tweepy import API
@@ -27,7 +28,7 @@ class TwitterListener(StreamListener):
 		object used to make connection with Twitter end point
 
     stream : tweepy Stream
-        Twitter stream end point
+        Twitter stream end point. Only works with OAuth
 
 	buffer : list
 	    circular buffer containing the latest label predictions

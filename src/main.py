@@ -55,7 +55,7 @@ def train(classifier_name, l1_file, l2_file, features_pct, output):
 def classify(cls_profile, account, filter_word):
 
 	# Loading classifiers
-	h_cls = Hierarchical_cls(os.path.join(profiles_folder, cls_profile))
+	#h_cls = Hierarchical_cls(os.path.join(profiles_folder, cls_profile))
 
 	# Obtaining tweets
 	miner = DataMiner()
