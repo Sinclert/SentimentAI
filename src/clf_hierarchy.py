@@ -11,15 +11,18 @@ class HierarchicalClassif(object):
 
 	Attributes
 	----------
-	tree : dictionary
+	keys : list
+		required keys in each JSON tree node
+
+	tree : dict
 		represents a tree structure in which each node has:
 
 		- clf_name : string
 		- clf_object : classifier object
 		- clf_children : dict
 
-	keys : list
-		required keys in each JSON tree node
+	labels : dict
+		classification labels with their hexadecimal colors
 	"""
 
 
@@ -41,8 +44,14 @@ class HierarchicalClassif(object):
 
 		profile = get_file_json(profile_path)
 
-		self.tree = profile['tree']
-		self.__load_clf(self.tree)
+		try:
+			self.tree = profile['tree']
+			self.labels = profile['labels']
+
+			self.__load_clf(self.tree)
+
+		except KeyError:
+			exit('Invalid JSON keys')
 
 
 
@@ -76,6 +85,30 @@ class HierarchicalClassif(object):
 
 		except AttributeError:
 			exit('Invalid JSON values')
+
+
+
+
+	def get_labels(self):
+
+		""" Gets the label names """
+
+		try:
+			return self.labels.keys()
+		except AttributeError:
+			exit('Invalid JSON labels structure')
+
+
+
+
+	def get_colors(self):
+
+		""" Gets the label colors """
+
+		try:
+			return self.labels.values()
+		except AttributeError:
+			exit('Invalid JSON labels structure')
 
 
 

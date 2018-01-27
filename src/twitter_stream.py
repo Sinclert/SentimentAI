@@ -1,119 +1,213 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-from keys import keys
-from tweepy import API, OAuthHandler, StreamListener, Stream, TweepError
-from utils import getCleanTweet
+from collections import Counter
+
+from tweepy import API
+from tweepy import OAuthHandler
+from tweepy import StreamListener
+from tweepy import Stream
+from tweepy import TweepError
+
+from constants import CONSUMER_KEY as CK
+from constants import CONSUMER_SECRET as CS
+from constants import TOKEN_KEY as TK
+from constants import TOKEN_SECRET as TS
+
+from utils import clean_text
+from utils import get_tweet_text
 
 
-""" Class in charge of retrieving live data from the Twitter Streaming API """
 class TwitterListener(StreamListener):
 
+    """ Represents a Twitter stream listener
 
-    # Attribute that stores the API connection object
-    API = None
+    Attributes
+	----------
+	API : tweepy API
+		object used to make connection with Twitter end point
+
+    stream : tweepy Stream
+        Twitter stream end point
+
+	buffer : list
+	    circular buffer containing the latest label predictions
+
+	index : int
+	    buffer index to the next position to be replaced
+
+	clf: HierarchicalClassif
+	    hierarchical classifier to predict tweets labels
+
+	counters: dict
+	    label counters
+    """
 
 
 
 
-    """ Set the listener connection and basic attributes """
-    def __init__(self, h_cls, buffer_size, labels):
+    def __init__(self, buffer_size, clf):
 
-        # Calling the superclass init method in case it does something
+        """ Creates the Twitter listener object
+
+        Arguments
+		---------
+		buffer_size : int
+			size of the label circular buffer
+
+		clf: HierarchicalClassif object
+		    hierarchical classifier to predict tweets labels
+		"""
+
         super().__init__()
 
-        # Initializing basic instance attributes
-        self.__setConnection()
-        self.hierarchical_cls = h_cls
-        self.buffer = buffer_size * [None]
-        self.counter = 0
+        self.API = None
         self.stream = None
-        self.stream_dict = dict().fromkeys(labels, 0)
+        self.buffer = buffer_size * [None]
+        self.index = 0
+        self.clf = clf
+        self.counters = Counter()
+
+        self.__set_API(TK, TS)
 
 
 
 
-    """ Establish Twitter API connection using user authentication """
-    def __setConnection(self):
+    def __set_API(self, token_key, token_secret):
 
-        # Obtaining application keys from the Keys file
-        consumer_key = keys['consumer_key']
-        consumer_secret = keys['consumer_secret']
-        access_token = keys['access_token']
-        access_token_secret = keys['access_token_secret']
+        """ Sets the instance API attribute using global keys
+
+        Arguments
+		---------
+		token_key : string
+			string that identifies a token
+
+		token_secret : string
+		    string that accompany the specified token
+        """
 
         try:
-            # Authentication creation using keys and tokens
-            auth = OAuthHandler(consumer_key, consumer_secret)
-            auth.set_access_token(access_token, access_token_secret)
+            auth = OAuthHandler(CK, CS)
+            auth.set_access_token(token_key, token_secret)
 
-            # Tweepy API connection creation
             self.API = API(auth)
 
         except TweepError:
-            print("TWEEPY ERROR: Unable to establish connection with Twitter")
-            exit()
+            exit('Unable to create the tweepy API object')
 
 
 
 
-    """ Updates the dictionary counter and the temporal buffer labels """
-    def __updateBuffers(self, label):
+    def __update_buffer(self, label):
+
+        """ Replace the self.index position by the specified label
+
+        Arguments
+		---------
+		label : string
+			label to the replace the one in self.index position
+        """
 
         try:
-            self.stream_dict[self.buffer[self.counter]] -= 1
+            self.counters[self.buffer[self.index]] -= 1
         except KeyError:
             pass
 
-        self.buffer[self.counter] = label
-        self.counter = (self.counter + 1) % len(self.buffer)
-        self.stream_dict[label] += 1
+        self.buffer[self.index] = label
+        self.index = (self.index + 1) % len(self.buffer)
+        self.counters[label] += 1
 
 
 
 
-    """ Initiates the streaming given query, languages and locations """
-    def initStream(self, query, languages, coordinates):
+    def start_stream(self, queries, languages, coordinates, timeout = 15):
 
-        self.stream = Stream(self.API.auth, self)
-        self.stream.filter(track = query,
-                           languages = languages,
-                           locations = coordinates,
-                           async = True)
+        """ Starts the Twitter stream
+
+        Arguments
+		---------
+		queries : string
+			comma separated queries to filter the stream
+
+		languages: string
+		    comma separated language codes to filter the stream
+
+		coordinates : string
+		    comma separated groups of 4 coordinates to filter the stream
+
+		    1. South-West longitude
+		    2. South-West latitude
+		    3. North-East longitude
+		    4. North-East latitude
+
+		timeout : int (optional)
+		    number of seconds to launch an exception due to lack of data
+        """
+
+        self.stream = Stream(
+            auth = self.API.auth,
+            listener = self,
+            timeout = timeout
+        )
+
+        self.stream.filter(
+            track = queries,
+            languages = languages,
+            locations = coordinates,
+            async = True
+        )
 
 
 
 
-    """ Closes the Twitter streaming """
-    def closeStream(self):
+    def finish_stream(self):
+
+        """ Closes the Twitter stream """
+
         self.stream.disconnect()
-        print("Disconnected from the Twitter streaming")
+        print('Disconnected from the Twitter stream')
 
 
 
 
-    """ Prints live data according to the stream parameters """
     def on_status(self, tweet):
 
-        try:
-            tweet_text = getCleanTweet(tweet)
-            label = self.hierarchical_cls.predict(tweet_text)
+        """ Process received tweet
 
-            if label is not None:
-                self.__updateBuffers(label)
+        Arguments
+		---------
+	    tweet : dictionary
+		    dict object containing all the fields of a tweet
+        """
 
-        # In case of tweet limit warning: pass
-        except KeyError:
-            pass
+        tweet_text = get_tweet_text(tweet)
+        tweet_text = clean_text(tweet_text)
 
-        # In case of an attribute NoneType error
-        except AttributeError:
-            print("TwitterListener attributes not correctly initiated")
-            exit()
+        label = self.clf.predict(tweet_text)
 
-
+        if label is not None:
+            self.__update_buffer(label)
 
 
-    """ In case of an error: prints its code """
-    def on_error(self, status):
-        print("CONNECTION ERROR:", status)
-        exit()
+
+
+    def on_exception(self, exception):
+
+        """ Finish stream due to the timeout exception """
+
+        print('Timeout exception due to lack of data')
+        self.finish_stream()
+
+
+
+
+    def on_error(self, code):
+
+        """ Prints error code
+
+        Arguments
+		---------
+		code : int
+			stream error code
+        """
+
+        exit('Twitter stream error: ' + code)

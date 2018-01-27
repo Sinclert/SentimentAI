@@ -1,3 +1,10 @@
+# Created by Sinclert Perez (Sinclert@hotmail.com)
+
+CONSUMER_KEY = '< Insert here your own key >'
+CONSUMER_SECRET = '< Insert here your own key >'
+
+TOKEN_KEY = '< Insert here your own key >'
+TOKEN_SECRET = '< Insert here your own key >'
 
 
 CLEANING_FILTERS = [
