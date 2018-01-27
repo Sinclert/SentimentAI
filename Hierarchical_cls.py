@@ -1,7 +1,7 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
-import json
 from Node_cls import Classifier
+from Utilities import getFileJSON
 
 
 """ Class in charge of the hierarchical classification of sentences """
@@ -11,17 +11,9 @@ class Hierarchical_cls(object):
 	""" Initiates variables when the instance is created """
 	def __init__(self, cls_config_path):
 
-		try:
-			cls_config_file = open(cls_config_path)
-			cls_config = json.load(cls_config_file)
-			cls_config_file.close()
+		self.cls_tree = getFileJSON(cls_config_path)
+		self.__load_cls(node = self.cls_tree)
 
-			self.cls_tree = cls_config
-			self.__load_cls(node = self.cls_tree)
-
-		except (FileNotFoundError, PermissionError, IsADirectoryError):
-			print("ERROR: The file", cls_config_path, "cannot be opened")
-			exit()
 
 
 

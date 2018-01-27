@@ -1,6 +1,7 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
 import re
+import json
 
 
 ################ FILTERS ################
@@ -19,19 +20,34 @@ user_filter = re.compile('(^|\s+)@\w+')
 
 
 
-""" Reads the contents of a file and returns them inside a list """
-def getFileContents(file_path):
+""" Reads the lines of a file and returns them as a list """
+def getFileLines(file_path):
 
 	try:
-		file = open(file_path, 'r', encoding = "UTF8")
-		contents = file.read().splitlines()
+		file = open(file_path, 'r', encoding = 'utf-8')
+		lines = file.read().splitlines()
 		file.close()
 
-		return contents
+		return lines
 
-	except (FileNotFoundError, PermissionError, IsADirectoryError):
-		print("ERROR: The file", file_path, "cannot be opened")
-		exit()
+	except IOError:
+		exit('The file' + file_path + 'cannot be opened')
+
+
+
+
+""" Reads a JSON file and returns it as a dictionary """
+def getFileJSON(file_path):
+
+	try:
+		file = open(file_path, 'r', encoding = 'utf-8')
+		json_dict = json.load(file)
+		file.close()
+
+		return json_dict
+
+	except IOError:
+		exit('The file' + file_path + 'cannot be opened')
 
 
 
@@ -74,8 +90,7 @@ def filterTweets(tweets, word):
 
 	# If the word is not a string or tweets not a iterable
 	except (AttributeError, TypeError):
-		print("ERROR: Invalid arguments")
-		exit()
+		exit('Invalid arguments')
 
 
 
@@ -84,7 +99,7 @@ def filterTweets(tweets, word):
 def storeTweets(tweets, file_name, min_length = 30):
 
 	try:
-		file = open(file_name, 'a', encoding = "UTF8")
+		file = open(file_name, 'a', encoding = 'utf-8')
 
 		for tweet in tweets:
 
@@ -99,7 +114,5 @@ def storeTweets(tweets, file_name, min_length = 30):
 
 		file.close()
 
-
-	except (FileNotFoundError, PermissionError, IsADirectoryError):
-		print("ERROR: The file '", file_name, "' cannot be opened")
-		exit()
+	except IOError:
+		exit('The file' + file_name + 'cannot be opened')

@@ -1,7 +1,7 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
 import os, pickle, numpy
-from Utilities import getFileContents
+from Utilities import getFileLines
 from nltk.tokenize import TweetTokenizer
 from nltk.stem import SnowballStemmer
 from sklearn.feature_extraction.text import CountVectorizer
@@ -32,7 +32,7 @@ class LemmaTokenizer(object):
 	def __init__(self, language = "english"):
 
 		stopwords_path = os.path.join("Stopwords", language + ".txt")
-		self.stopwords = set(getFileContents(stopwords_path))
+		self.stopwords = set(getFileLines(stopwords_path))
 
 		self.tokenizer = TweetTokenizer(False, True, True)
 		self.lemmatizer = SnowballStemmer("english")
@@ -80,8 +80,8 @@ class Classifier(object):
 		label2 = os.path.basename(l2_file).rsplit('.')[0]
 
 		# Obtaining every sentence inside both files
-		l1_sentences = getFileContents(l1_file)
-		l2_sentences = getFileContents(l2_file)
+		l1_sentences = getFileLines(l1_file)
+		l2_sentences = getFileLines(l2_file)
 
 		# Getting the labels as a numpy array
 		labels = numpy.array(([label1] * len(l1_sentences)) + ([label2] * len(l2_sentences)))
@@ -136,8 +136,7 @@ class Classifier(object):
 				return self.model.predict(features)[0]
 
 		except AttributeError:
-			print("ERROR: The classifier needs to be trained first")
-			exit()
+			exit('The classifier needs to be trained first')
 
 
 
@@ -155,13 +154,12 @@ class Classifier(object):
 
 			file = open(file_path, 'wb')
 			pickle.dump([self.model, self.selector], file)
-
 			file.close()
-			print("Classifier model saved in", file_path)
 
-		except (FileNotFoundError, PermissionError, IsADirectoryError):
-			print("ERROR: The model cannot be saved in", file_path)
-			exit()
+			print('Classifier model saved in', file_path)
+
+		except IOError:
+			exit('The model cannot be saved in ' + file_path)
 
 
 
@@ -175,10 +173,9 @@ class Classifier(object):
 		try:
 			file = open(file_path, 'rb')
 			self.model, self.selector = pickle.load(file)
-
 			file.close()
-			print("Classifier model loaded from", file_path)
 
-		except (FileNotFoundError, PermissionError, IsADirectoryError):
-			print("ERROR: The model cannot be loaded from", file_path)
-			exit()
+			print('Classifier model loaded from', file_path)
+
+		except IOError:
+			exit('The model cannot be loaded from ' + file_path)
