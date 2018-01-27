@@ -97,6 +97,8 @@ def search(search_query, language, search_depth, output):
 		depth = search_depth
 	)
 
+	# TODO storeTweets
+
 
 
 
@@ -109,11 +111,6 @@ def stream(cls_profile, buffer_size, filter_word, language, coordinates):
 	# Transforming arguments
 	tracks = [filter_word]
 	languages = [language]
-
-	if len(coordinates) % 4 != 0:
-		print("ERROR: The number of coordinates must be a multiple of 4")
-		exit()
-
 
 	# Creates the stream object and start stream
 	listener = TwitterListener(h_cls, buffer_size, labels)

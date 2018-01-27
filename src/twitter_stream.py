@@ -127,16 +127,16 @@ class TwitterListener(StreamListener):
         Arguments:
 		----------
 		    queries:
-		        type: string
-			    info: comma separated queries
+		        type: list
+			    info: words to filter
 
 		    languages:
-		        type: string
-		        info: comma separated language codes
+		        type: list
+		        info: language codes to filter
 
 		    coordinates
-		        type: string
-		        info: comma separated groups of 4 coordinates:
+		        type: list
+		        info: groups of 4 coordinates to filter, where:
 		            1. South-West longitude
 		            2. South-West latitude
 		            3. North-East longitude
