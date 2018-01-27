@@ -1,16 +1,13 @@
 {
-    "clf_name": "neu-pol.pickle",
-    "clf_labels": [
-        "Neutral",
-        "Polarized"
-    ],
-    "clf_children": {
-        "Polarized": {
-            "clf_name": "neg-pos.pickle",
-            "clf_labels": [
-                "Negative",
-                "Positive"
-            ]
-        }
-	}
+    "tree": {
+        "clf_name": "neu-pol.pickle",
+        "clf_object": null,
+        "clf_children": {
+            "Polarized": {
+                "clf_name": "neg-pos.pickle",
+                "clf_object": null,
+                "clf_children": {}
+            }
+	    }
+    }
 }
