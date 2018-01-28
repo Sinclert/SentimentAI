@@ -168,7 +168,7 @@ class NodeClassif(object):
 	@staticmethod
 	def __validate(algorithm, feats_v, labels_v, cv_folds = 10):
 
-		""" Validates the trained algorithm using crossF1 score
+		""" Validates the trained algorithm using CV and F1 score
 
 		Arguments:
 		----------
@@ -191,14 +191,12 @@ class NodeClassif(object):
 
 		labels_v = LabelEncoder().fit_transform(labels_v)
 
-		# The model is tested using cross validation and F1 score
 		results = cross_val_score(
 			estimator = clone(algorithms[algorithm]),
 			X = feats_v,
 			y = labels_v,
 			scoring = 'f1',
-			cv = cv_folds,
-			n_jobs = -1
+			cv = cv_folds
 		)
 
 		print('F1 score:', round(results.mean(), 4))

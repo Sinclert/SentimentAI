@@ -6,6 +6,9 @@
 # Adding trap in case of cancelling this script
 trap "kill -15 -$$" SIGHUP SIGINT SIGQUIT SIGABRT SIGTERM
 
+# Indicating this directory as root
+cd $(dirname $0)
+
 # Security flags
 set -e
 set -u
@@ -23,19 +26,13 @@ eval_files=("LR_eval.txt"
 			"SVM_eval.txt"
 			"RF_eval.txt")
 
-cls_types=(	"Polarity"
+clf_types=(	"Polarity"
 			"Sentiment")
 
-cls_files=(	"neutral.txt polarized.txt"
-			"positive.txt negative.txt")
+clf_profiles=(	"polarity.json"
+				"sentiment.json")
 
-folder="evaluations"
 max_pct=10
-
-
-############################## CREATING THE FOLDER #############################
-rm -rf ${folder}
-mkdir ${folder}
 
 
 ############################# FUNCTIONS DECLARATION ############################
@@ -54,7 +51,7 @@ function print_progress() {
 
 function algorithm_eval() {
 	algorithm=$1
-	output=${folder}/$2
+	output=$2
 
 	echo "Starting $algorithm evaluation"
 	echo "############# Evaluating $algorithm #############" >> ${output}
@@ -67,15 +64,16 @@ function algorithm_eval() {
 		echo "	$features_pct% features" >> ${output}
 
 		# For each classifier type (polarized VS sentiment)
-		for ((i = 0 ; i < ${#cls_types[@]} ; i++)); do
-			files=${cls_files[$i]}
-			score=$(python3 Parser.py train -n ${algorithm} \
-			                                -d ${files} \
-			                                -f ${features_pct} \
-			                                -o None)
+		for ((i = 0 ; i < ${#clf_types[@]} ; i++)); do
+			profile=${clf_profiles[$i]}
+			score=$(python3 ../src/main.py train_clf -a ${algorithm} \
+													 -f ${features_pct} \
+													 -l 'english' \
+													 -o None \
+													 -p ${profile})
 
-			score=$(echo ${score} | cut -d" " -f 6)
-			echo "		${cls_types[$i]}: $score" >> ${output}
+			score=$(echo ${score} | cut -d" " -f 3)
+			echo "		${clf_types[$i]}: $score" >> ${output}
 		done
 	done
 
