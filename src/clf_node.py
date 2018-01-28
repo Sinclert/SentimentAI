@@ -16,10 +16,8 @@ from sklearn.model_selection import cross_val_score
 
 from text_tokenizer import TextTokenizer
 
-from utils import get_file_json
 from utils import get_file_lines
 from utils import load_object
-from utils import save_object
 
 
 algorithms = {
@@ -147,7 +145,7 @@ class NodeClassif(object):
 			path = info['file_path']
 			label = info['file_label']
 
-			sentences = get_file_lines(path) # TODO
+			sentences = get_file_lines(path)
 			feats.extend(sentences)
 			labels.extend([label] * len(sentences))
 
@@ -256,14 +254,14 @@ class NodeClassif(object):
 
 
 
-	def train(self, algorithm, feats_pct, lang, profile_path, validate = True):
+	def train(self, algorithm, feats_pct, lang, profile_data, validate = True):
 
-		""" Trains and stores the specified classification algorithm
+		""" Trains the specified classification algorithm
 
 		Arguments:
 		----------
 			algorithm:
-				type: string
+				type: string (lowercase)
 				info: name of the algorithm to train
 
 			feats_pct:
@@ -274,34 +272,26 @@ class NodeClassif(object):
 				type: string
 				info: language to perform the tokenizer process
 
-			profile_path:
-				type: string
-				info: relative path to the JSON profile file
+			profile_data:
+				type: list
+				info: dictionaries containing datasets paths and labels
 
 			validate:
 				type: bool (optional)
 				info: indicates if the model should be validated
 		"""
 
-		algorithm = algorithm.lower()
-
 		self.__init_attr(algorithm, feats_pct, lang)
 
-		try:
-			# Extracting datasets information and output path
-			profile = get_file_json(profile_path)
-			profile_data = profile['datasets']
-			profile_out = profile['output']
+		# Training process
+		feats_v, labels_v = self.__build_feats(profile_data)
+		self.model.fit(feats_v, labels_v)
 
-			# Training process
-			feats_v, labels_v = self.__build_feats(profile_data)
-			self.model.fit(feats_v, labels_v)
+		# Validation process
+		if validate: self.__validate(
+			algorithm = algorithm,
+			feats_v = feats_v,
+			labels_v = labels_v
+		)
 
-			# Validation
-			if validate: self.__validate(algorithm, feats_v, labels_v)
-
-			print('Training process completed')
-			save_object(self, profile_out)
-
-		except KeyError:
-			exit('Invalid JSON keys')
+		print('Training process completed')

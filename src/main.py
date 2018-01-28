@@ -1,204 +1,281 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
+
 import os
-#from clf_node import Classifier, possible_classifiers
-#from clf_hierarchy import Hierarchical_cls
-#from twitter_miner import DataMiner
-#from twitter_stream import TwitterListener
-#from utils import filterTweets
-from argparse import ArgumentParser, RawDescriptionHelpFormatter
+
+from argparse import ArgumentParser
+from argparse import RawDescriptionHelpFormatter
+from collections import Counter
+from functools import partial
+
+from clf_node import NodeClassif
+from clf_hierarchy import HierarchicalClassif
+from twitter_miner import TwitterMiner
+from twitter_stream import TwitterListener
+
+from utils import draw_pie_chart
+from utils import filter_text
+from utils import get_file_json
+from utils import save_object
+from utils import store_texts
 
 
-# Folder paths
+# Default outputs folders
 datasets_folder = "datasets"
 models_folder = "models"
-profiles_folder = "profiles"
 
-#ROOT_DIR = os.path.relpath("negative.txt", "../.."))
-
-functions = ['classify', 'search', 'stream', 'train']
-labels = ['Negative', 'Neutral', 'Positive']
-
-
-
-
-""" Trains and stores the specified ML algorithm after been trained """
-def train(classifier_name, l1_file, l2_file, features_pct, output):
-
-	from os.path import dirname, abspath
-	d = dirname(dirname(abspath(__file__)))
-	print(d)
-	d = os.path.dirname(os.getcwd())
-	print(d)
-
-	from pathlib import Path
-	d = Path().resolve().parent
-	print(d)
-
-	# Checks the validity of the percentages
-	if (features_pct < 0) or (features_pct > 100):
-		print("ERROR: The specified percentage is invalid")
-		exit()
-
-# 	# Checks the specified classifier
-# 	if classifier_name.lower() in possible_classifiers.keys():
-#
-# 		l1_file = os.path.join(datasets_folder, l1_file)
-# 		l2_file = os.path.join(datasets_folder, l2_file)
-#
-# 		classifier = Classifier()
-# 		classifier.train(
-# 			classifier_name = classifier_name.lower(),
-# 			l1_file = l1_file,
-# 			l2_file = l2_file,
-# 			features_pct = features_pct
-# 		)
-#
-# 		classifier.saveModel(models_folder, output)
-#
-# 	else:
-# 		print("ERROR: Invalid classifier")
-# 		exit()
-#
-#
-#
-#
-# """ Performs sentiment analysis over the specified Twitter account """
-# def classify(cls_profile, account, filter_word):
-#
-# 	# Loading classifiers
-# 	#h_cls = Hierarchical_cls(ROOT, sdfgs)
-#
-# 	# Obtaining tweets
-# 	miner = DataMiner()
-# 	tweets = miner.getUserTweets(user = account)
-#
-# 	# Splitting the tweets into sentences
-# 	sentences = filterTweets(
-# 		tweets = tweets,
-# 		word = filter_word
-# 	)
-#
-# 	# Creating the results dictionary
-# 	results = dict.fromkeys(labels, 0)
-#
-# 	# Storing the classification results
-# 	"""for sentence in sentences:
-# 		label = h_cls.predict(sentence)
-#
-# 		if label is not None:
-# 			results[label] += 1
-# """
-# 	print(results)
-#
-#
-#
-#
-# """ Search tweets using Twitter API storing them into the output file """
-# def search(search_query, language, search_depth, output):
-#
-# 	# Creating the storing output final path
-# 	output_path = os.path.join(datasets_folder, output)
-#
-# 	# Obtaining tweets and storing them in a file
-# 	miner = DataMiner()
-# 	miner.searchTweets(
-# 		query = search_query,
-# 		language = language,
-# 		file = output_path,
-# 		depth = search_depth
-# 	)
-#
-# 	# TODO storeTweets
-#
-#
-#
-#
-# """ Performs sentiment analysis over a stream of tweets filter by location """
-# def stream(cls_profile, buffer_size, filter_word, language, coordinates):
-#
-# 	# Loading classifiers
-# 	h_cls = Hierarchical_cls(os.path.join(profiles_folder, cls_profile))
-#
-# 	# Transforming arguments
-# 	tracks = [filter_word]
-# 	languages = [language]
-#
-# 	# Creates the stream object and start stream
-# 	listener = TwitterListener(h_cls, buffer_size, labels)
-# 	listener.initStream(tracks, languages, coordinates)
-#
-# 	from matplotlib import pyplot, animation
-# 	from src.graph_animation import animatePieChart, figure
-#
-# 	# Animate the graph each milliseconds interval
-# 	ani = animation.FuncAnimation(
-# 		fig = figure,
-# 		func = animatePieChart,
-# 		interval = 500,
-# 		fargs = (labels, tracks, listener.stream_dict)
-# 	)
-# 	pyplot.show()
-#
-# 	# Finally: close the stream process
-# 	listener.closeStream()
+# Default function names
+functions = [
+	'classif_train',
+	'miner_predict',
+	'miner_search',
+	'stream_predict'
+]
 
 
 
 
-""" Main method to parse the arguments and call the proper function """
+def classif_train(algorithm, feats_pct, lang, output, profile_path):
+
+	""" Prepares arguments to train and saves a NodeClassif object
+
+	Arguments:
+	----------
+		algorithm:
+			type: string
+			info: name of the algorithm to train
+
+		feats_pct:
+			type: int
+			info: percentage of features to keep
+
+		lang:
+			type: string
+			info: language to perform the tokenizer process
+
+		output:
+			type: string
+			info: output file name including extension
+
+		profile_path:
+			type: string
+			info: relative path to the JSON profile file
+	"""
+
+	if (feats_pct < 0) or (feats_pct > 100):
+		exit('The specified features percentage is invalid')
+
+	profile_data = get_file_json(profile_path)
+
+	node_classif = NodeClassif()
+	node_classif.train(
+		algorithm = algorithm.lower(),
+		feats_pct = feats_pct,
+		lang = lang,
+		profile_data = profile_data
+	)
+
+	abs_path = os.path.join(models_folder, output)
+	save_object(node_classif, abs_path)
+
+
+
+
+def miner_predict(user, filter_word, profile_path):
+
+	""" Prepares arguments to predict Twitter account tweets labels
+
+	Arguments:
+	----------
+		user:
+			type: string
+			info: Twitter user account without the '@'
+
+		filter_word:
+			type: string
+			info: word applied to filter all tweets sentences
+
+		profile_path:
+			type: string
+			info: relative path to the JSON profile file
+	"""
+
+	# Defining tweets filter function
+	func = partial(filter_text(str, word = filter_word))
+
+	miner = TwitterMiner('','') # TODO
+	tweets = miner.get_user_tweets(user)
+	tweets = map(func, tweets)
+
+	h_clf = HierarchicalClassif(profile_path)
+	results = Counter()
+
+	for tweet in tweets:
+		label = h_clf.predict(tweet)
+		if label is not None: results[label] += 1
+
+	print(results)
+
+
+
+
+def miner_search(query, lang, depth, output):
+
+	""" Prepares arguments to search tweets and save them in a file
+
+	Arguments:
+	----------
+		query:
+			type: string
+			info: string with logic operations (AND, OR...)
+
+		lang:
+			type: string
+			info: language abbreviation to filter the tweets
+
+		depth:
+			type: int
+			info: number of tweets to retrieve
+
+		output:
+			type: string
+			info: output file name including extension
+	"""
+
+	miner = TwitterMiner('','') # TODO
+	miner.search_tweets(
+		query = query,
+		lang = lang,
+		depth = depth
+	)
+
+	abs_path = os.path.join(datasets_folder, output)
+	store_texts([], abs_path) # TODO
+
+
+
+
+def stream_predict(buffer_size, tracks, langs, coordinates, profile_path):
+
+	""" Prepares arguments to predict Twitter stream tweets labels
+
+	Arguments:
+	----------
+		buffer_size:
+			type: int
+			info: size of the labels circular buffer
+
+		tracks:
+		    type: string
+			info: words to filter
+
+		langs:
+		    type: string
+		    info: language codes to filter
+
+		coordinates
+		    type: string
+		    info: groups of 4 coordinates to filter, where:
+		        1. South-West longitude
+		        2. South-West latitude
+		        3. North-East longitude
+		        4. North-East latitude
+
+		profile_path:
+			type: string
+			info: relative path to the JSON profile file
+	"""
+
+	h_cls = HierarchicalClassif(profile_path)
+
+	tracks = tracks.split(', ')
+	langs = langs.split(', ')
+
+	# Initiating the Twitter stream
+	listener = TwitterListener('','', buffer_size, h_cls) # TODO
+	listener.start_stream(tracks, langs, coordinates)
+
+
+	from matplotlib import pyplot, animation
+
+	# Animate the graph each milliseconds interval
+	# ani = animation.FuncAnimation(
+	# 	fig = figure,
+	# 	func = draw_pie_chart,
+	# 	interval = 500,
+	# 	fargs = (labels, tracks, listener.stream_dict)
+	# )
+	# pyplot.show()
+
+	listener.finish_stream()
+
+
+
+
 if __name__ == '__main__':
 
-	# Creating the top-level parser
 	global_parser = ArgumentParser(
-		usage = "main.py [mode] [arguments]",
-		description = "modes and arguments:\n"
-		              "  \n"
-		              "  classify: analyses tweets of a Twitter account\n"
-		              "            -p <classification profile>\n"
-		              "            -a <Twitter account>\n"
-		              "            -w <filter word>\n"
-		              "  \n"
-		              "  search: stores query tweets into a new dataset\n"
-		              "            -q <query>\n"
-		              "            -l <language>\n"
-		              "            -d <search depth>\n"
-		              "            -o <dataset output>\n"
-		              "  \n"
-		              "  stream: analyses tweets of a Twitter stream\n"
-		              "            -p <classification profile>\n"
-		              "            -b <buffer size>\n"
-		              "            -w <filter word>\n"
-		              "            -l <language>\n"
-		              "            -c <coord 1> <coord 2> <coord 3> <coord 4>\n"
-		              "  \n"
-		              "  train: trains and store the specified ML model\n"
-		              "            -n <classifier name>\n"
-		              "            -d <first dataset> <second dataset>\n"
-		              "            -f <features percentage>\n"
-		              "            -o <output name>\n",
-		formatter_class = RawDescriptionHelpFormatter)
-
+		usage = 'main.py [mode] [arguments]',
+		description =
+			'modes and arguments:\n'
+		    '  \n'
+		    '  classif_train: trains and store the specified ML alg\n'
+		    '            -a <algorithm name>\n'
+		    '            -f <features percentage>\n'
+		    '            -l <language>\n'
+		    '            -o <output name>\n'
+			'            -p <training profile path>\n'
+			'  \n'
+		    '  miner_predict: analyses tweets of a Twitter account\n'
+		    '            -u <Twitter user>\n'
+		    '            -w <filter word>\n'
+		    '            -p <predicting profile path>\n'
+		    '  \n'
+		    '  miner_search: stores query tweets into a new dataset\n'
+		    '            -q <search query>\n'
+		    '            -l <language code>\n'
+		    '            -d <search depth>\n'
+		    '            -o <output name>\n'
+		    '  \n'
+		    '  stream_predict: analyses tweets of a Twitter stream\n'
+		    '            -s <buffer size>\n'
+		    '            -t <filter tracks>\n'
+		    '            -l <language codes>\n'
+		    '            -c <coord 1> <coord 2> <coord 3> <coord 4>\n'
+			'            -p <predicting profile path>\n',
+		formatter_class = RawDescriptionHelpFormatter
+	)
 
 	# Parsing the arguments in order to check the mode
 	global_parser.add_argument('mode', choices = functions)
 	arg, func_args = global_parser.parse_known_args()
 
 
-	# First mode: classify
-	if arg.mode == "classify":
+	if arg.mode == 'classif_train':
+
+		train_par = ArgumentParser(usage = "Use 'main.py -h' for help")
+		train_par.add_argument('-a', required = True)
+		train_par.add_argument('-f', required = True, type = int)
+		train_par.add_argument('-l', required = True)
+		train_par.add_argument('-o', required = True)
+		train_par.add_argument('-p', required = True)
+
+		args = train_par.parse_args(func_args)
+		classif_train(args.a, args.f, args.l, args.o, args.p)
+
+
+	elif arg.mode == 'miner_predict':
 
 		classify_par = ArgumentParser(usage = "Use 'main.py -h' for help")
-		classify_par.add_argument('-p', required = True)
-		classify_par.add_argument('-a', required = True)
+		classify_par.add_argument('-u', required = True)
 		classify_par.add_argument('-w', required = True)
+		classify_par.add_argument('-p', required = True)
 
 		args = classify_par.parse_args(func_args)
-		classify(args.p, args.a, args.w)
+		miner_predict(args.u, args.w, args.p)
 
 
-	# Second mode: search
-	elif arg.mode == "search":
+	elif arg.mode == 'miner_search':
 
 		search_par = ArgumentParser(usage = "Use 'main.py -h' for help")
 		search_par.add_argument('-q', required = True)
@@ -207,31 +284,17 @@ if __name__ == '__main__':
 		search_par.add_argument('-o', required = True)
 
 		args = search_par.parse_args(func_args)
-		search(args.q, args.l, args.d, args.o)
+		miner_search(args.q, args.l, args.d, args.o)
 
 
-	# Third mode: stream
-	elif arg.mode == "stream":
+	elif arg.mode == 'stream_predict':
 
 		stream_par = ArgumentParser(usage = "Use 'main.py -h' for help")
-		stream_par.add_argument('-p', required = True)
-		stream_par.add_argument('-b', required = True, type = int)
-		stream_par.add_argument('-w', required = True)
+		stream_par.add_argument('-s', required = True, type = int)
+		stream_par.add_argument('-t', required = True)
 		stream_par.add_argument('-l', required = True)
 		stream_par.add_argument('-c', required = True, type = float, nargs = '+')
+		stream_par.add_argument('-p', required = True)
 
 		args = stream_par.parse_args(func_args)
-		stream(args.p, args.b, args.w, args.l, args.c)
-
-
-	# Fourth mode: train
-	elif arg.mode == "train":
-
-		train_par = ArgumentParser(usage = "Use 'main.py -h' for help")
-		train_par.add_argument('-n', required = True)
-		train_par.add_argument('-d', required = True, nargs = 2)
-		train_par.add_argument('-f', required = True, type = float)
-		train_par.add_argument('-o', required = True)
-
-		args = train_par.parse_args(func_args)
-		train(args.n, args.d[0], args.d[1], args.f, args.o)
+		stream_predict(args.s, args.t, args.l, args.c, args.p)

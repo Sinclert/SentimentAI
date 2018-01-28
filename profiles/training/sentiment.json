@@ -1,13 +1,10 @@
-{
-    "datasets": [
-        {
-            "file_path": "resources/datasets/negative.txt",
-            "file_label": "negative"
-        },
-        {
-            "file_path": "resources/datasets/positive.txt",
-            "file_label": "positive"
-        }
-    ],
-    "output": "/models/polarity.pickle"
-}
+[
+	{
+		"file_path": "resources/datasets/negative.txt",
+		"file_label": "negative"
+	},
+	{
+		"file_path": "resources/datasets/positive.txt",
+		"file_label": "positive"
+	}
+]

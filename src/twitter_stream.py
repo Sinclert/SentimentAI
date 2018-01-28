@@ -120,7 +120,7 @@ class TwitterListener(StreamListener):
 
 
 
-    def start_stream(self, queries, languages, coordinates, timeout = 15):
+    def start_stream(self, queries, langs, coordinates, timeout = 15):
 
         """ Starts the Twitter stream
 
@@ -130,7 +130,7 @@ class TwitterListener(StreamListener):
 		        type: list
 			    info: words to filter
 
-		    languages:
+		    langs:
 		        type: list
 		        info: language codes to filter
 
@@ -155,7 +155,7 @@ class TwitterListener(StreamListener):
 
         self.stream.filter(
             track = queries,
-            languages = languages,
+            languages = langs,
             locations = coordinates,
             async = True
         )

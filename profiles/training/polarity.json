@@ -1,13 +1,10 @@
-{
-    "datasets": [
-        {
-            "file_path": "resources/datasets/neutral.txt",
-            "file_label": "neutral"
-        },
-        {
-            "file_path": "resources/datasets/polarized.txt",
-            "file_label": "polarized"
-        }
-    ],
-    "output": "/models/polarity.pickle"
-}
+[
+	{
+		"file_path": "resources/datasets/neutral.txt",
+		"file_label": "neutral"
+	},
+	{
+		"file_path": "resources/datasets/polarized.txt",
+		"file_label": "polarized"
+	}
+]
