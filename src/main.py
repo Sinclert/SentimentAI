@@ -6,12 +6,13 @@ import os
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 from collections import Counter
-from functools import partial
 
 from clf_node import NodeClassif
 from clf_hierarchy import HierarchicalClassif
 from twitter_miner import TwitterMiner
 from twitter_stream import TwitterListener
+
+from twitter_keys import USER_KEYS as U_K
 
 from utils import draw_pie_chart
 from utils import filter_text
@@ -100,17 +101,18 @@ def miner_predict(user, filter_word, profile_path):
 			info: relative path to the JSON profile file
 	"""
 
-	# Defining tweets filter function
-	func = partial(filter_text(str, word = filter_word))
-
-	miner = TwitterMiner('','') # TODO
-	tweets = miner.get_user_tweets(user)
-	tweets = map(func, tweets)
-
 	h_clf = HierarchicalClassif(profile_path)
+
+	miner = TwitterMiner(
+		token_key = U_K['token_key'],
+		token_secret = U_K['token_secret']
+	)
+
+	tweets = miner.get_user_tweets(user)
 	results = Counter()
 
 	for tweet in tweets:
+		tweet = filter_text(tweet, filter_word)
 		label = h_clf.predict(tweet)
 		if label is not None: results[label] += 1
 
@@ -142,7 +144,11 @@ def miner_search(query, lang, depth, output):
 			info: output file name including extension
 	"""
 
-	miner = TwitterMiner('','') # TODO
+	miner = TwitterMiner(
+		token_key = U_K['token_key'],
+		token_secret = U_K['token_secret']
+	)
+
 	miner.search_tweets(
 		query = query,
 		lang = lang,
@@ -188,11 +194,16 @@ def stream_predict(buffer_size, tracks, langs, coordinates, profile_path):
 
 	h_cls = HierarchicalClassif(profile_path)
 
+	listener = TwitterListener(
+		token_key = U_K['token_key'],
+		token_secret = U_K['token_secret'],
+		buffer_size = buffer_size,
+		clf = h_cls
+	)
+
+	# Start the Twitter stream
 	tracks = tracks.split(', ')
 	langs = langs.split(', ')
-
-	# Initiating the Twitter stream
-	listener = TwitterListener('','', buffer_size, h_cls) # TODO
 	listener.start_stream(tracks, langs, coordinates)
 
 
