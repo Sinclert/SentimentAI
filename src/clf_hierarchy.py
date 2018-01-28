@@ -2,6 +2,8 @@
 
 
 from clf_node import NodeClassif
+
+from utils import check_keys
 from utils import get_file_json
 
 
@@ -72,21 +74,26 @@ class HierarchicalClassif(object):
 				info: current tree node to load the 'clf_name' classifier
 		"""
 
-		if not all(k in node for k in self.keys):
-			exit('Invalid JSON keys')
+		check_keys(
+			keys = self.keys,
+			data_struct = node,
+			error = 'Invalid JSON keys'
+		)
 
 		node['clf_object'] = NodeClassif(node['clf_name'])
 
-
 		try:
 			clf_labels = node['clf_object'].get_labels()
-			clf_children_names = node['clf_children'].keys()
-			clf_children_nodes = node['clf_children'].values()
+			clf_child_names = node['clf_children'].keys()
+			clf_child_nodes = node['clf_children'].values()
 
-			if not all(n in clf_labels for n in clf_children_names):
-				exit('Invalid JSON children names')
+			check_keys(
+				keys = clf_child_names,
+				data_struct = clf_labels,
+				error = 'Invalid JSON keys'
+			)
 
-			for child_node in clf_children_nodes:
+			for child_node in clf_child_nodes:
 				self.__load_clf(child_node)
 
 		except AttributeError:

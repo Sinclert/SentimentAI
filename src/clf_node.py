@@ -16,6 +16,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.base import clone
 from sklearn.model_selection import cross_val_score
 
+from text_tokenizer import TextTokenizer
 from utils import get_file_lines
 
 
@@ -32,32 +33,72 @@ algorithms = {
 
 
 class NodeClassif(object):
-	""" Class in charge of the binary classification of sentences
 
+	""" Represents a hierarchical node classifier
+
+	Attributes:
+	----------
+		model:
+			type: sklearn.estimator
+			info: trained classifier model
+
+		selector:
+			type: SelectPercentile
+			info: filter the features depending on their relevance. It has:
+				- score_func (func)
+				- percentile (float)
+
+		vectorizer:
+			type: CountVectorizer
+			info: builds the vector of features. It has:
+				- tokenizer (class)
+				- ngram_range (tuple of ints)
 	"""
 
 
 
 
-	""" Initiates variables when the instance is created """
-	def __init__(self, name = None):
+	def __init__(self, saved_model = None):
 
-		#if name != null:
-		#	load
+		""" Loads a trained model if specified
 
-		self.model = None
-		self.selector = None
-		self.vectorizer = CountVectorizer(
-			tokenizer=LemmaTokenizer(),
-			ngram_range=(1, 2)
-		)
+		Arguments:
+		----------
+			saved_model:
+				type: string
+				info: name of the saved model
+		"""
+
+		if saved_model is not None:
+			self.__load_model("", saved_model)   # TODO
+
+		else:
+			self.model = None
+			self.selector = None
+			self.vectorizer = None
 
 
 
 
 	""" Trains a classifier using the sentences from the specified files """
-	def train(self, clf_name, l1_file, l2_file, features_pct):
+	def train(self, clf_name, l1_file, l2_file, features_pct, language):
 
+		##############33
+		CountVectorizer(
+			tokenizer=TextTokenizer(language),
+			ngram_range=(1, 2)
+		)
+
+		# Creating the feature selector object
+		self.selector = SelectPercentile(
+			score_func = chi2,
+			percentile = features_pct
+		)
+
+		##########
+
+
+		##########
 		# Obtaining the label names
 		label1 = os.path.basename(l1_file).rsplit('.')[0]
 		label2 = os.path.basename(l2_file).rsplit('.')[0]
@@ -69,16 +110,12 @@ class NodeClassif(object):
 		# Getting the labels as a numpy array
 		labels = numpy.array(([label1] * len(l1_sentences)) + ([label2] * len(l2_sentences)))
 
-		# Creating the feature selector object
-		self.selector = SelectPercentile(
-			score_func = chi2,
-			percentile = features_pct
-		)
-
 		# Extracting and selecting the best features
 		features = numpy.array(l1_sentences + l2_sentences)
 		features = self.vectorizer.fit_transform(features)
 		features = self.selector.fit_transform(features, labels)
+
+		#############
 
 
 		# Training process
@@ -86,9 +123,11 @@ class NodeClassif(object):
 		self.model = classifier.fit(features, labels)
 		print("Training process completed")
 
+
+		##########
 		# The labels are encoded to perform F1 scoring
 		labels = LabelEncoder().fit_transform(labels)
-		bin_classifier = clone(possible_classifiers[clf_name])
+		bin_classifier = clone(algorithms[clf_name])
 
 		# The model is tested using cross validation
 		results = cross_val_score(
@@ -101,6 +140,8 @@ class NodeClassif(object):
 		)
 
 		print("F1 score:", round(results.mean(), 4), "\n")
+
+		################
 
 
 
@@ -148,7 +189,7 @@ class NodeClassif(object):
 
 
 	""" Loads a trained model into our classifier object """
-	def loadModel(self, models_folder, model_name):
+	def __load_model(self, models_folder, model_name):
 
 		# Joining the paths to create the total model path
 		file_path = os.path.join(models_folder, model_name)

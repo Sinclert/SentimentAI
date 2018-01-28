@@ -37,6 +37,31 @@ cleaning_filters = [
 
 
 
+def check_keys(keys, data_struct, error):
+
+	""" Checks if all the keys are present in the data structure
+
+	Arguments:
+	----------
+		keys:
+			type: list
+			info: elements which must be in the data structure
+
+		data_struct:
+			type: set / dictionary
+			info: data structure to check existence
+
+		error:
+			type: string
+			info: error message to print
+	"""
+
+	if not all(k in data_struct for k in keys):
+		exit(error)
+
+
+
+
 def clean_text(text, filters = cleaning_filters):
 
 	""" Cleans the text applying regex substitution specified by the filters
