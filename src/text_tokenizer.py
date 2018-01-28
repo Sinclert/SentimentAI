@@ -4,7 +4,7 @@
 from nltk.stem import SnowballStemmer
 from nltk.tokenize import TweetTokenizer
 
-from utils_io import get_file_lines
+from utils_files import get_file_lines
 
 
 languages = {

@@ -16,8 +16,8 @@ from sklearn.model_selection import cross_val_score
 
 from text_tokenizer import TextTokenizer
 
-from utils_io import get_file_lines
-from utils_io import load_object
+from utils_files import get_file_lines
+from utils_files import load_object
 
 
 algorithms = {

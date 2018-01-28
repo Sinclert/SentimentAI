@@ -3,9 +3,8 @@
 
 from clf_node import NodeClassif
 
-from utils_io import get_file_json
+from utils_files import get_file_json
 from utils_misc import check_keys
-
 
 
 

@@ -1,7 +1,7 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
 
-from argparse import ArgumentParser
+from argparse import ArgumentParser as Parser
 from argparse import RawDescriptionHelpFormatter
 from collections import Counter
 
@@ -12,26 +12,26 @@ from twitter_stream import TwitterListener
 
 from twitter_keys import USER_KEYS as U_K
 
-from utils_io import get_file_json
-from utils_io import save_object
-from utils_io import store_texts
+from utils_files import get_file_json
+from utils_files import save_object
+from utils_files import store_texts
 
 from utils_misc import draw_pie_chart
 from utils_misc import filter_text
 
 
-# Default function names
-functions = [
-	'classif_train',
-	'miner_predict',
-	'miner_search',
-	'stream_predict'
+# Default CLI modes
+modes = [
+	'train_clf',
+	'search_data',
+	'predict_user',
+	'predict_stream',
 ]
 
 
 
 
-def classif_train(algorithm, feats_pct, lang, output, profile_name):
+def train_clf(algorithm, feats_pct, lang, output, profile_name):
 
 	""" Prepares arguments to train and saves a NodeClassif object
 
@@ -79,46 +79,7 @@ def classif_train(algorithm, feats_pct, lang, output, profile_name):
 
 
 
-def miner_predict(user, filter_word, profile_path):
-
-	""" Prepares arguments to predict Twitter account tweets labels
-
-	Arguments:
-	----------
-		user:
-			type: string
-			info: Twitter user account without the '@'
-
-		filter_word:
-			type: string
-			info: word applied to filter all tweets sentences
-
-		profile_path:
-			type: string
-			info: relative path to the JSON profile file
-	"""
-
-	h_clf = HierarchicalClassif(profile_path)
-
-	miner = TwitterMiner(
-		token_key = U_K['token_key'],
-		token_secret = U_K['token_secret']
-	)
-
-	tweets = miner.get_user_tweets(user)
-	results = Counter()
-
-	for tweet in tweets:
-		tweet = filter_text(tweet, filter_word)
-		label = h_clf.predict(tweet)
-		if label is not None: results[label] += 1
-
-	print(results)
-
-
-
-
-def miner_search(query, lang, depth, output):
+def search_data(query, lang, depth, output):
 
 	""" Prepares arguments to search tweets and save them in a file
 
@@ -157,7 +118,46 @@ def miner_search(query, lang, depth, output):
 
 
 
-def stream_predict(buffer_size, tracks, langs, coordinates, profile_path):
+def predict_user(user, filter_word, profile_path):
+
+	""" Prepares arguments to predict Twitter account tweets labels
+
+	Arguments:
+	----------
+		user:
+			type: string
+			info: Twitter user account without the '@'
+
+		filter_word:
+			type: string
+			info: word applied to filter all tweets sentences
+
+		profile_path:
+			type: string
+			info: relative path to the JSON profile file
+	"""
+
+	h_clf = HierarchicalClassif(profile_path)
+
+	miner = TwitterMiner(
+		token_key = U_K['token_key'],
+		token_secret = U_K['token_secret']
+	)
+
+	tweets = miner.get_user_tweets(user)
+	results = Counter()
+
+	for tweet in tweets:
+		tweet = filter_text(tweet, filter_word)
+		label = h_clf.predict(tweet)
+		if label is not None: results[label] += 1
+
+	print(results)
+
+
+
+
+def predict_stream(buffer_size, tracks, langs, coordinates, profile_path):
 
 	""" Prepares arguments to predict Twitter stream tweets labels
 
@@ -221,30 +221,30 @@ def stream_predict(buffer_size, tracks, langs, coordinates, profile_path):
 
 if __name__ == '__main__':
 
-	global_parser = ArgumentParser(
+	global_parser = Parser(
 		usage = 'main.py [mode] [arguments]',
 		description =
 			'modes and arguments:\n'
 		    '  \n'
-		    '  classif_train: trains and store the specified ML alg\n'
+		    '  train_clf: trains and store the specified ML alg\n'
 		    '            -a <algorithm name>\n'
 		    '            -f <features percentage>\n'
 		    '            -l <language>\n'
 		    '            -o <output name>\n'
 			'            -p <training profile path>\n'
 			'  \n'
-		    '  miner_predict: analyses tweets of a Twitter account\n'
-		    '            -u <Twitter user>\n'
-		    '            -w <filter word>\n'
-		    '            -p <predicting profile path>\n'
-		    '  \n'
-		    '  miner_search: stores query tweets into a new dataset\n'
+			'  search_data: stores query tweets into a new dataset\n'
 		    '            -q <search query>\n'
 		    '            -l <language code>\n'
 		    '            -d <search depth>\n'
 		    '            -o <output name>\n'
 		    '  \n'
-		    '  stream_predict: analyses tweets of a Twitter stream\n'
+		    '  predict_user: analyses tweets of a Twitter account\n'
+		    '            -u <Twitter user>\n'
+		    '            -w <filter word>\n'
+		    '            -p <predicting profile path>\n'
+		    '  \n'
+		    '  predict_stream: analyses tweets of a Twitter stream\n'
 		    '            -s <buffer size>\n'
 		    '            -t <filter tracks>\n'
 		    '            -l <language codes>\n'
@@ -254,54 +254,54 @@ if __name__ == '__main__':
 	)
 
 	# Parsing the arguments in order to check the mode
-	global_parser.add_argument('mode', choices = functions)
+	global_parser.add_argument('mode', choices = modes)
 	arg, func_args = global_parser.parse_known_args()
 
 
-	if arg.mode == 'classif_train':
+	if arg.mode == 'train_clf':
 
-		train_par = ArgumentParser(usage = "Use 'main.py -h' for help")
-		train_par.add_argument('-a', required = True)
-		train_par.add_argument('-f', required = True, type = int)
-		train_par.add_argument('-l', required = True)
-		train_par.add_argument('-o', required = True)
-		train_par.add_argument('-p', required = True)
+		parser = Parser(usage = "Use 'main.py -h' for help")
+		parser.add_argument('-a', required = True)
+		parser.add_argument('-f', required = True, type = int)
+		parser.add_argument('-l', required = True)
+		parser.add_argument('-o', required = True)
+		parser.add_argument('-p', required = True)
 
-		args = train_par.parse_args(func_args)
-		classif_train(args.a, args.f, args.l, args.o, args.p)
-
-
-	elif arg.mode == 'miner_predict':
-
-		classify_par = ArgumentParser(usage = "Use 'main.py -h' for help")
-		classify_par.add_argument('-u', required = True)
-		classify_par.add_argument('-w', required = True)
-		classify_par.add_argument('-p', required = True)
-
-		args = classify_par.parse_args(func_args)
-		miner_predict(args.u, args.w, args.p)
+		args = parser.parse_args(func_args)
+		train_clf(args.a, args.f, args.l, args.o, args.p)
 
 
-	elif arg.mode == 'miner_search':
+	elif arg.mode == 'search_data':
 
-		search_par = ArgumentParser(usage = "Use 'main.py -h' for help")
-		search_par.add_argument('-q', required = True)
-		search_par.add_argument('-l', required = True)
-		search_par.add_argument('-d', required = True, type = int)
-		search_par.add_argument('-o', required = True)
+		parser = Parser(usage = "Use 'main.py -h' for help")
+		parser.add_argument('-q', required = True)
+		parser.add_argument('-l', required = True)
+		parser.add_argument('-d', required = True, type = int)
+		parser.add_argument('-o', required = True)
 
-		args = search_par.parse_args(func_args)
-		miner_search(args.q, args.l, args.d, args.o)
+		args = parser.parse_args(func_args)
+		search_data(args.q, args.l, args.d, args.o)
 
 
-	elif arg.mode == 'stream_predict':
+	elif arg.mode == 'predict_user':
 
-		stream_par = ArgumentParser(usage = "Use 'main.py -h' for help")
-		stream_par.add_argument('-s', required = True, type = int)
-		stream_par.add_argument('-t', required = True)
-		stream_par.add_argument('-l', required = True)
-		stream_par.add_argument('-c', required = True, type = float, nargs = '+')
-		stream_par.add_argument('-p', required = True)
+		parser = Parser(usage = "Use 'main.py -h' for help")
+		parser.add_argument('-u', required = True)
+		parser.add_argument('-w', required = True)
+		parser.add_argument('-p', required = True)
 
-		args = stream_par.parse_args(func_args)
-		stream_predict(args.s, args.t, args.l, args.c, args.p)
+		args = parser.parse_args(func_args)
+		predict_user(args.u, args.w, args.p)
+
+
+	elif arg.mode == 'predict_stream':
+
+		parser = Parser(usage = "Use 'main.py -h' for help")
+		parser.add_argument('-s', required = True, type = int)
+		parser.add_argument('-t', required = True)
+		parser.add_argument('-l', required = True)
+		parser.add_argument('-c', required = True, type = float, nargs = '+')
+		parser.add_argument('-p', required = True)
+
+		args = parser.parse_args(func_args)
+		predict_stream(args.s, args.t, args.l, args.c, args.p)
