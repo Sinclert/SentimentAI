@@ -52,7 +52,7 @@ class HierarchicalClassif(object):
 
 		profile = get_file_json(
 			file_name = profile_name,
-			file_type = 'predicting_profile'
+			file_type = 'profile_p'
 		)
 
 		try:

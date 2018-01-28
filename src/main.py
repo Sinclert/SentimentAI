@@ -63,7 +63,7 @@ def classif_train(algorithm, feats_pct, lang, output, profile_name):
 
 	profile_data = get_file_json(
 		file_name = profile_name,
-		file_type = 'training_profile'
+		file_type = 'profile_t'
 	)
 
 	node_classif = NodeClassif()

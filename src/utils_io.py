@@ -7,8 +7,8 @@ import pickle
 
 
 project_paths = {
-	'datasets': ['resources', 'datasets'],
-	'models': ['models'],
+	'dataset': ['resources', 'datasets'],
+	'model': ['models'],
 	'profile_t': ['profiles', 'training'],
 	'profile_p': ['profiles', 'predicting'],
 	'stopwords': ['resources', 'stopwords'],
@@ -43,7 +43,7 @@ def get_abs_path(file_name, file_type):
 
 		path = [project_root]
 		path = path + project_paths[file_type]
-		path = path + file_name
+		path = path + [file_name]
 
 		return os.path.join(*path)
 
@@ -182,7 +182,9 @@ def save_object(obj, file_name, file_type):
 	"""
 
 	file_path = get_abs_path(file_name, file_type)
-	os.makedirs(file_path, exist_ok = True)
+
+	file_dir = file_path.replace(file_name, '')
+	os.makedirs(file_dir, exist_ok = True)
 
 	try:
 		file = open(file_path, 'wb')
@@ -195,7 +197,7 @@ def save_object(obj, file_name, file_type):
 
 
 
-def store_texts(texts, file_path, min_length = 0):
+def store_texts(texts, file_name, min_length = 0):
 
 	""" Appends the specified texts at the end of the given file
 
@@ -205,34 +207,27 @@ def store_texts(texts, file_path, min_length = 0):
 			type: list
 			info: strings to be appended at the end of the file
 
-		file_path:
+		file_name:
 			type: string
-			info: relative path to the appendable file
+			info: appendable file name
 
 		min_length:
 			type: int (optional)
 			info: minimum length to append a text to the file
-
-	Returns:
-	----------
-		skipped_num:
-			type: int
-			info: number of text that did not fulfill the length requirement
 	"""
+
+	file_path = get_abs_path(file_name, 'dataset')
+
+	file_dir = file_path.replace(file_name, '')
+	os.makedirs(file_dir, exist_ok = True)
 
 	try:
 		file = open(file_path, 'a', encoding = 'utf-8')
-		skipped_num = 0
 
 		for text in texts:
-
-			if len(text) >= min_length:
-				file.write(text + '\n')
-			else:
-				skipped_num += 1
+			if len(text) >= min_length: file.write(text + '\n')
 
 		file.close()
-		return skipped_num
 
 	except IOError:
 		exit('The file ' + file_path + ' cannot be opened')
