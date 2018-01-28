@@ -1,10 +1,10 @@
 [
 	{
-		"file_path": "resources/datasets/negative.txt",
-		"file_label": "negative"
+		"dataset_file": "negative.txt",
+		"dataset_label": "negative"
 	},
 	{
-		"file_path": "resources/datasets/positive.txt",
-		"file_label": "positive"
+		"dataset_file": "positive.txt",
+		"dataset_label": "positive"
 	}
 ]

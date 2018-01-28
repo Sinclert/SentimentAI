@@ -16,8 +16,8 @@ from sklearn.model_selection import cross_val_score
 
 from text_tokenizer import TextTokenizer
 
-from utils import get_file_lines
-from utils import load_object
+from utils_io import get_file_lines
+from utils_io import load_object
 
 
 algorithms = {
@@ -56,19 +56,19 @@ class NodeClassif(object):
 
 
 
-	def __init__(self, model_path = None):
+	def __init__(self, file_name = None):
 
 		""" Loads a trained model if specified
 
 		Arguments:
 		----------
-			saved_model:
+			file_name:
 				type: string
-				info: name of the saved model
+				info: name of the saved model file
 		"""
 
-		if model_path is not None:
-			self.__dict__ = load_object(model_path)
+		if file_name is not None:
+			self.__dict__ = load_object(file_name, 'model')
 
 		else:
 			self.model = None
@@ -124,8 +124,8 @@ class NodeClassif(object):
 			datasets_info:
 				type: list
 				info: list of dictionaries containing:
-					- file_path (string)
-					- file_label (string)
+					- dataset_file (string)
+					- dataset_label (string)
 
 		Returns:
 		----------
@@ -142,10 +142,14 @@ class NodeClassif(object):
 		labels = []
 
 		for info in datasets_info:
-			path = info['file_path']
-			label = info['file_label']
+			name = info['dataset_file']
+			label = info['dataset_label']
 
-			sentences = get_file_lines(path)
+			sentences = get_file_lines(
+				file_name = name,
+				file_type = 'dataset'
+			)
+
 			feats.extend(sentences)
 			labels.extend([label] * len(sentences))
 

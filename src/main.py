@@ -1,8 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
 
-import os
-
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 from collections import Counter
@@ -14,16 +12,13 @@ from twitter_stream import TwitterListener
 
 from twitter_keys import USER_KEYS as U_K
 
-from utils import draw_pie_chart
-from utils import filter_text
-from utils import get_file_json
-from utils import save_object
-from utils import store_texts
+from utils_io import get_file_json
+from utils_io import save_object
+from utils_io import store_texts
 
+from utils_misc import draw_pie_chart
+from utils_misc import filter_text
 
-# Default outputs folders
-datasets_folder = "datasets"
-models_folder = "models"
 
 # Default function names
 functions = [
@@ -36,7 +31,7 @@ functions = [
 
 
 
-def classif_train(algorithm, feats_pct, lang, output, profile_path):
+def classif_train(algorithm, feats_pct, lang, output, profile_name):
 
 	""" Prepares arguments to train and saves a NodeClassif object
 
@@ -58,15 +53,18 @@ def classif_train(algorithm, feats_pct, lang, output, profile_path):
 			type: string
 			info: output file name including extension
 
-		profile_path:
+		profile_name:
 			type: string
-			info: relative path to the JSON profile file
+			info: name of the JSON training profile file
 	"""
 
 	if (feats_pct < 0) or (feats_pct > 100):
 		exit('The specified features percentage is invalid')
 
-	profile_data = get_file_json(profile_path)
+	profile_data = get_file_json(
+		file_name = profile_name,
+		file_type = 'training_profile'
+	)
 
 	node_classif = NodeClassif()
 	node_classif.train(
@@ -76,8 +74,7 @@ def classif_train(algorithm, feats_pct, lang, output, profile_path):
 		profile_data = profile_data
 	)
 
-	abs_path = os.path.join(models_folder, output)
-	save_object(node_classif, abs_path)
+	save_object(node_classif, output, 'model')
 
 
 
@@ -155,8 +152,7 @@ def miner_search(query, lang, depth, output):
 		depth = depth
 	)
 
-	abs_path = os.path.join(datasets_folder, output)
-	store_texts([], abs_path) # TODO
+	store_texts([], output) # TODO
 
 
 

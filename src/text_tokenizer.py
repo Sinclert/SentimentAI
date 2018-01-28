@@ -4,10 +4,8 @@
 from nltk.stem import SnowballStemmer
 from nltk.tokenize import TweetTokenizer
 
-from utils import get_file_lines
+from utils_io import get_file_lines
 
-
-stopwords_folder = "stopwords"
 
 languages = {
 	'danish', 'dutch', 'english', 'finnish', 'french',
@@ -61,8 +59,10 @@ class TextTokenizer(object):
 			strip_handles = True
 		)
 
-		stopwords_path = "" # TODO
-		self.stopwords = set(get_file_lines(stopwords_path))
+		self.stopwords = set(get_file_lines(
+			file_name = lang + '.txt',
+			file_type = 'stopwords'
+		))
 
 
 

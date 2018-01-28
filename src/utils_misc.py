@@ -1,11 +1,7 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
 
-import json
-import os
-import pickle
 import re
-
 from matplotlib import pyplot
 
 
@@ -172,66 +168,6 @@ def filter_text(text, word):
 
 
 
-def get_file_lines(file_path):
-
-	""" Reads the lines of a file and returns them inside a list
-
-	Arguments:
-	----------
-		file_path:
-			type: string
-			info: relative path to the readable file
-
-	Returns:
-	----------
-		lines:
-			type: list
-			info: file lines (separated by the new line character)
-	"""
-
-	try:
-		file = open(file_path, 'r', encoding = 'utf-8')
-		lines = file.read().splitlines()
-		file.close()
-
-		return lines
-
-	except IOError:
-		exit('The file ' + file_path + ' cannot be opened')
-
-
-
-
-def get_file_json(file_path):
-
-	""" Reads the lines of a file and returns them inside a list
-
-	Arguments:
-	----------
-		file_path:
-			type: string
-			info: relative path to the readable file
-
-	Returns:
-	----------
-		json_dict:
-			type: dict
-			info: dictionary containing the parsed JSON file
-	"""
-
-	try:
-		file = open(file_path, 'r', encoding = 'utf-8')
-		json_dict = json.load(file)
-		file.close()
-
-		return json_dict
-
-	except IOError:
-		exit('The file ' + file_path + ' cannot be opened')
-
-
-
-
 def get_tweet_text(tweet):
 
 	""" Reads the lines of a file and returns them inside a list
@@ -253,107 +189,3 @@ def get_tweet_text(tweet):
 		tweet = tweet['retweeted_status']
 
 	return tweet['text']
-
-
-
-
-def load_object(file_path):
-
-	""" Loads an object from the specified file
-
-	Arguments:
-		----------
-		file_path:
-			type: string
-			info: file path to the saved object
-
-	Returns:
-	----------
-		obj:
-			type: dict
-			info: dictionary containing the object information
-	"""
-
-	try:
-		file = open(file_path, 'rb')
-		obj = pickle.load(file)
-		file.close()
-
-		return obj
-
-	except IOError:
-		exit('The object could not be loaded from ' + file_path)
-
-
-
-
-def save_object(obj, file_path):
-
-	""" Saves an object in the specified path
-
-	Arguments:
-	----------
-		obj:
-			type: object
-			info: instance of a class that will be serialized
-
-		file_path:
-			type: string
-			info: file path to the saving location
-	"""
-
-	try:
-		# Directory creation in case it did not exist
-		os.makedirs(file_path, exist_ok = True)
-
-		file = open(file_path, 'wb')
-		pickle.dump(obj.__dict__, file)
-		file.close()
-
-	except IOError:
-		exit('The object could not be saved in ' + file_path)
-
-
-
-
-def store_texts(texts, file_path, min_length = 0):
-
-	""" Appends the specified texts at the end of the given file
-
-	Arguments:
-	----------
-		texts:
-			type: list
-			info: strings to be appended at the end of the file
-
-		file_path:
-			type: string
-			info: relative path to the appendable file
-
-		min_length:
-			type: int (optional)
-			info: minimum length to append a text to the file
-
-	Returns:
-	----------
-		skipped_num:
-			type: int
-			info: number of text that did not fulfill the length requirement
-	"""
-
-	try:
-		file = open(file_path, 'a', encoding = 'utf-8')
-		skipped_num = 0
-
-		for text in texts:
-
-			if len(text) >= min_length:
-				file.write(text + '\n')
-			else:
-				skipped_num += 1
-
-		file.close()
-		return skipped_num
-
-	except IOError:
-		exit('The file ' + file_path + ' cannot be opened')

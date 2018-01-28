@@ -3,8 +3,9 @@
 
 from clf_node import NodeClassif
 
-from utils import check_keys
-from utils import get_file_json
+from utils_io import get_file_json
+from utils_misc import check_keys
+
 
 
 
@@ -38,7 +39,7 @@ class HierarchicalClassif(object):
 
 
 
-	def __init__(self, profile_path):
+	def __init__(self, profile_name):
 
 		""" Loads the JSON profile models into the tree attribute
 
@@ -46,10 +47,13 @@ class HierarchicalClassif(object):
 		----------
 			profile_path:
 				type: string
-				info: relative path to the JSON profile file
+				info: name of the JSON predicting profile file
 		"""
 
-		profile = get_file_json(profile_path)
+		profile = get_file_json(
+			file_name = profile_name,
+			file_type = 'predicting_profile'
+		)
 
 		try:
 			self.tree = profile['tree']

@@ -8,8 +8,8 @@ from tweepy import TweepError
 
 from twitter_keys import APP_KEYS
 
-from utils import clean_text
-from utils import get_tweet_text
+from utils_misc import clean_text
+from utils_misc import get_tweet_text
 
 
 
