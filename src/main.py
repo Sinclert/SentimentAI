@@ -1,11 +1,11 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
 import os
-from clf_node import Classifier, possible_classifiers
-from clf_hierarchy import Hierarchical_cls
-from twitter_miner import DataMiner
-from twitter_stream import TwitterListener
-from utils import filterTweets
+#from clf_node import Classifier, possible_classifiers
+#from clf_hierarchy import Hierarchical_cls
+#from twitter_miner import DataMiner
+#from twitter_stream import TwitterListener
+#from utils import filterTweets
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 
 
@@ -13,6 +13,8 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 datasets_folder = "datasets"
 models_folder = "models"
 profiles_folder = "profiles"
+
+#ROOT_DIR = os.path.relpath("negative.txt", "../.."))
 
 functions = ['classify', 'search', 'stream', 'train']
 labels = ['Negative', 'Neutral', 'Positive']
@@ -23,113 +25,123 @@ labels = ['Negative', 'Neutral', 'Positive']
 """ Trains and stores the specified ML algorithm after been trained """
 def train(classifier_name, l1_file, l2_file, features_pct, output):
 
+	from os.path import dirname, abspath
+	d = dirname(dirname(abspath(__file__)))
+	print(d)
+	d = os.path.dirname(os.getcwd())
+	print(d)
+
+	from pathlib import Path
+	d = Path().resolve().parent
+	print(d)
+
 	# Checks the validity of the percentages
 	if (features_pct < 0) or (features_pct > 100):
 		print("ERROR: The specified percentage is invalid")
 		exit()
 
-	# Checks the specified classifier
-	if classifier_name.lower() in possible_classifiers.keys():
-
-		l1_file = os.path.join(datasets_folder, l1_file)
-		l2_file = os.path.join(datasets_folder, l2_file)
-
-		classifier = Classifier()
-		classifier.train(
-			classifier_name = classifier_name.lower(),
-			l1_file = l1_file,
-			l2_file = l2_file,
-			features_pct = features_pct
-		)
-
-		classifier.saveModel(models_folder, output)
-
-	else:
-		print("ERROR: Invalid classifier")
-		exit()
-
-
-
-
-""" Performs sentiment analysis over the specified Twitter account """
-def classify(cls_profile, account, filter_word):
-
-	# Loading classifiers
-	#h_cls = Hierarchical_cls(os.path.join(profiles_folder, cls_profile))
-
-	# Obtaining tweets
-	miner = DataMiner()
-	tweets = miner.getUserTweets(user = account)
-
-	# Splitting the tweets into sentences
-	sentences = filterTweets(
-		tweets = tweets,
-		word = filter_word
-	)
-
-	# Creating the results dictionary
-	results = dict.fromkeys(labels, 0)
-
-	# Storing the classification results
-	for sentence in sentences:
-		label = h_cls.predict(sentence)
-
-		if label is not None:
-			results[label] += 1
-
-	print(results)
-
-
-
-
-""" Search tweets using Twitter API storing them into the output file """
-def search(search_query, language, search_depth, output):
-
-	# Creating the storing output final path
-	output_path = os.path.join(datasets_folder, output)
-
-	# Obtaining tweets and storing them in a file
-	miner = DataMiner()
-	miner.searchTweets(
-		query = search_query,
-		language = language,
-		file = output_path,
-		depth = search_depth
-	)
-
-	# TODO storeTweets
-
-
-
-
-""" Performs sentiment analysis over a stream of tweets filter by location """
-def stream(cls_profile, buffer_size, filter_word, language, coordinates):
-
-	# Loading classifiers
-	h_cls = Hierarchical_cls(os.path.join(profiles_folder, cls_profile))
-
-	# Transforming arguments
-	tracks = [filter_word]
-	languages = [language]
-
-	# Creates the stream object and start stream
-	listener = TwitterListener(h_cls, buffer_size, labels)
-	listener.initStream(tracks, languages, coordinates)
-
-	from matplotlib import pyplot, animation
-	from src.graph_animation import animatePieChart, figure
-
-	# Animate the graph each milliseconds interval
-	ani = animation.FuncAnimation(
-		fig = figure,
-		func = animatePieChart,
-		interval = 500,
-		fargs = (labels, tracks, listener.stream_dict)
-	)
-	pyplot.show()
-
-	# Finally: close the stream process
-	listener.closeStream()
+# 	# Checks the specified classifier
+# 	if classifier_name.lower() in possible_classifiers.keys():
+#
+# 		l1_file = os.path.join(datasets_folder, l1_file)
+# 		l2_file = os.path.join(datasets_folder, l2_file)
+#
+# 		classifier = Classifier()
+# 		classifier.train(
+# 			classifier_name = classifier_name.lower(),
+# 			l1_file = l1_file,
+# 			l2_file = l2_file,
+# 			features_pct = features_pct
+# 		)
+#
+# 		classifier.saveModel(models_folder, output)
+#
+# 	else:
+# 		print("ERROR: Invalid classifier")
+# 		exit()
+#
+#
+#
+#
+# """ Performs sentiment analysis over the specified Twitter account """
+# def classify(cls_profile, account, filter_word):
+#
+# 	# Loading classifiers
+# 	#h_cls = Hierarchical_cls(ROOT, sdfgs)
+#
+# 	# Obtaining tweets
+# 	miner = DataMiner()
+# 	tweets = miner.getUserTweets(user = account)
+#
+# 	# Splitting the tweets into sentences
+# 	sentences = filterTweets(
+# 		tweets = tweets,
+# 		word = filter_word
+# 	)
+#
+# 	# Creating the results dictionary
+# 	results = dict.fromkeys(labels, 0)
+#
+# 	# Storing the classification results
+# 	"""for sentence in sentences:
+# 		label = h_cls.predict(sentence)
+#
+# 		if label is not None:
+# 			results[label] += 1
+# """
+# 	print(results)
+#
+#
+#
+#
+# """ Search tweets using Twitter API storing them into the output file """
+# def search(search_query, language, search_depth, output):
+#
+# 	# Creating the storing output final path
+# 	output_path = os.path.join(datasets_folder, output)
+#
+# 	# Obtaining tweets and storing them in a file
+# 	miner = DataMiner()
+# 	miner.searchTweets(
+# 		query = search_query,
+# 		language = language,
+# 		file = output_path,
+# 		depth = search_depth
+# 	)
+#
+# 	# TODO storeTweets
+#
+#
+#
+#
+# """ Performs sentiment analysis over a stream of tweets filter by location """
+# def stream(cls_profile, buffer_size, filter_word, language, coordinates):
+#
+# 	# Loading classifiers
+# 	h_cls = Hierarchical_cls(os.path.join(profiles_folder, cls_profile))
+#
+# 	# Transforming arguments
+# 	tracks = [filter_word]
+# 	languages = [language]
+#
+# 	# Creates the stream object and start stream
+# 	listener = TwitterListener(h_cls, buffer_size, labels)
+# 	listener.initStream(tracks, languages, coordinates)
+#
+# 	from matplotlib import pyplot, animation
+# 	from src.graph_animation import animatePieChart, figure
+#
+# 	# Animate the graph each milliseconds interval
+# 	ani = animation.FuncAnimation(
+# 		fig = figure,
+# 		func = animatePieChart,
+# 		interval = 500,
+# 		fargs = (labels, tracks, listener.stream_dict)
+# 	)
+# 	pyplot.show()
+#
+# 	# Finally: close the stream process
+# 	listener.closeStream()
 
 
 

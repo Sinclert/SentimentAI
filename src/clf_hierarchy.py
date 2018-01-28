@@ -22,7 +22,7 @@ class HierarchicalClassif(object):
 		tree:
 			type: dict
 			info: tree structure in which each node has:
-				- clf_name (string)
+				- clf_file (string)
 				- clf_object (NodeClassif)
 				- clf_children (dict)
 
@@ -33,7 +33,7 @@ class HierarchicalClassif(object):
 
 
 	# Class attribute containing the required JSON nodes keys
-	keys = ['clf_name', 'clf_object', 'clf_children']
+	keys = ['clf_file', 'clf_object', 'clf_children']
 
 
 
@@ -71,7 +71,7 @@ class HierarchicalClassif(object):
 		----------
 			node:
 				type: dict
-				info: current tree node to load the 'clf_name' classifier
+				info: current tree node to load the 'clf_file' classifier
 		"""
 
 		check_keys(
@@ -80,7 +80,7 @@ class HierarchicalClassif(object):
 			error = 'Invalid JSON keys'
 		)
 
-		node['clf_object'] = NodeClassif(node['clf_name'])
+		node['clf_object'] = NodeClassif(node['clf_file'])
 
 		try:
 			clf_labels = node['clf_object'].get_labels()

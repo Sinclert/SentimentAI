@@ -1,10 +1,10 @@
 {
     "tree": {
-        "clf_name": "neu-pol.pickle",
+        "clf_file": "models/polarity.pickle",
         "clf_object": null,
         "clf_children": {
             "polarized": {
-                "clf_name": "neg-pos.pickle",
+                "clf_file": "models/sentiment.pickle",
                 "clf_object": null,
                 "clf_children": {}
             }

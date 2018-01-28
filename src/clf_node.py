@@ -2,8 +2,6 @@
 
 
 import numpy
-import os
-import pickle
 
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_selection import chi2
@@ -17,10 +15,12 @@ from sklearn.base import clone
 from sklearn.model_selection import cross_val_score
 
 from text_tokenizer import TextTokenizer
+
+from utils import get_file_json
 from utils import get_file_lines
+from utils import load_object
+from utils import save_object
 
-
-models_folder = "models"
 
 algorithms = {
 	"logistic-regression": LogisticRegression(),
@@ -58,7 +58,7 @@ class NodeClassif(object):
 
 
 
-	def __init__(self, saved_model = None):
+	def __init__(self, model_path = None):
 
 		""" Loads a trained model if specified
 
@@ -69,8 +69,8 @@ class NodeClassif(object):
 				info: name of the saved model
 		"""
 
-		if saved_model is not None:
-			self.__load_model("", saved_model)   # TODO
+		if model_path is not None:
+			self.__dict__ = load_object(model_path)
 
 		else:
 			self.model = None
@@ -80,126 +80,228 @@ class NodeClassif(object):
 
 
 
-	""" Trains a classifier using the sentences from the specified files """
-	def train(self, clf_name, l1_file, l2_file, features_pct, language):
+	def __init_attr(self, algorithm, feats_pct, lang):
 
-		##############33
-		CountVectorizer(
-			tokenizer=TextTokenizer(language),
-			ngram_range=(1, 2)
-		)
+		""" Set ups the instance attributes before training
 
-		# Creating the feature selector object
+		Arguments:
+		----------
+			algorithm:
+				type: string (lowercase)
+				info: name of the algorithm to train
+
+			feats_pct:
+				type: int
+				info: percentage of features to keep
+
+			lang:
+				type: string
+				info: language to perform the tokenizer process
+		"""
+
+		try:
+			self.model = algorithms[algorithm]
+		except KeyError:
+			exit('Invalid algorithm name')
+
 		self.selector = SelectPercentile(
 			score_func = chi2,
-			percentile = features_pct
+			percentile = feats_pct
 		)
 
-		##########
+		self.vectorizer = CountVectorizer(
+			tokenizer = TextTokenizer(lang),
+			ngram_range = (1, 2)
+		)
 
 
-		##########
-		# Obtaining the label names
-		label1 = os.path.basename(l1_file).rsplit('.')[0]
-		label2 = os.path.basename(l2_file).rsplit('.')[0]
-
-		# Obtaining every sentence inside both files
-		l1_sentences = getFileLines(l1_file)
-		l2_sentences = getFileLines(l2_file)
-
-		# Getting the labels as a numpy array
-		labels = numpy.array(([label1] * len(l1_sentences)) + ([label2] * len(l2_sentences)))
-
-		# Extracting and selecting the best features
-		features = numpy.array(l1_sentences + l2_sentences)
-		features = self.vectorizer.fit_transform(features)
-		features = self.selector.fit_transform(features, labels)
-
-		#############
 
 
-		# Training process
-		classifier = possible_classifiers[clf_name]
-		self.model = classifier.fit(features, labels)
-		print("Training process completed")
+	def __build_feats(self, datasets_info):
+
+		""" Builds the feature and label vectors from the specified datasets
+
+		Arguments:
+		----------
+			datasets_info:
+				type: list
+				info: list of dictionaries containing:
+					- file_path (string)
+					- file_label (string)
+
+		Returns:
+		----------
+			feats_v:
+				type: numpy.array
+				info: vector containing all the sentences features
+
+			labels_v:
+				type: numpy.array
+				info: vector contains all the sentences labels
+		"""
+
+		feats = []
+		labels = []
+
+		for info in datasets_info:
+			path = info['file_path']
+			label = info['file_label']
+
+			sentences = get_file_lines(path) # TODO
+			feats.extend(sentences)
+			labels.extend([label] * len(sentences))
+
+		feats_v = numpy.array(feats)
+		labels_v = numpy.array(labels)
+
+		# Sentences are transformed using tokenization and selection
+		feats_v = self.vectorizer.fit_transform(feats_v)
+		feats_v = self.selector.fit_transform(feats_v, labels)
+
+		return feats_v, labels_v
 
 
-		##########
-		# The labels are encoded to perform F1 scoring
-		labels = LabelEncoder().fit_transform(labels)
-		bin_classifier = clone(algorithms[clf_name])
 
-		# The model is tested using cross validation
+
+	@staticmethod
+	def __validate(algorithm, feats_v, labels_v, cv_folds = 10):
+
+		""" Validates the trained algorithm using crossF1 score
+
+		Arguments:
+		----------
+			algorithm:
+				type: string (lowercase)
+				info: name of any valid classification algorithm
+
+			feats_v:
+				type: numpy.array
+				info: vector containing all the sentences features
+
+			labels_v:
+				type: numpy.array
+				info: vector contains all the sentences labels
+
+			cv_folds:
+				type: int
+				info: number of cross validation folds
+		"""
+
+		labels_v = LabelEncoder().fit_transform(labels_v)
+
+		# The model is tested using cross validation and F1 score
 		results = cross_val_score(
-			estimator = bin_classifier,
-			X = features,
-			y = labels,
+			estimator = clone(algorithms[algorithm]),
+			X = feats_v,
+			y = labels_v,
 			scoring = 'f1',
-			cv = 10,
+			cv = cv_folds,
 			n_jobs = -1
 		)
 
-		print("F1 score:", round(results.mean(), 4), "\n")
-
-		################
+		print('F1 score:', round(results.mean(), 4))
 
 
 
 
-	""" Classify the specified text after obtaining all its features """
-	def classify(self, sentence):
+	def get_labels(self):
+
+		""" Gets the trained label names
+
+		Returns:
+		----------
+			labels:
+				type: list
+				info: trained model label names
+		"""
 
 		try:
-			features = self.vectorizer.transform([sentence])
-			features = self.selector.transform(features)
+			return self.model.classes_
+		except AttributeError:
+			exit('The classifier has not been trained')
 
-			# If none of the features give any information: return None
-			if features.getnnz() == 0:
+
+
+
+	def predict(self, sentence):
+
+		""" Predicts the label of the given sentence
+
+		Arguments:
+		----------
+			sentence:
+				type: string
+				info: text to classify
+
+		Returns:
+		----------
+			label:
+				type: string / None
+				info: predicted sentence label
+		"""
+
+		try:
+			feats = self.vectorizer.transform([sentence])
+			feats = self.selector.transform(feats)
+
+			# If none of the features give any information
+			if feats.getnnz() == 0:
 				return None
-			else:
-				return self.model.predict(features)[0]
+
+			return self.model.predict(feats)[0]
 
 		except AttributeError:
-			exit('The classifier needs to be trained first')
+			exit('The classifier has not been trained')
 
 
 
 
-	""" Saves a trained model into the models folder """
-	def saveModel(self, models_folder, model_name):
+	def train(self, algorithm, feats_pct, lang, profile_path, validate = True):
 
-		# Joining the paths to create the total model path
-		file_path = os.path.join(models_folder, model_name)
+		""" Trains and stores the specified classification algorithm
+
+		Arguments:
+		----------
+			algorithm:
+				type: string
+				info: name of the algorithm to train
+
+			feats_pct:
+				type: int
+				info: percentage of features to keep
+
+			lang:
+				type: string
+				info: language to perform the tokenizer process
+
+			profile_path:
+				type: string
+				info: relative path to the JSON profile file
+
+			validate:
+				type: bool (optional)
+				info: indicates if the model should be validated
+		"""
+
+		algorithm = algorithm.lower()
+
+		self.__init_attr(algorithm, feats_pct, lang)
 
 		try:
-			# If the folder does not exist: it is created
-			if os.path.exists(models_folder) is False:
-				os.mkdir(models_folder)
+			# Extracting datasets information and output path
+			profile = get_file_json(profile_path)
+			profile_data = profile['datasets']
+			profile_out = profile['output']
 
-			file = open(file_path, 'wb')
-			pickle.dump([self.model, self.selector], file)
-			file.close()
+			# Training process
+			feats_v, labels_v = self.__build_feats(profile_data)
+			self.model.fit(feats_v, labels_v)
 
-			print('Classifier model saved in', file_path)
+			# Validation
+			if validate: self.__validate(algorithm, feats_v, labels_v)
 
-		except IOError:
-			exit('The model cannot be saved in ' + file_path)
+			print('Training process completed')
+			save_object(self, profile_out)
 
-
-
-
-	""" Loads a trained model into our classifier object """
-	def __load_model(self, models_folder, model_name):
-
-		# Joining the paths to create the total model path
-		file_path = os.path.join(models_folder, model_name)
-
-		try:
-			file = open(file_path, 'rb')
-			self.model, self.selector = pickle.load(file)
-			file.close()
-
-			print('Classifier model loaded from', file_path)
-
-		except IOError:
-			exit('The model cannot be loaded from ' + file_path)
+		except KeyError:
+			exit('Invalid JSON keys')

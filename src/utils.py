@@ -2,6 +2,8 @@
 
 
 import json
+import os
+import pickle
 import re
 
 from matplotlib import pyplot
@@ -251,6 +253,65 @@ def get_tweet_text(tweet):
 		tweet = tweet['retweeted_status']
 
 	return tweet['text']
+
+
+
+
+def load_object(file_path):
+
+	""" Loads an object from the specified file
+
+	Arguments:
+		----------
+		file_path:
+			type: string
+			info: file path to the saved object
+
+	Returns:
+	----------
+		obj:
+			type: dict
+			info: dictionary containing the object information
+	"""
+
+	try:
+		file = open(file_path, 'rb')
+		obj = pickle.load(file)
+		file.close()
+
+		return obj
+
+	except IOError:
+		exit('The object could not be loaded from ' + file_path)
+
+
+
+
+def save_object(obj, file_path):
+
+	""" Saves an object in the specified path
+
+	Arguments:
+	----------
+		obj:
+			type: object
+			info: instance of a class that will be serialized
+
+		file_path:
+			type: string
+			info: file path to the saving location
+	"""
+
+	try:
+		# Directory creation in case it did not exist
+		os.makedirs(file_path, exist_ok = True)
+
+		file = open(file_path, 'wb')
+		pickle.dump(obj.__dict__, file)
+		file.close()
+
+	except IOError:
+		exit('The object could not be saved in ' + file_path)
 
 
 
