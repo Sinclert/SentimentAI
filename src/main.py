@@ -17,7 +17,6 @@ from utils_files import get_file_json
 from utils_files import save_object
 
 from utils_misc import draw_pie_chart
-from utils_misc import filter_text
 
 
 # Default CLI modes
@@ -124,13 +123,13 @@ def search_data(query, lang, depth, output):
 
 
 
-def predict_user(user, filter_word, profile_path):
+def predict_user(user_id, filter_word, profile_path):
 
 	""" Prepares arguments to predict Twitter account tweets labels
 
 	Arguments:
 	----------
-		user:
+		user_id:
 			type: string
 			info: Twitter user account without the '@'
 
@@ -150,11 +149,14 @@ def predict_user(user, filter_word, profile_path):
 		token_secret = U_K['token_secret']
 	)
 
-	tweets = miner.get_user_tweets(user)
+	tweets = miner.get_user_tweets(
+		user = user_id,
+		word = filter_word.lower()
+	)
+
 	results = Counter()
 
 	for tweet in tweets:
-		tweet = filter_text(tweet, filter_word)
 		label = h_clf.predict(tweet)
 		if label is not None: results[label] += 1
 

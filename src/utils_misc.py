@@ -139,35 +139,6 @@ def draw_pie_chart(i, labels, colors, counters, title):
 
 
 
-def filter_text(text, word):
-
-	""" Filters the text sentences given a word
-
-	Arguments:
-	----------
-		text:
-			type: string (lowercase)
-			info: text which may have several sentences
-
-		word:
-			type: string (lowercase)
-			info: string which is going to be used to filter
-
-	Returns:
-	----------
-		text:
-			type: string
-			info: text containing the sentences in which the word is present
-	"""
-
-	sentences = re.split('[.:!?]\s+', text)
-	sentences = filter(lambda s: word in s, sentences)
-
-	return '. '.join(sentences)
-
-
-
-
 def get_tweet_text(tweet):
 
 	""" Reads the lines of a file and returns them inside a list

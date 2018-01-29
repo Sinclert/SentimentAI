@@ -58,7 +58,7 @@ class TwitterMiner(object):
 
 
 
-	def get_user_tweets(self, user, depth = 1000):
+	def get_user_tweets(self, user, word, depth = 1000):
 
 		""" Generator that returns the 'depth' most recent user tweets
 
@@ -67,6 +67,10 @@ class TwitterMiner(object):
 			user:
 				type: string
 				info: Twitter user account without the '@'
+
+			word:
+				type: string (lowercase)
+				info: word used to filter the tweets
 
 			depth:
 				type: int (optional)
@@ -91,7 +95,7 @@ class TwitterMiner(object):
 				tweet_text = get_tweet_text(tweet)
 				tweet_text = clean_text(tweet_text)
 
-				yield tweet_text
+				if word in tweet_text: yield tweet_text
 
 		except TweepError:
 			exit('Unable to retrieve tweets from ' + user)
