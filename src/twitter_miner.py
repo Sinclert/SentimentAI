@@ -80,7 +80,12 @@ class TwitterMiner(object):
 		"""
 
 		try:
-			cursor = Cursor(self.API.user_timeline, user, count = 200)
+			cursor = Cursor(
+				method = self.API.user_timeline,
+				user_id = user,
+				count = 200,
+				tweet_mode = 'extended'
+			)
 
 			for tweet in cursor.items(depth):
 				tweet_text = get_tweet_text(tweet)
@@ -120,7 +125,13 @@ class TwitterMiner(object):
 		"""
 
 		try:
-			cursor = Cursor(self.API.search, query, lang, count = 100)
+			cursor = Cursor(
+				method = self.API.search,
+				q = query,
+				lang = lang,
+				count = 100,
+				tweet_mode = 'extended'
+			)
 
 			for tweet in cursor.items(depth):
 				tweet_text = get_tweet_text(tweet)

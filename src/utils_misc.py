@@ -175,8 +175,8 @@ def get_tweet_text(tweet):
 	Arguments:
 	----------
 		tweet:
-			type: dict
-			info: dictionary containing all the fields of a tweet
+			type: Status object
+			info: contains all the attributes of a tweet
 
 	Returns:
 	----------
@@ -185,7 +185,10 @@ def get_tweet_text(tweet):
 			info: original tweet text
 	"""
 
-	if tweet.get('retweeted_status'):
-		tweet = tweet['retweeted_status']
+	if hasattr(tweet, 'retweeted_status'):
+		tweet = tweet.retweeted_status
 
-	return tweet['text']
+	try:
+		return tweet.full_text
+	except AttributeError:
+		return tweet.text

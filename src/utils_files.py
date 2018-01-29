@@ -197,16 +197,12 @@ def save_object(obj, file_name, file_type):
 
 
 
-def store_texts(texts, file_name, min_length = 0):
+def store_texts(file_name, min_length = 0):
 
-	""" Appends the specified texts at the end of the given file
+	""" Coroutine that appends the received text at the end of a file
 
 	Arguments:
 	----------
-		texts:
-			type: list
-			info: strings to be appended at the end of the file
-
 		file_name:
 			type: string
 			info: appendable file name
@@ -224,7 +220,8 @@ def store_texts(texts, file_name, min_length = 0):
 	try:
 		file = open(file_path, 'a', encoding = 'utf-8')
 
-		for text in texts:
+		while True:
+			text = yield
 			if len(text) >= min_length: file.write(text + '\n')
 
 		file.close()

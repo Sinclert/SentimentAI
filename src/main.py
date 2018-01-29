@@ -107,13 +107,19 @@ def search_data(query, lang, depth, output):
 		token_secret = U_K['token_secret']
 	)
 
-	miner.search_tweets(
+	text_producer = miner.search_tweets(
 		query = query,
 		lang = lang,
 		depth = depth
 	)
 
-	store_texts([], output) # TODO
+	text_consumer = store_texts(output)
+	next(text_consumer)
+
+	for text in text_producer:
+		text_consumer.send(text)
+
+	text_consumer.close()
 
 
 
