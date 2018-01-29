@@ -17,6 +17,49 @@ project_paths = {
 
 
 
+def append_text(file_name, min_length = 0):
+
+	""" Coroutine that appends the received text at the end of a file
+
+	Arguments:
+	----------
+		file_name:
+			type: string
+			info: appendable file name
+
+		min_length:
+			type: int (optional)
+			info: minimum length to append a text to the file
+
+	Yield:
+	----------
+		text:
+			type: string
+			info: text to append in the file
+	"""
+
+	file_path = get_abs_path(file_name, 'dataset')
+
+	file_dir = file_path.replace(file_name, '')
+	os.makedirs(file_dir, exist_ok = True)
+
+	try:
+		file = open(file_path, 'a', encoding = 'utf-8')
+
+		try:
+			while True:
+				text = yield
+				if len(text) >= min_length: file.write(text + '\n')
+
+		finally:
+			file.close()
+
+	except IOError:
+		exit('The file ' + file_path + ' cannot be opened')
+
+
+
+
 def get_abs_path(file_name, file_type):
 
 	""" Reads the lines of a file and returns them inside a list
@@ -193,38 +236,3 @@ def save_object(obj, file_name, file_type):
 
 	except IOError:
 		exit('The object could not be saved in ' + file_path)
-
-
-
-
-def store_texts(file_name, min_length = 0):
-
-	""" Coroutine that appends the received text at the end of a file
-
-	Arguments:
-	----------
-		file_name:
-			type: string
-			info: appendable file name
-
-		min_length:
-			type: int (optional)
-			info: minimum length to append a text to the file
-	"""
-
-	file_path = get_abs_path(file_name, 'dataset')
-
-	file_dir = file_path.replace(file_name, '')
-	os.makedirs(file_dir, exist_ok = True)
-
-	try:
-		file = open(file_path, 'a', encoding = 'utf-8')
-
-		while True:
-			text = yield
-			if len(text) >= min_length: file.write(text + '\n')
-
-		file.close()
-
-	except IOError:
-		exit('The file ' + file_path + ' cannot be opened')

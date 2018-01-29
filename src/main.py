@@ -12,9 +12,9 @@ from twitter_stream import TwitterListener
 
 from twitter_keys import USER_KEYS as U_K
 
+from utils_files import append_text
 from utils_files import get_file_json
 from utils_files import save_object
-from utils_files import store_texts
 
 from utils_misc import draw_pie_chart
 from utils_misc import filter_text
@@ -113,7 +113,7 @@ def search_data(query, lang, depth, output):
 		depth = depth
 	)
 
-	text_consumer = store_texts(output)
+	text_consumer = append_text(output)
 	next(text_consumer)
 
 	for text in text_producer:
