@@ -4,7 +4,7 @@
 from nltk.stem import SnowballStemmer
 from nltk.tokenize import TweetTokenizer
 
-from utils_files import get_file_lines
+from utils_files import read_lines
 
 
 languages = {
@@ -59,7 +59,7 @@ class TextTokenizer(object):
 			strip_handles = True
 		)
 
-		self.stopwords = set(get_file_lines(
+		self.stopwords = set(read_lines(
 			file_name = lang + '.txt',
 			file_type = 'stopwords'
 		))

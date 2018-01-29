@@ -3,7 +3,7 @@
 
 from clf_node import NodeClassif
 
-from utils_files import get_file_json
+from utils_files import read_json
 from utils_misc import check_keys
 
 
@@ -49,7 +49,7 @@ class HierarchicalClassif(object):
 				info: name of the JSON predicting profile file
 		"""
 
-		profile = get_file_json(
+		profile = read_json(
 			file_name = profile_name,
 			file_type = 'profile_p'
 		)

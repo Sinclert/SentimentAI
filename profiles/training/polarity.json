@@ -1,10 +1,10 @@
 [
 	{
-		"dataset_file": "neutral.txt",
+		"dataset_name": "neutral.txt",
 		"dataset_label": "neutral"
 	},
 	{
-		"dataset_file": "polarized.txt",
+		"dataset_name": "polarized.txt",
 		"dataset_label": "polarized"
 	}
 ]

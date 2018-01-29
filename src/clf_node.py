@@ -16,7 +16,7 @@ from sklearn.model_selection import cross_val_score
 
 from text_tokenizer import TextTokenizer
 
-from utils_files import get_file_lines
+from utils_files import read_lines
 from utils_files import load_object
 
 
@@ -142,10 +142,10 @@ class NodeClassif(object):
 		labels = []
 
 		for info in datasets_info:
-			name = info['dataset_file']
+			name = info['dataset_name']
 			label = info['dataset_label']
 
-			sentences = get_file_lines(
+			sentences = read_lines(
 				file_name = name,
 				file_type = 'dataset'
 			)

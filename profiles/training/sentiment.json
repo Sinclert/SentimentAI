@@ -1,10 +1,10 @@
 [
 	{
-		"dataset_file": "negative.txt",
+		"dataset_name": "negative.txt",
 		"dataset_label": "negative"
 	},
 	{
-		"dataset_file": "positive.txt",
+		"dataset_name": "positive.txt",
 		"dataset_label": "positive"
 	}
 ]

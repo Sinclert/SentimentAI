@@ -38,7 +38,7 @@ def append_text(file_name, min_length = 0):
 			info: text to append in the file
 	"""
 
-	file_path = get_abs_path(file_name, 'dataset')
+	file_path = compute_path(file_name, 'dataset')
 
 	file_dir = file_path.replace(file_name, '')
 	os.makedirs(file_dir, exist_ok = True)
@@ -60,7 +60,7 @@ def append_text(file_name, min_length = 0):
 
 
 
-def get_abs_path(file_name, file_type):
+def compute_path(file_name, file_type):
 
 	""" Reads the lines of a file and returns them inside a list
 
@@ -96,79 +96,6 @@ def get_abs_path(file_name, file_type):
 
 
 
-
-def get_file_lines(file_name, file_type):
-
-	""" Reads the lines of a file and returns them inside a list
-
-	Arguments:
-	----------
-		file_name:
-			type: string
-			info: readable file name
-
-		file_type:
-			type: string
-			info: used to determine the proper path
-
-	Returns:
-	----------
-		lines:
-			type: list
-			info: file lines (separated by the new line character)
-	"""
-
-	file_path = get_abs_path(file_name, file_type)
-
-	try:
-		file = open(file_path, 'r', encoding = 'utf-8')
-		lines = file.read().splitlines()
-		file.close()
-
-		return lines
-
-	except IOError:
-		exit('The file ' + file_name + ' cannot be opened')
-
-
-
-
-def get_file_json(file_name, file_type):
-
-	""" Reads the lines of a file and returns them inside a list
-
-	Arguments:
-	----------
-		file_name:
-			type: string
-			info: readable file name
-
-		file_type:
-			type: string
-			info: used to determine the proper path
-
-	Returns:
-	----------
-		json_dict:
-			type: dict
-			info: dictionary containing the parsed JSON file
-	"""
-
-	file_path = get_abs_path(file_name, file_type)
-
-	try:
-		file = open(file_path, 'r', encoding = 'utf-8')
-		json_dict = json.load(file)
-		file.close()
-
-		return json_dict
-
-	except IOError:
-		exit('The file ' + file_name + ' cannot be opened')
-
-
-
-
 def load_object(file_name, file_type):
 
 	""" Loads an object from the specified file
@@ -190,7 +117,7 @@ def load_object(file_name, file_type):
 			info: dictionary containing the object information
 	"""
 
-	file_path = get_abs_path(file_name, file_type)
+	file_path = compute_path(file_name, file_type)
 
 	try:
 		file = open(file_path, 'rb')
@@ -224,7 +151,7 @@ def save_object(obj, file_name, file_type):
 			info: used to determine the proper path
 	"""
 
-	file_path = get_abs_path(file_name, file_type)
+	file_path = compute_path(file_name, file_type)
 
 	file_dir = file_path.replace(file_name, '')
 	os.makedirs(file_dir, exist_ok = True)
@@ -236,3 +163,75 @@ def save_object(obj, file_name, file_type):
 
 	except IOError:
 		exit('The object could not be saved in ' + file_path)
+
+
+
+
+def read_json(file_name, file_type):
+
+	""" Reads the lines of a file and returns them inside a list
+
+	Arguments:
+	----------
+		file_name:
+			type: string
+			info: readable file name
+
+		file_type:
+			type: string
+			info: used to determine the proper path
+
+	Returns:
+	----------
+		json_dict:
+			type: dict
+			info: dictionary containing the parsed JSON file
+	"""
+
+	file_path = compute_path(file_name, file_type)
+
+	try:
+		file = open(file_path, 'r', encoding = 'utf-8')
+		json_dict = json.load(file)
+		file.close()
+
+		return json_dict
+
+	except IOError:
+		exit('The file ' + file_name + ' cannot be opened')
+
+
+
+
+def read_lines(file_name, file_type):
+
+	""" Reads the lines of a file and returns them inside a list
+
+	Arguments:
+	----------
+		file_name:
+			type: string
+			info: readable file name
+
+		file_type:
+			type: string
+			info: used to determine the proper path
+
+	Returns:
+	----------
+		lines:
+			type: list
+			info: file lines (separated by the new line character)
+	"""
+
+	file_path = compute_path(file_name, file_type)
+
+	try:
+		file = open(file_path, 'r', encoding = 'utf-8')
+		lines = file.read().splitlines()
+		file.close()
+
+		return lines
+
+	except IOError:
+		exit('The file ' + file_name + ' cannot be opened')
