@@ -140,9 +140,11 @@ class TwitterListener(StreamListener):
         if hasattr(tweet, 'retweeted_status'):
             tweet = tweet.retweeted_status
 
-        try:
-            return tweet.full_text
-        except AttributeError:
+        if hasattr(tweet, 'extended_tweet'):
+            tweet = tweet.extended_tweet
+            return tweet['full_text']
+
+        else:
             return tweet.text
 
 

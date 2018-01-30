@@ -114,7 +114,7 @@ class TwitterMiner(object):
 		try:
 			cursor = Cursor(
 				method = self.API.user_timeline,
-				user_id = user,
+				id = user,
 				count = 200,
 				tweet_mode = 'extended'
 			)
