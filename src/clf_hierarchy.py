@@ -26,9 +26,9 @@ class HierarchicalClassif(object):
 				- clf_object (NodeClassif)
 				- clf_children (dict)
 
-		labels:
+		colors:
 			type: dict
-			info: labels with their hexadecimal colors
+			info: RGB color (value) of each label (key)
 	"""
 
 
@@ -56,7 +56,7 @@ class HierarchicalClassif(object):
 
 		try:
 			self.tree = profile['tree']
-			self.labels = profile['labels']
+			self.colors = profile['colors']
 
 			self.__load_clf(self.tree)
 
@@ -117,7 +117,7 @@ class HierarchicalClassif(object):
 		"""
 
 		try:
-			return self.labels.keys()
+			return self.colors.keys()
 		except AttributeError:
 			exit('Invalid JSON labels structure')
 
@@ -136,7 +136,7 @@ class HierarchicalClassif(object):
 		"""
 
 		try:
-			return self.labels.values()
+			return self.colors.values()
 		except AttributeError:
 			exit('Invalid JSON labels structure')
 
@@ -167,5 +167,5 @@ class HierarchicalClassif(object):
 			node = node['clf_children'][label]
 			label = node['clf_object'].predict(sentence)
 
-		if label is None: print(sentence, "(Unknown label)")
+		if label is None: print(sentence, '(Unknown label)')
 		return label

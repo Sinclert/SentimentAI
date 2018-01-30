@@ -256,7 +256,7 @@ def save_object(obj, file_name, file_type):
 
 def read_json(file_name, file_type):
 
-	""" Reads the lines of a file and returns them inside a list
+	""" Reads a JSON file and returns it as a dictionary
 
 	Arguments:
 	----------

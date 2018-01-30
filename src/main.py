@@ -7,9 +7,11 @@ from collections import Counter
 
 from clf_node import NodeClassif
 from clf_hierarchy import HierarchicalClassif
+
+from figures import FiguresDrawer
+
 from twitter_miner import TwitterMiner
 from twitter_stream import TwitterListener
-
 from twitter_keys import USER_KEYS as U_K
 
 from utils import append_text
@@ -158,7 +160,12 @@ def predict_user(user_id, filter_word, profile_path):
 		label = h_clf.predict(tweet)
 		if label is not None: results[label] += 1
 
-	print(results)
+	FiguresDrawer.draw_pie(
+		counter = results,
+		labels = h_clf.get_labels(),
+		colors = h_clf.get_colors(),
+		title = user_id + ' on ' + filter_word
+	)
 
 
 
