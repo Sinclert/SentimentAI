@@ -4,6 +4,7 @@
 import json
 import os
 import pickle
+import re
 
 
 project_paths = {
@@ -13,6 +14,34 @@ project_paths = {
 	'profile_p': ['profiles', 'predicting'],
 	'stopwords': ['resources', 'stopwords'],
 }
+
+
+cleaning_filters = [
+    {
+        'pattern': 'http\S+',
+        'replace': ''
+    },
+    {
+        'pattern': '#',
+        'replace': ''
+    },
+	{
+        'pattern': '&\w+;',
+        'replace': ''
+    },
+    {
+        'pattern':
+            '[\U00002600-\U000027B0'
+            '\U0001F300-\U0001F64F'
+            '\U0001F680-\U0001F6FF'
+            '\U0001F910-\U0001F919]+',
+        'replace': ''
+    },
+    {
+        'pattern': '\s+',
+        'replace': ' '
+    },
+]
 
 
 
@@ -56,6 +85,64 @@ def append_text(file_name, min_length = 0):
 
 	except IOError:
 		exit('The file ' + file_path + ' cannot be opened')
+
+
+
+
+def check_keys(keys, data_struct, error):
+
+	""" Checks if all the keys are present in the data structure
+
+	Arguments:
+	----------
+		keys:
+			type: list
+			info: elements which must be in the data structure
+
+		data_struct:
+			type: set / dictionary
+			info: data structure to check existence
+
+		error:
+			type: string
+			info: error message to print
+	"""
+
+	if not all(k in data_struct for k in keys):
+		exit(error)
+
+
+
+
+def clean_text(text, filters = cleaning_filters):
+
+	""" Cleans the text applying regex substitution specified by the filters
+
+	Arguments:
+	----------
+		text:
+		    type: string
+		    info: text where the regex substitutions will be applied
+
+		filters:
+		    type: list
+		    info: list containing dictionaries with the following keys:
+		        1. pattern (regular expression)
+				2. replace (string)
+
+	Returns:
+	----------
+		text:
+			type: string
+			info: lowercase cleaned text
+	"""
+
+	for f in filters:
+		text = re.sub(f['pattern'], f['replace'], text)
+
+	text = text.lower()
+	text = text.strip()
+	return text
 
 
 

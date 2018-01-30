@@ -12,11 +12,9 @@ from twitter_stream import TwitterListener
 
 from twitter_keys import USER_KEYS as U_K
 
-from utils_files import append_text
-from utils_files import read_json
-from utils_files import save_object
-
-from utils_misc import draw_pie_chart
+from utils import append_text
+from utils import read_json
+from utils import save_object
 
 
 # Default CLI modes
@@ -209,20 +207,6 @@ def predict_stream(buffer_size, tracks, langs, coordinates, profile_path):
 	tracks = tracks.split(', ')
 	langs = langs.split(', ')
 	listener.start_stream(tracks, langs, coordinates)
-
-
-	from matplotlib import pyplot, animation
-
-	# Animate the graph each milliseconds interval
-	# ani = animation.FuncAnimation(
-	# 	fig = figure,
-	# 	func = draw_pie_chart,
-	# 	interval = 500,
-	# 	fargs = (labels, tracks, listener.stream_dict)
-	# )
-	# pyplot.show()
-
-	listener.finish_stream()
 
 
 

@@ -1,8 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
 
-import numpy
-
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_selection import chi2
 from sklearn.feature_selection import SelectPercentile
@@ -16,8 +14,8 @@ from sklearn.model_selection import cross_val_score
 
 from text_tokenizer import TextTokenizer
 
-from utils_files import read_lines
-from utils_files import load_object
+from utils import read_lines
+from utils import load_object
 
 
 algorithms = {
@@ -153,20 +151,17 @@ class NodeClassif(object):
 			feats.extend(sentences)
 			labels.extend([label] * len(sentences))
 
-		feats_v = numpy.array(feats)
-		labels_v = numpy.array(labels)
-
 		# Sentences are transformed using tokenization and selection
-		feats_v = self.vectorizer.fit_transform(feats_v)
-		feats_v = self.selector.fit_transform(feats_v, labels)
+		feats = self.vectorizer.fit_transform(feats)
+		feats = self.selector.fit_transform(feats, labels)
 
-		return feats_v, labels_v
+		return feats, labels
 
 
 
 
 	@staticmethod
-	def __validate(algorithm, feats_v, labels_v, cv_folds = 10):
+	def __validate(algorithm, feats, labels, cv_folds = 10):
 
 		""" Validates the trained algorithm using CV and F1 score
 
@@ -176,11 +171,11 @@ class NodeClassif(object):
 				type: string (lowercase)
 				info: name of any valid classification algorithm
 
-			feats_v:
+			feats:
 				type: numpy.array
 				info: vector containing all the sentences features
 
-			labels_v:
+			labels:
 				type: numpy.array
 				info: vector contains all the sentences labels
 
@@ -189,12 +184,12 @@ class NodeClassif(object):
 				info: number of cross validation folds
 		"""
 
-		labels_v = LabelEncoder().fit_transform(labels_v)
+		labels = LabelEncoder().fit_transform(labels)
 
 		results = cross_val_score(
 			estimator = clone(algorithms[algorithm]),
-			X = feats_v,
-			y = labels_v,
+			X = feats,
+			y = labels,
 			scoring = 'f1',
 			cv = cv_folds
 		)
@@ -286,14 +281,14 @@ class NodeClassif(object):
 		self.__init_attr(algorithm, feats_pct, lang)
 
 		# Training process
-		feats_v, labels_v = self.__build_feats(profile_data)
-		self.model.fit(feats_v, labels_v)
+		feats, labels = self.__build_feats(profile_data)
+		self.model.fit(feats, labels)
 
 		# Validation process
 		if validate: self.__validate(
 			algorithm = algorithm,
-			feats_v = feats_v,
-			labels_v = labels_v
+			feats = feats,
+			labels = labels
 		)
 
 		print('Training process completed')

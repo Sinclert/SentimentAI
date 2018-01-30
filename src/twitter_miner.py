@@ -8,15 +8,14 @@ from tweepy import TweepError
 
 from twitter_keys import APP_KEYS
 
-from utils_misc import clean_text
-from utils_misc import get_tweet_text
+from utils import clean_text
 
 
 
 
 class TwitterMiner(object):
 
-	""" Represents a Twitter data miner
+	""" Represents a Twitter REST API data miner
 
 	Attributes:
 	----------
@@ -58,6 +57,35 @@ class TwitterMiner(object):
 
 
 
+	@staticmethod
+	def get_text(tweet):
+
+		""" Extracts the text from a Status object (tweet)
+
+		Arguments:
+		----------
+			tweet:
+				type: Status object
+				info: contains all the attributes of a tweet
+
+		Returns:
+		----------
+			text:
+				type: string
+				info: original tweet text
+		"""
+
+		if hasattr(tweet, 'retweeted_status'):
+			tweet = tweet.retweeted_status
+
+		try:
+			return tweet.full_text
+		except AttributeError:
+			return tweet.text
+
+
+
+
 	def get_user_tweets(self, user, word, depth = 1000):
 
 		""" Generator that returns the 'depth' most recent user tweets
@@ -92,7 +120,7 @@ class TwitterMiner(object):
 			)
 
 			for tweet in cursor.items(depth):
-				tweet_text = get_tweet_text(tweet)
+				tweet_text = self.get_text(tweet)
 				tweet_text = clean_text(tweet_text)
 
 				if word in tweet_text: yield tweet_text
@@ -138,7 +166,7 @@ class TwitterMiner(object):
 			)
 
 			for tweet in cursor.items(depth):
-				tweet_text = get_tweet_text(tweet)
+				tweet_text = self.get_text(tweet)
 				tweet_text = clean_text(tweet_text)
 
 				yield tweet_text

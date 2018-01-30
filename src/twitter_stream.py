@@ -11,15 +11,14 @@ from tweepy import TweepError
 
 from twitter_keys import APP_KEYS
 
-from utils_misc import clean_text
-from utils_misc import get_tweet_text
+from utils import clean_text
 
 
 
 
 class TwitterListener(StreamListener):
 
-    """ Represents a Twitter stream listener
+    """ Represents a Twitter Streaming listener
 
     Attributes:
     ----------
@@ -120,6 +119,35 @@ class TwitterListener(StreamListener):
 
 
 
+    @staticmethod
+    def get_text(tweet):
+
+        """ Extracts the text from a Status object (tweet)
+
+		Arguments:
+		----------
+			tweet:
+				type: Status object
+				info: contains all the attributes of a tweet
+
+		Returns:
+		----------
+			text:
+				type: string
+				info: original tweet text
+		"""
+
+        if hasattr(tweet, 'retweeted_status'):
+            tweet = tweet.retweeted_status
+
+        try:
+            return tweet.full_text
+        except AttributeError:
+            return tweet.text
+
+
+
+
     def start_stream(self, queries, langs, coordinates, timeout = 15):
 
         """ Starts the Twitter stream
@@ -184,7 +212,7 @@ class TwitterListener(StreamListener):
 		        info: dict object containing all the fields of a tweet
         """
 
-        tweet_text = get_tweet_text(tweet)
+        tweet_text = self.get_text(tweet)
         tweet_text = clean_text(tweet_text)
 
         label = self.clf.predict(tweet_text)
