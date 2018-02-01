@@ -201,19 +201,29 @@ def predict_stream(buffer_size, tracks, langs, coordinates, profile_path):
 			info: relative path to the JSON profile file
 	"""
 
-	h_cls = HierarchicalClassif(profile_path)
+	h_clf = HierarchicalClassif(profile_path)
 
 	listener = TwitterListener(
 		token_key = U_K['token_key'],
 		token_secret = U_K['token_secret'],
 		buffer_size = buffer_size,
-		clf = h_cls
+		clf = h_clf
 	)
 
-	# Start the Twitter stream
+	# Start the stream
 	tracks = tracks.split(', ')
 	langs = langs.split(', ')
 	listener.start_stream(tracks, langs, coordinates)
+
+	FiguresDrawer.animate_pie(
+		counter = listener.counters,
+		labels = h_clf.get_labels(),
+		colors = h_clf.get_colors(),
+		title = 'Stream on ' + str(tracks)
+	)
+
+	# Finish the stream when the graph is closed
+	listener.finish_stream()
 
 
 
