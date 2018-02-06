@@ -1,9 +1,13 @@
 # Sentiment AI 📊
 
-This project contains some of the code I used in my CS Bachelor's thesis research. Its main goal is to provide a simple sentiment analysis tool that can be used joinly with the Twitter API in order to classify tweets into the different categories (<i>"positive"</i>, <i>"negative"</i> or <i>"neutral"</i>), depending on the sentiment the author/s want to express. In order to perform this classification, Machine Learning (ML) algorithms from the <a href="http://scikit-learn.org/stable/">Scikit-learn</a> library have been used.
-<br><br>
-Additionally, there is a hosted web application that uses Python packages such as <a href="http://flask.pocoo.org/docs/0.12/">Flask</a> and <a href="http://gunicorn.org">Gunicorn</a>, in addition to some trained ML models, to provide an accesible graphical interface.
-<br><br>
+This project is based on the code used in my CS Bachelor's thesis research. Its main goal is to provide a simple way of training ML models to perform classification over tweets (using Twitter APIs). The models can be combined, using a JSON configuration file, in order to build a hierarchical classifier in the shape of a tree, where nodes are trained models and leaves are the different categories.<br>
+
+<br>
+
+Althought the models could be trained using datasets of very different nature, one of the most straightforward applications is to build a sentiment analysis hierarchical classifier. This particular classification example is hosted online using packages such as Flask and Gunicorn, to show the project potential capabilities.<br>
+
+<br>
+
 <b><a target="_blank" href="https://sentiment-ai-183521.appspot.com">Check out the Web Application here!</a></b>
 
 <br>
@@ -11,137 +15,207 @@ Additionally, there is a hosted web application that uses Python packages such a
 ## How does it work?
 
 ### General scheme:
-<img src="https://github.com/Sinclert/SentimentAI/blob/master/Images/Project%20scheme.png"/>
+<img src="resources/images/project_steps.png"/>
 
-On the one hand, we need to train ML models:<br>
-<b>1. Datasets:</b> they are obtained from the <a href="http://www.nltk.org">NLTK</a> corpus.<br>
-<b>2. Datasets Preprocessing:</b> remove stopwords, transform every word into lower case...<br>
-<b>3. Features vectors:</b> features are vectorized.<br>
-<b>4. Features selection:</b> using <a href="http://www.nltk.org">NLTK</a> Chi-square scoring, get the most relevant features (indicated by a percentage).<br>
-<b>5. Training:</b> using <a href="http://scikit-learn.org/stable/">Scikit-learn</a> algorithms (Bernoulli Naïve Bayes, Logistic Regression, Linear SVM & Random Forest).<br>
+First of all,  the ML models are trained:<br>
+<b>1. Datasets:</b> they are text files containing one sentence per row.<br>
+<b>2. Sentences cleaning:</b> tokenize, remove stopwords and extract the lemma of each word.<br>
+<b>3. Features vectors:</b> build feature vectors using unigrams (words) and bigrams (pairs of words).<br>
+<b>4. Features selection:</b> get the most informative features (input percentage) using chi-square test.<br>
+<b>5. Filter features:</b> filter the current features leaving only the most informative ones.<br>
+<b>6. Train classifier:</b> use Scikit-learn algorithms:<br>
+- <i>Bernoulli Naïve Bayes.</i><br>
+- <i>Logistic Regression.</i><br>
+- <i>Linear Support Vector Machine.</i><br>
+- <i>Random Forest (100 trees).</i><br>
+
 <br>
-On the other hand, we need to extract the tweets we want to classify:<br>
-<b>6. Tweets extraction:</b> obtain tweets using <a href="http://www.tweepy.org">Tweepy</a>.<br>
-<b>7. Tweets preprocessing:</b> remove stopwords, transform everything into lower case...<br>
-<b>8. Features vectors:</b> they are built and prepared to be classified.<br>
-<b>9. Classification:</b> the trained models assign a label to them.<br>
+
+Secondly, the tweets are extracted and processed:<br>
+<b>7. Tweets extraction:</b> obtain tweets from Twitter APIs using Tweepy.<br>
+<b>8. Tweets preprocessing:</b> tokenize, remove stopwords and extract the lemma of each word.<br>
+<b>9. Features vectors:</b> build feature vectors using unigrams (words) and bigrams (pairs of words).<br>
+<b>10. Filter features:</b> filter the current features leaving only the most informative ones.<br>
+
+<br>
+
+Finally, the classification is performed:<br>
+<b>11. Classification:</b> the trained models classify the vector of features into one of the final categories.<br>
 
 <br>
 
 ### Classification process:
-In order to classify tweets among 3 possible labels, the project is designed to perform a hierarchical classification, instead of a multilabel one. This approach makes more sense considering the domain in which we are classifying:
-<br>
-<img src="https://github.com/Sinclert/SentimentAI/blob/master/Images/Classification%20scheme.png" width="500" height="400"/>
-
-Using this method, it is important to realize that there exist 2 types of ML models:
-- <b>Polarity models:</b> classify between <i>"Neutral"</i> and <i>"Polarized"</i> categories.
-- <b>Sentiment models:</b> classify between <i>"Positive"</i> and <i>"Negative"</i> categories.
+The classification is performed in a hierarchical way. This means that the trained models are placed in the nodes of a tree, and depending on how the upper models classify a given piece of information, it will follow one branch or another.<br>
 
 <br>
 
-### Considered ML algorithms:
-From all the ML algorithms, only a set of them were trained and compared to each other using their <a href="https://en.wikipedia.org/wiki/F1_score">F-scores</a>. These algorithms were considered <b>without modifying any of the Scikit learn default parameters</b>, but in the case of Random Forest (number of trees incresed up to 100):
-1. Bernoulli Naïve Bayes.
-2. Linear SVM.
-3. Logistic Regression.
-4. Random Forest (k = 100).
+The advantages os this approach over a classic multi-label category are:<br>
+- There could be different classifier algorithms as nodes, depending on which one perform best.<br>
+- The set of most informative features is specific for each label-to-label differentiation.<br>
 
 <br>
 
-### ML algorithms evaluation:
-The evaluation and comparison among the different models in order to find out which is the one that better solves this classification problem has been done using <b>10 Folds Cross Validation</b>. This method divides the training sets in 10 folds, performing 10 training iterations where 9 are used for training and only 1 for testing.
-<br><br>
-Additionally, choosing a good fitness metric is basic to perform a good comparison. In this project, the chosen metric has been the <b>F-score</b>. This measure is better than common accuracy because it considers unbalance classification between labels (<a href="https://www.r-bloggers.com/accuracy-versus-f-score-machine-learning-for-the-rna-polymerases/">Explanation here</a>)
+Following with the sentiment analysis case, there are 3 possible categories: neutral, positive and negative. They are represented as leaves in the classification tree, so once the assigned category to the text is one of those, the process is over. The classification tree would have this shape:<br>
+
+<img src="resources/images/hierarchical_clf.png" width="500" height="400"/>
+
+In order to build a this custom classification tree, a JSON file with the following structure is required:
+
+```json
+    {
+        "tree": {
+            "clf_file": "subjetivity.pickle",
+            "clf_object": null,
+            "clf_children": {
+                "polarized": {
+                    "clf_file": "sentiment.pickle",
+                    "clf_object": null,
+                    "clf_children": {}
+                }
+            }
+        },
+        "colors": {
+            "neutral": [0.6, 0.6, 0.6],
+            "negative": [0.8, 0.0, 0.0],
+            "positive": [0.0, 0.8, 0.0]
+        }
+    }
+```
+
+<br>
+
+
+### Models evaluation:
+The evaluation of the different models (defined by algorithm and percentage of informative features) is done using <b>10 Folds Cross Validation</b>. This method divides the datasets in 10 folds, performing 10 iterations where 9 are used for training and 1 for testing. Finally, the mean of the results is calculated.<br>
+
+<br>
+
+However, the evaluation procedure is not the only relevant factor to decide, choosing a good fitness metric is crucial to perform a good comparison. In this project, the evaluation metric is the <b>F-score</b>, which is better than common accuracy because it considers unbalance classification between categories (Explanation here).<br>
 
 <br>
 
 ## What is in the repository?
 The repository contains:
 
-- <b>Datasets folder:</b> contains the NLTK datasets.
-- <b>Evaluations folder:</b> contains the F-scores of the different ML algorithms.
-- <b>Stopwords folder:</b> contains the stop words of different languages.
-- <b>Evaluate.sh:</b> shell script that performs the evaluation, saving the results in the <i>"Evaluations"</i> folder.
-- <b>Python files:</b> contains the code supporting the functionalities. The most relevant file is <i>"Parser.py"</i> because is the one you will need to execute. The relation among them and the different folders is as follows:
-
-<img src="https://github.com/Sinclert/SentimentAI/blob/master/Images/Architecture.png"/>
+- <b>Evaluation folder:</b> contains a shell script to evaluate algorithms with different features percentages.<br>
+- <b>Models folder:</b> contains the trained models.<br>
+- <b>Profiles folder:</b> contrains configuration files:<br>
+  - <b>Predicting folder:</b> contains files for building a hierarchical classifier from individual models.<br>
+  - <b>Training folder:</b> contains files for training a model from specific datasets.<br>
+- <b>Resources folder:</b><br>
+  - <b>Datasets folder:</b> contains datasets to train models.<br>
+  - <b>Images folder:</b> constains the images for this README.<br>
+  - <b>Stopwords folder:</b> contains lists of language specific non-relevant words to filter.<br>
+- <b>Source folder:</b> contains the code. The files could be grouped into different categories depending on their responsability:<br>
+  - <b>Classification files:</b> using Scikit-learn<br>
+    - <i> clf_hierarchy.py</i><br>
+    - <i> clf_node.py</i><br>
+  - <b>Data mining files:</b> using Tweepy<br>
+    - <i> twitter_miner.py</i><br>
+    - <i> twitter_stream.py</i><br>
+  - <b>Data representation:</b> using Matplotlib<br>
+    - <i> figures.py</i><br>
+  - <b>Text_processing:<b> using NLTK<br>
+    - <i>text_processing.py</i><br>
 
 <br>
 
 ## Usage:
 
-<b>DISCLAIMER:</b> Before using some of the following functionalities, you will need to provide application and user keys in the <i>"Keys.py"</i> file. They can be obtained by <b>creating a <a href="https://apps.twitter.com">Twitter Application</a></b> (necessary to use the Twitter API).
+<b>DISCLAIMER:</b> Before using some of the following functionalities, you need to provide Twitter application and user keys in the <i>"twitter_keys.py"</i> file. They can be obtained by <b>creating a Twitter Application</b>.<br>
+
 <br>
-<br>
-The main file from which all functionalities are called is <i>"Parser.py"</i>. The execute syntax is as follows:
+
+The main file from which all functionalities are called is <i>"main.py"</i>. The execution syntax is as follows:
 ```shell
-$ python3 Parser.py <Functionality> <Arguments> 
+$ python3 main.py <functionality> <args> 
 ```
 
-Depending on the chosen functionality, the arguments are different. Here is the list of possible functionalities:
+Depending on the chosen functionality, the arguments are different. List of possible functionalities:
 
 <br>
 
 ### Train a model:
-Trained models are saved in the <i>"Models"</i> folder (created if it does not exist). The expected arguments are:
-- <b>-n classifier_name:</b> {Naive-Bayes, Logistic-Regression, Linear-SVM, Random-Forest}
-- <b>-d dataset_1 dataset_2:</b> Files inside "Datasets" containing the training examples.
-- <b>-f features:</b> Percentage of most relevant features to keep.
-- <b>-o output:</b> Name of the output model.
+Trains a models and saves it inside the <i>"models"</i> folder. The expected arguments are:<br>
+- <b>-a algorithm:</b> {naive-bayes, logistic-regression, linear-svm, random-forest}.<br>
+- <b>-f features percentage:</b> percentage of most informative features to keep.<br>
+- <b>-l language:</b> language of the datasets sentences.<br>
+- <b>-o output:</b> name of the output model.<br>
+- <b>-p training profile:</b> JSON file specifying the datasets name and associated label. The datasets must be placed inside the <i>"profiles/training"</i> folder. Example:<br>
 
-Example:
+```json
+[
+   {
+      "dataset_name": "neutral.txt",
+      "dataset_label": "neutral"
+   },
+   {
+      "dataset_name": "polarized.txt",
+      "dataset_label": "polarized"
+   }
+]
+```
+
+Command line sxample:
 ```shell
-$ python3 Parser.py train -n Logistic-Regression -d Positive.txt Negative.txt -f 5 -o Pos-Neg
+$ ... main.py train_clf -a Logistic-Regression -f 2 -l english -o polarity.pickle -p polarity.json
 ```
 
 <br>
 
 ### Search for tweets:
-In this case the <a href="https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets">Twitter Search API</a> is used to search for tweets fulfilling a specific query and build a different dataset. The expected arguments are:
-- <b>-q query:</b> words or hashtags that the tweets must contain.
-- <b>-l language:</b> language in which the tweets are searched.
-- <b>-d search_depth:</b> number of tweets to retrieve.
-- <b>-o output:</b> name of the output file containing all the tweets.
+Retrieves tweets using Twitter Search API and saves them inside <i>resources/datasets</i>. The expected arguments are:<br>
 
-Example:
+- <b>-q query:</b> words or hashtags that the tweets must contain.<br>
+- <b>-l language:</b> language of the retrieved tweets.<br>
+- <b>-d search_depth:</b> number of tweets to retrieve.<br>
+- <b>-o output:</b> name of the output file containing all the tweets.<br>
+
+<br>
+
+Command line example:
 ```shell
-$ python3 Parser.py search -q '#optimistic OR #happy' -l en -d 1000 -o PosTweets.txt
+$ ... search_data -q "#excited OR #happy -filter:retweets" -l en -d 1000 -o pos_search.txt
 ```
 
 <br>
 
-### Classify account tweets:
-In this case, the <a href="https://developer.twitter.com/en/docs/tweets/timelines/api-reference/get-statuses-user_timeline">Twitter REST API</a> is used to extract historic tweets from one specific account, and classify them using a pair of ML models (one polarity model and one sentiment model). The expected arguments are:
-- <b>-p polarity_classifier:</b> polarity trained model.
-- <b>-s sentiment_classifier:</b> sentiment trained model.
-- <b>-a account:</b> Twitter account to analyse.
-- <b>-w filter_word:</b> word that has to be present in the retrieved tweets.
+### Predict user tweets:
+Predicts the category of historic user tweets filtered by word using the Twitter REST API. The prediction is performed using a hierarchical classifier defined by a profile file inside <i>profile/predicting</i>. The expected arguments are:<br>
 
-Example:
+- <b>-u user:</b> user account name (without the '@').<br>
+- <b>-w filter word:</b> word that has to be present in the retrieved tweets.<br>
+- <b>-p profile:</b> JSON specifying the hierarhical classification tree (inside <i>profile/predicting</i>).<br>
+
+<br>
+
+Command line example:
 ```shell
-$ python3 Parser.py classify -p Neu-Pol -s Pos-Neg -a David_Cameron -w brexit
+$ ... predict_user -u david_cameron -w brexit -p sentiment.json
 ```
 
 <br>
 
-### Classify real-time tweets:
-In this case, the <a href="https://developer.twitter.com/en/docs/tweets/filter-realtime/api-reference/post-statuses-filter">Twitter Streaming API</a> is used to extract real time tweets from one specific location, and classify them using a pair of ML models (one polarity model and one sentiment model). The expected arguments are:
-- <b>-p polarity_classifier:</b> polarity trained model.
-- <b>-s sentiment_classifier:</b> sentiment trained model.
-- <b>-b buffer_size:</b> number of tweets to represent into a live graph.
-- <b>-w filter_word:</b> word that has to be present in the retrieved tweets.
-- <b>-l language:</b> language of the retrieved tweets.
-- <b>-c coord_1 coord_2 coord_3 coord_4:</b> coordinates of the desired location. <b>Tip:</b> use <a href="https://developers.google.com/maps/documentation/geocoding/intro">Google Geocoding API</a>
+### Predict real-time tweets:
+Predicts the category of real time tweets filtered by word and location using the Twitter Streaming API. The prediction is performed using a hierarchical classifier tree. The expected arguments are:<br>
 
-Example:
+- <b>-s buffer size:</b> number of tweets to represent in a live graph.<br>
+- <b>-t filtered word:</b> word that has to be present in the retrieved tweets.<br>
+- <b>-l language:</b> language of the retrieved tweets.<br>
+- <b>-c coord_1 coord_2 coord_3 coord_4:</b> coordinates of the desired location.<br>
+- <b>-p profile:</b> JSON specifying the hierarhical classification tree (inside <i>profile/predicting</i>)<br>
+
+<br>
+
+Command line example:
 ```shell
-$ python3 Parser.py stream -p Neu-Pol -s Pos-Neg -b 500 -w Obama -l en -c -122 36 -121 38
+$ ... predict_stream -s 500 -t Trump -l en -c -122.75 36.8 -121.75 37.8 -p sentiment.json
 ```
 
 <br>
 
 ## Requirements:
-This project uses Python 3 interpreter 🐍. Furthermore, additional packages are needed to perform all the steps in the ML training model process. These packages are:
+This project requires the Python 3.4 (or superior) 🐍 , as long as some additional packages such as:<br>
 - <a href="https://matplotlib.org">Matplotlib</a>
 - <a href="http://www.nltk.org">NLTK</a>
 - <a href="http://www.numpy.org">Numpy</a>
