@@ -6,6 +6,7 @@ Althought the models could be trained using datasets of very different nature, o
 
 <b><a target="_blank" href="https://sentiment-ai-183521.appspot.com">Check out the Web Application here!</a></b>
 
+<br>
 
 ## How does it work?
 
@@ -32,20 +33,21 @@ Secondly, the tweets are extracted and processed:
 <b>9. Features vectors:</b> build feature vectors using unigrams (words) and bigrams (pairs of words).<br>
 <b>10. Filter features:</b> filter the current features leaving only the most informative ones.<br>
 
+
+Finally, the classification is performed:
+
+<b>11. Classification:</b> the trained models classify the vector of features into one of the final categories.
+
 <br>
 
-Finally, the classification is performed:<br>
-<b>11. Classification:</b> the trained models classify the vector of features into one of the final categories.<br>
-
-
 ### Classification process:
-The classification is performed in a hierarchical way. This means that the trained models are placed in the nodes of a tree, and depending on how the previous models have classified a given piece of information, it will follow one branch or another.
+The classification is performed in a hierarchical way. This means that the trained models are placed in the nodes of a tree, and depending on how the previous models classify a given piece of information, it will follow one branch or another.
 
-The advantages os this approach over a classic multi-label classification are:<br>
-- There could be different model algorithms as nodes, depending on which one perform best.<br>
-- The set of most informative features is specific for each label-to-label differentiation.<br>
+The <b>advantages</b> of this approach over a classic multi-label classification are:
+- There could be different model algorithms as nodes, depending on which one perform best.
+- The set of most informative features is specific for each label-to-label differentiation.
 
-Following with the sentiment analysis case, there are 3 possible categories: neutral, positive and negative. They are represented as leaves in the classification tree, so once the assigned category is one of those, the process is over. The classification tree would have this shape:<br>
+Following with the sentiment analysis case, there are 3 possible categories: <i>neutral</i>, <i>positive</i> and <i>negative</i>. They are represented as leaves in the classification tree, so once the assigned category is one of those, the process is over. The classification tree would have this shape:
 
 <img src="resources/images/hierarchical_clf.png" width="500" height="500"/>
 
@@ -72,17 +74,19 @@ In order to build a this custom classification tree, a JSON file with the follow
 }
 ```
 
+<br>
 
 ### Models evaluation:
 The evaluation of the different models (defined by algorithm and percentage of informative features) is done using <b>10 Folds Cross Validation</b>. This method divides the datasets in 10 folds, performing 10 iterations where 9 are used for training and 1 for testing. Finally, the mean of the results is calculated.
 
 However, the evaluation procedure is not the only relevant factor to decide, choosing a good fitness metric is crucial to perform a good comparison. In this project, the evaluation metric is the <b>F-score</b>, which is better than common accuracy because it considers unbalance classification among categories (<a href="https://www.r-bloggers.com/accuracy-versus-f-score-machine-learning-for-the-rna-polymerases/">Explanation here</a>).
 
+<br>
 
 ## What is in the repository?
 The repository contains:
 
-- <b>Evaluation folder:</b> contains a shell script to evaluate algorithms with different features percentages.
+- <b>Evaluation folder:</b> contains a shell script to automatically evaluate algorithms.
 
 - <b>Models folder:</b> contains the trained models.
 
@@ -95,7 +99,7 @@ The repository contains:
   - <b>Images folder:</b> constains the images for this README.
   - <b>Stopwords folder:</b> contains lists of language specific non-relevant words to filter.
 
-- <b>Source folder:</b> contains the code. The files could be grouped into different categories depending on their responsability:
+- <b>Source folder:</b> contains the code. The files could be grouped depending on their responsability:
   - <b>Classification files:</b> using Scikit-learn.
     - <i> clf_hierarchy.py</i>
     - <i> clf_node.py</i>
@@ -107,6 +111,7 @@ The repository contains:
   - <b>Text_processing:</b> using NLTK
     - <i>text_processing.py</i>
 
+<br>
 
 ## Usage:
 <b>DISCLAIMER:</b> Before using some of the following functionalities, you need to provide Twitter application and user keys in the <i>"twitter_keys.py"</i> file. They can be obtained by <b>creating a Twitter Application</b>.
@@ -118,7 +123,9 @@ $ python3 main.py <functionality> <args>
 
 Depending on the chosen functionality, the arguments are different. List of possible functionalities:
 
-### Train a model:
+<br>
+
+### A) Train a model:
 Trains a models and saves it inside the <i>"models"</i> folder. The expected arguments are:
 - <b>-a algorithm:</b> {naive-bayes, logistic-regression, linear-svm, random-forest}.
 - <b>-f features percentage:</b> percentage of most informative features to keep.
@@ -144,8 +151,9 @@ Command line example:
 $ ... main.py train_clf -a Logistic-Regression -f 2 -l english -o polarity.pickle -p polarity.json
 ```
 
+<br>
 
-### Search for tweets:
+### B) Search for tweets:
 Retrieves tweets using Twitter Search API and saves them inside <i>resources/datasets</i>. The expected arguments are:
 - <b>-q query:</b> words or hashtags that the tweets must contain.
 - <b>-l language:</b> language of the retrieved tweets.
@@ -157,8 +165,9 @@ Command line example:
 $ ... search_data -q "#excited OR #happy -filter:retweets" -l en -d 1000 -o pos_search.txt
 ```
 
+<br>
 
-### Predict user tweets:
+### C) Predict user tweets:
 Predicts the category of historic user tweets filtered by word using the Twitter REST API. The prediction is performed using a hierarchical classifier defined by a profile file inside <i>profile/predicting</i>. The expected arguments are:
 - <b>-u user:</b> user account name (without the '@').
 - <b>-w filter word:</b> word that has to be present in the retrieved tweets.
@@ -169,8 +178,9 @@ Command line example:
 $ ... predict_user -u david_cameron -w brexit -p sentiment.json
 ```
 
+<br>
 
-### Predict real-time tweets:
+### D) Predict real-time tweets:
 Predicts the category of real time tweets filtered by word and location using the Twitter Streaming API. The prediction is performed using a hierarchical classifier tree. The expected arguments are:
 - <b>-s buffer size:</b> number of tweets to represent in a live graph.
 - <b>-t filtered word:</b> word that has to be present in the retrieved tweets.
@@ -184,6 +194,7 @@ Command line example:
 $ ... predict_stream -s 500 -t Trump -l en -c -122.75 36.8 -121.75 37.8 -p sentiment.json
 ```
 
+<br>
 
 ## Requirements:
 This project requires Python 3.4 (or superior) 🐍 , as long as some additional packages such as:<br>
