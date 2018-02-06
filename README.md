@@ -114,7 +114,7 @@ The repository contains:
 <br>
 
 ## Usage:
-<b>DISCLAIMER:</b> Before using some of the following functionalities, you need to provide Twitter application and user keys in the <i>"twitter_keys.py"</i> file. They can be obtained by <b>creating a Twitter Application</b>.
+<b>DISCLAIMER:</b> Before using some of the following functionalities, you need to provide Twitter application and user keys in the <i>"twitter_keys.py"</i> file. They can be obtained by <b>creating a <a href="https://apps.twitter.com">Twitter Application</a></b>.
 
 The main file from which all functionalities are called is <i>"main.py"</i>. The execution syntax is as follows:
 ```shell
