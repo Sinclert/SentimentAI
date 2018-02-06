@@ -115,7 +115,7 @@ The repository contains:
     - <i> twitter_stream.py</i><br>
   - <b>Data representation:</b> using Matplotlib<br>
     - <i> figures.py</i><br>
-  - <b>Text_processing:<b> using NLTK<br>
+  - <b>Text_processing:</b> using NLTK<br>
     - <i>text_processing.py</i><br>
 
 <br>
@@ -215,7 +215,7 @@ $ ... predict_stream -s 500 -t Trump -l en -c -122.75 36.8 -121.75 37.8 -p senti
 <br>
 
 ## Requirements:
-This project requires the Python 3.4 (or superior) 🐍 , as long as some additional packages such as:<br>
+This project requires Python 3.4 (or superior) 🐍 , as long as some additional packages such as:<br>
 - <a href="https://matplotlib.org">Matplotlib</a>
 - <a href="http://www.nltk.org">NLTK</a>
 - <a href="http://www.numpy.org">Numpy</a>
