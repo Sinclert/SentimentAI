@@ -56,7 +56,7 @@ In order to build a this custom classification tree, a JSON file with the follow
 ```json
 {
     "tree": {
-        "clf_file": "subjetivity.pickle",
+        "clf_file": "subjectivity.pickle",
         "clf_object": null,
         "clf_children": {
             "polarized": {
@@ -148,7 +148,7 @@ Trains a models and saves it inside the <i>"models"</i> folder. The expected arg
 
 Command line example:
 ```shell
-$ ... main.py train_clf -a Logistic-Regression -f 2 -l english -o polarity.pickle -p polarity.json
+$ ... main.py train_clf -a Logistic-Regression -f 2 -l english -o subjectivity.pickle -p subjectivity.json
 ```
 
 <br>
