@@ -56,7 +56,7 @@ In order to build a this custom classification tree, a JSON file with the follow
 ```json
 {
     "tree": {
-        "clf_file": "subjetivity.pickle",
+        "clf_file": "subjectivity.pickle",
         "clf_object": null,
         "clf_children": {
             "polarized": {
