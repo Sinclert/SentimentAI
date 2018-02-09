@@ -118,10 +118,10 @@ The repository contains:
 
 The main file from which all functionalities are called is <i>"main.py"</i>. The execution syntax is as follows:
 ```shell
-$ python3 main.py <functionality> <args> 
+$ python3 main.py <mode> <args> 
 ```
 
-Depending on the chosen functionality, the arguments are different. List of possible functionalities:
+Depending on the chosen mode ({<i>train_model</i>, <i>search_data</i>, <i>predict_user</i>, <i>predict_stream</i>}), the following arguments are different:
 
 <br>
 
@@ -148,7 +148,7 @@ Trains a models and saves it inside the <i>"models"</i> folder. The expected arg
 
 Command line example:
 ```shell
-$ ... main.py train_clf -a Logistic-Regression -f 2 -l english -o polarity.pickle -p polarity.json
+$ ... train_model -a Logistic-Regression -f 2 -l english -o polarity.pickle -p polarity.json
 ```
 
 <br>

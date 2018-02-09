@@ -21,7 +21,7 @@ from utils import save_object
 
 # Default CLI modes
 modes = [
-	'train_clf',
+	'train_model',
 	'search_data',
 	'predict_user',
 	'predict_stream',
@@ -30,7 +30,7 @@ modes = [
 
 
 
-def train_clf(algorithm, feats_pct, lang, output, profile_name):
+def train_model(algorithm, feats_pct, lang, output, profile_name):
 
 	""" Prepares arguments to train and saves a NodeClassif object
 
@@ -235,7 +235,7 @@ if __name__ == '__main__':
 		description =
 			'modes and arguments:\n'
 		    '  \n'
-		    '  train_clf: trains and store the specified ML alg\n'
+		    '  train_model: trains and store the specified ML algorithm\n'
 		    '            -a <algorithm name>\n'
 		    '            -f <features percentage>\n'
 		    '            -l <language>\n'
@@ -267,7 +267,7 @@ if __name__ == '__main__':
 	arg, func_args = global_parser.parse_known_args()
 
 
-	if arg.mode == 'train_clf':
+	if arg.mode == 'train_model':
 
 		parser = Parser(usage = "Use 'main.py -h' for help")
 		parser.add_argument('-a', required = True)
@@ -277,7 +277,7 @@ if __name__ == '__main__':
 		parser.add_argument('-p', required = True)
 
 		args = parser.parse_args(func_args)
-		train_clf(args.a, args.f, args.l, args.o, args.p)
+		train_model(args.a, args.f, args.l, args.o, args.p)
 
 
 	elif arg.mode == 'search_data':
