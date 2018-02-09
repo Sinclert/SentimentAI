@@ -121,7 +121,7 @@ The main file from which all functionalities are called is <i>"main.py"</i>. The
 $ python3 main.py <mode> <args> 
 ```
 
-Depending on the chosen mode ({<i>train_model</i>, <i>search_data</i>, <i>predict_user</i>, <i>predict_stream</i>}), the following arguments are different:
+Depending on the chosen mode (<i>train_model</i>, <i>search_data</i>, <i>predict_user</i>, <i>predict_stream</i>), the following arguments are different. The required arguments depending on the selected mode are specified in the next sections:
 
 <br>
 
