@@ -96,20 +96,11 @@ The repository contains:
 
 - <b>Resources folder:</b>
   - <b>Datasets folder:</b> contains datasets to train models.
-  - <b>Images folder:</b> constains the images for this README.
+  - <b>Images folder:</b> contains the images for this README.
   - <b>Stopwords folder:</b> contains lists of language specific non-relevant words to filter.
 
 - <b>Source folder:</b> contains the code. The files could be grouped depending on their responsability:
-  - <b>Classification files:</b> using Scikit-learn.
-    - <i> clf_hierarchy.py</i>
-    - <i> clf_node.py</i>
-  - <b>Data mining files:</b> using Tweepy
-    - <i> twitter_miner.py</i>
-    - <i> twitter_stream.py</i>
-  - <b>Data representation:</b> using Matplotlib
-    - <i> figures.py</i>
-  - <b>Text_processing:</b> using NLTK
-    - <i>text_processing.py</i>
+<img src="resources/images/python_modules.png"/>
 
 <br>
 
