@@ -8,7 +8,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.svm import LinearSVC
 from sklearn.ensemble import RandomForestClassifier as RandomForest
-from sklearn.preprocessing import LabelEncoder
 from sklearn.base import clone
 from sklearn.model_selection import cross_val_score
 
@@ -172,11 +171,11 @@ class NodeClassif(object):
 				info: name of any valid classification algorithm
 
 			feats:
-				type: numpy.array
+				type: numpy.array / list
 				info: vector containing all the sentences features
 
 			labels:
-				type: numpy.array
+				type: numpy.array / list
 				info: vector contains all the sentences labels
 
 			cv_folds:
@@ -184,13 +183,11 @@ class NodeClassif(object):
 				info: number of cross validation folds
 		"""
 
-		labels = LabelEncoder().fit_transform(labels)
-
 		results = cross_val_score(
 			estimator = clone(algorithms[algorithm]),
 			X = feats,
 			y = labels,
-			scoring = 'f1',
+			scoring = 'f1_weighted',
 			cv = cv_folds
 		)
 
