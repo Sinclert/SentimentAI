@@ -1,6 +1,6 @@
 {
     "tree": {
-        "clf_file": "polarity.pickle",
+        "clf_file": "subjectivity.pickle",
         "clf_object": null,
         "clf_children": {
             "polarized": {
