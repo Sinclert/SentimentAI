@@ -5,7 +5,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_selection import chi2
 from sklearn.feature_selection import SelectPercentile
 from sklearn.linear_model import LogisticRegression
-from sklearn.naive_bayes import BernoulliNB
+from sklearn.naive_bayes import MultinomialNB
 from sklearn.svm import LinearSVC
 from sklearn.ensemble import RandomForestClassifier as RandomForest
 from sklearn.base import clone
@@ -19,7 +19,7 @@ from utils import load_object
 
 algorithms = {
 	"logistic-regression": LogisticRegression(),
-	"naive-bayes": BernoulliNB(),
+	"naive-bayes": MultinomialNB(),
 	"linear-svc": LinearSVC(),
 	"random-forest": RandomForest(n_estimators = 100, n_jobs = -1)
 }
