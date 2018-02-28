@@ -126,7 +126,7 @@ def build_filters(words, words_prob, basic_filters = default_filters):
 
 	for word in words:
 		prob_filters.append({
-			'pattern': '(^|\s)' + word + '(\s|$)',
+			'pattern': '(^|\s)' + word + '(\W|$)',
 			'replace': ' ',
 			'prob': words_prob
 		})
@@ -197,6 +197,8 @@ def clean_text(text, filters = default_filters):
 			info: lowercase cleaned text
 	"""
 
+	text = text.lower()
+
 	try:
 		# Substitution based on a given probability
 		for f in filters['probabilistic']:
@@ -212,7 +214,6 @@ def clean_text(text, filters = default_filters):
 		exit('The filters do not have the correct format')
 
 
-	text = text.lower()
 	text = text.strip()
 	return text
 

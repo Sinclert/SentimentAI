@@ -135,7 +135,7 @@ class TwitterMiner(object):
 
 
 
-	def search_tweets(self, query, lang, filter_prob = 90, depth = 1000):
+	def search_tweets(self, query, lang, filter_prob = 95, depth = 1000):
 
 		""" Generator that returns the 'depth' most recent user tweets
 
