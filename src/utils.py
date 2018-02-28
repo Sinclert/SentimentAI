@@ -4,44 +4,52 @@
 import json
 import os
 import pickle
+import random
 import re
 
 
 project_paths = {
 	'dataset': ['resources', 'datasets'],
 	'model': ['models'],
-	'profile_t': ['profiles', 'training'],
 	'profile_p': ['profiles', 'predicting'],
-	'stopwords': ['resources', 'stopwords'],
+	'profile_t': ['profiles', 'training'],
+	'stopwords': ['resources', 'stopwords']
 }
 
 
-cleaning_filters = [
-    {
-        'pattern': 'http\S+',
-        'replace': ''
-    },
-    {
-        'pattern': '#',
-        'replace': ''
-    },
-	{
-        'pattern': '&\w+;',
-        'replace': ''
-    },
-    {
-        'pattern':
-            '[\U00002600-\U000027B0'
-            '\U0001F300-\U0001F64F'
-            '\U0001F680-\U0001F6FF'
-            '\U0001F910-\U0001F919]+',
-        'replace': ''
-    },
-    {
-        'pattern': '\s+',
-        'replace': ' '
-    },
-]
+default_filters = {
+	'probabilistic': [],
+	'deterministic': [
+		{
+			'pattern': 'http\S+',
+			'replace': ''
+		},
+		{
+			'pattern': '(^|\s)@\w+',
+			'replace': ' -USER-'
+		},
+		{
+			'pattern': '#',
+			'replace': ''
+		},
+		{
+			'pattern': '&\w+;',
+			'replace': ''
+		},
+		{
+			'pattern':
+				'[\U00002600-\U000027B0'
+				'\U0001F300-\U0001F64F'
+				'\U0001F680-\U0001F6FF'
+				'\U0001F910-\U0001F919]+',
+			'replace': ''
+		},
+		{
+			'pattern': '\s+',
+			'replace': ' '
+		},
+	]
+}
 
 
 
@@ -89,6 +97,51 @@ def append_text(file_name, min_length = 0):
 
 
 
+def build_filters(words, words_prob, basic_filters = default_filters):
+
+	""" Builds a probabilistic list of filters and appends it to a given one
+
+		Arguments:
+		----------
+			words:
+				type: list
+				info: words to subtract given a probability
+
+			words_prob:
+				type: int
+				info: probability in which the words are subtracted
+
+			basic_filters:
+				type: dict (optional)
+				info: basic dictionary to which append the built one
+
+	Returns:
+	----------
+		filters:
+			type: dict
+			info: contains the probabilistic filters in addition to the basic
+	"""
+
+	prob_filters = []
+
+	for word in words:
+		prob_filters.append({
+			'pattern': '(^|\s)' + word + '(\s|$)',
+			'replace': ' ',
+			'prob': words_prob
+		})
+
+
+	try:
+		basic_filters['probabilistic'] = prob_filters
+		return basic_filters
+
+	except TypeError:
+		exit('The basic filters object is not a dictionary')
+
+
+
+
 def check_keys(keys, data_struct, error):
 
 	""" Checks if all the keys are present in the data structure
@@ -114,21 +167,28 @@ def check_keys(keys, data_struct, error):
 
 
 
-def clean_text(text, filters = cleaning_filters):
+def clean_text(text, filters = default_filters):
 
 	""" Cleans the text applying regex substitution specified by the filters
 
 	Arguments:
 	----------
 		text:
-		    type: string
-		    info: text where the regex substitutions will be applied
+			type: string
+			info: text where the regex substitutions will be applied
 
 		filters:
-		    type: list
-		    info: list containing dictionaries with the following keys:
-		        1. pattern (regular expression)
-				2. replace (string)
+			type: dict (optional)
+			info: dictionary containing the following lists:
+
+				1. probabilistic: entries are dictionaries with keys:
+					- pattern (regex)
+					- replace (string)
+					- prob (int)
+
+				2. deterministic: entries are dictionaries with keys:
+					- pattern (regex)
+					- replace (string)
 
 	Returns:
 	----------
@@ -137,8 +197,20 @@ def clean_text(text, filters = cleaning_filters):
 			info: lowercase cleaned text
 	"""
 
-	for f in filters:
-		text = re.sub(f['pattern'], f['replace'], text)
+	try:
+		# Substitution based on a given probability
+		for f in filters['probabilistic']:
+
+			if (random.random() * 100) < f['prob']:
+				text = re.sub(f['pattern'], f['replace'], text)
+
+		# Substitution is always performed
+		for f in filters['deterministic']:
+			text = re.sub(f['pattern'], f['replace'], text)
+
+	except (KeyError, TypeError):
+		exit('The filters do not have the correct format')
+
 
 	text = text.lower()
 	text = text.strip()
@@ -149,7 +221,7 @@ def clean_text(text, filters = cleaning_filters):
 
 def compute_path(file_name, file_type):
 
-	""" Reads the lines of a file and returns them inside a list
+	""" Builds the absolute path to the desired file given its file type
 
 	Arguments:
 	----------
@@ -159,11 +231,11 @@ def compute_path(file_name, file_type):
 
 		file_type:
 			type: string
-			info: used to determine the proper path
+			info: {'dataset', 'model', 'profile_p', 'profile_t', 'stopwords'}
 
 	Returns:
 	----------
-		lines:
+		path:
 			type: string
 			info: absolute path to the desired file
 	"""

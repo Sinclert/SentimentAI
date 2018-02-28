@@ -8,7 +8,11 @@ from tweepy import TweepError
 
 from twitter_keys import APP_KEYS
 
+from utils import build_filters
 from utils import clean_text
+
+
+search_ops = ['AND', 'OR', ':']
 
 
 
@@ -131,7 +135,7 @@ class TwitterMiner(object):
 
 
 
-	def search_tweets(self, query, lang, depth = 1000):
+	def search_tweets(self, query, lang, filter_prob = 10, depth = 1000):
 
 		""" Generator that returns the 'depth' most recent user tweets
 
@@ -144,6 +148,10 @@ class TwitterMiner(object):
 			lang:
 				type: string
 				info: language abbreviation to filter the tweets
+
+			filter_prob:
+				type: int (optional)
+				info: probability in which the query words are kept
 
 			depth:
 				type: int (optional)
@@ -165,9 +173,20 @@ class TwitterMiner(object):
 				tweet_mode = 'extended'
 			)
 
+			# Obtaining the search query words in order to build a filter
+			query_words = query.split(' ')
+			query_words = filter(
+				function = lambda w: not any(op in w for op in search_ops),
+				iterable = query_words
+			)
+
+			# Build a probabilistic filter in order to avoid overfitting
+			search_filters = build_filters(query_words, filter_prob)
+
+
 			for tweet in cursor.items(depth):
 				tweet_text = self.get_text(tweet)
-				tweet_text = clean_text(tweet_text)
+				tweet_text = clean_text(tweet_text, search_filters)
 
 				yield tweet_text
 
