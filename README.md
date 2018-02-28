@@ -21,7 +21,7 @@ First of all, the datasets are processed and the ML models trained:
 <b>4. Features selection:</b> get the most informative features (input percentage) using chi-square test.<br>
 <b>5. Filter features:</b> filter the current features leaving only the most informative ones.<br>
 <b>6. Train classifier:</b> use <a href="http://scikit-learn.org/stable/">Scikit-learn</a> algorithms:<br>
-- <i>Bernoulli Naïve Bayes.</i><br>
+- <i>Multinomial Naïve Bayes.</i><br>
 - <i>Logistic Regression.</i><br>
 - <i>Linear Support Vector Machine.</i><br>
 - <i>Random Forest (100 trees).</i><br>
