@@ -134,7 +134,7 @@ class TwitterListener(StreamListener):
 		----------
 			text:
 				type: string
-				info: original tweet text
+				info: lowercase tweet text
 		"""
 
         if hasattr(tweet, 'retweeted_status'):
@@ -142,10 +142,10 @@ class TwitterListener(StreamListener):
 
         if hasattr(tweet, 'extended_tweet'):
             tweet = tweet.extended_tweet
-            return tweet['full_text']
+            return tweet['full_text'].lower()
 
         else:
-            return tweet.text
+            return tweet.text.lower()
 
 
 

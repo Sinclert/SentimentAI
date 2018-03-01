@@ -76,16 +76,17 @@ class TwitterMiner(object):
 		----------
 			text:
 				type: string
-				info: original tweet text
+				info: lowercase tweet text
 		"""
 
 		if hasattr(tweet, 'retweeted_status'):
 			tweet = tweet.retweeted_status
 
 		try:
-			return tweet.full_text
+			return tweet.full_text.lower()
+
 		except AttributeError:
-			return tweet.text
+			return tweet.text.lower()
 
 
 
@@ -187,6 +188,7 @@ class TwitterMiner(object):
 			for tweet in cursor.items(depth):
 				tweet_text = self.get_text(tweet)
 				tweet_text = clean_text(tweet_text, search_filters)
+				tweet_text = clean_text(tweet_text)
 
 				yield tweet_text
 

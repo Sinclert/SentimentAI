@@ -17,39 +17,42 @@ project_paths = {
 }
 
 
-default_filters = {
-	'probabilistic': [],
-	'deterministic': [
-		{
-			'pattern': 'http\S+',
-			'replace': ''
-		},
-		{
-			'pattern': '(^|\s)@\w+',
-			'replace': ' -USER-'
-		},
-		{
-			'pattern': '#',
-			'replace': ''
-		},
-		{
-			'pattern': '&\w+;',
-			'replace': ''
-		},
-		{
-			'pattern':
-				'[\U00002600-\U000027B0'
-				'\U0001F300-\U0001F64F'
-				'\U0001F680-\U0001F6FF'
-				'\U0001F910-\U0001F919]+',
-			'replace': ''
-		},
-		{
-			'pattern': '\s+',
-			'replace': ' '
-		},
-	]
-}
+default_filters = [
+	{
+		'pattern': 'http\S+',
+		'replace': '',
+		'prob': 100
+	},
+	{
+		'pattern': '(^|\s)@\w+',
+		'replace': ' -USER-',
+		'prob': 100
+	},
+	{
+		'pattern': '#',
+		'replace': '',
+		'prob': 100
+	},
+	{
+		'pattern': '&\w+;',
+		'replace': '',
+		'prob': 100
+	},
+	{
+		'pattern':
+			'[\U00002600-\U000027B0'
+			'\U0001F300-\U0001F64F'
+			'\U0001F680-\U0001F6FF'
+			'\U0001F910-\U0001F919]+',
+		'replace': '',
+		'prob': 100
+	},
+	{
+		'pattern': '\s+',
+		'replace': ' ',
+		'prob': 100
+	},
+]
 
 
 
@@ -97,9 +100,9 @@ def append_text(file_name, min_length = 0):
 
 
 
-def build_filters(words, words_prob, basic_filters = default_filters):
+def build_filters(words, words_prob):
 
-	""" Builds a probabilistic list of filters and appends it to a given one
+	""" Builds a list of probabilistic filters
 
 		Arguments:
 		----------
@@ -111,15 +114,11 @@ def build_filters(words, words_prob, basic_filters = default_filters):
 				type: int
 				info: probability in which the words are subtracted
 
-			basic_filters:
-				type: dict (optional)
-				info: basic dictionary to which append the built one
-
 	Returns:
 	----------
 		filters:
-			type: dict
-			info: contains the probabilistic filters in addition to the basic
+			type: list
+			info: contains the probabilistic filters
 	"""
 
 	prob_filters = []
@@ -131,13 +130,7 @@ def build_filters(words, words_prob, basic_filters = default_filters):
 			'prob': words_prob
 		})
 
-
-	try:
-		basic_filters['probabilistic'] = prob_filters
-		return basic_filters
-
-	except TypeError:
-		exit('The basic filters object is not a dictionary')
+	return prob_filters
 
 
 
@@ -175,20 +168,14 @@ def clean_text(text, filters = default_filters):
 	----------
 		text:
 			type: string
-			info: text where the regex substitutions will be applied
+			info: lowercase text where the regex substitutions will be applied
 
 		filters:
-			type: dict (optional)
-			info: dictionary containing the following lists:
-
-				1. probabilistic: entries are dictionaries with keys:
-					- pattern (regex)
-					- replace (string)
-					- prob (int)
-
-				2. deterministic: entries are dictionaries with keys:
-					- pattern (regex)
-					- replace (string)
+			type: list (optional)
+			info: list containing dictionaries with the following keys:
+				- pattern (regex)
+				- replace (string)
+				- prob (int)
 
 	Returns:
 	----------
@@ -197,25 +184,17 @@ def clean_text(text, filters = default_filters):
 			info: lowercase cleaned text
 	"""
 
-	text = text.lower()
-
 	try:
-		# Substitution based on a given probability
-		for f in filters['probabilistic']:
+		for f in filters:
 
-			if (random.random() * 100) < f['prob']:
+			# In case the replacement must be performed
+			if (f['prob'] == 100) or ((random.random() * 100) < f['prob']):
 				text = re.sub(f['pattern'], f['replace'], text)
 
-		# Substitution is always performed
-		for f in filters['deterministic']:
-			text = re.sub(f['pattern'], f['replace'], text)
+		return text.strip()
 
-	except (KeyError, TypeError):
+	except KeyError:
 		exit('The filters do not have the correct format')
-
-
-	text = text.strip()
-	return text
 
 
 
