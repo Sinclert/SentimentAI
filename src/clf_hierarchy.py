@@ -167,5 +167,7 @@ class HierarchicalClassif(object):
 			node = node['clf_children'][label]
 			label = node['clf_object'].predict(sentence)
 
-		if label is None: print(sentence, '(Unknown label)')
+		if label is None:
+			print(sentence, '(Unknown label)')
+
 		return label

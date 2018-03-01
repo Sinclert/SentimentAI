@@ -29,7 +29,7 @@ eval_files=("LR_eval.txt"
 clf_types=(	"Polarity"
 			"Sentiment")
 
-clf_profiles=(	"polarity.json"
+clf_profiles=(	"subjectivity.json"
 				"sentiment.json")
 
 max_pct=10
@@ -66,13 +66,13 @@ function algorithm_eval() {
 		# For each classifier type (polarized VS sentiment)
 		for ((i = 0 ; i < ${#clf_types[@]} ; i++)); do
 			profile=${clf_profiles[$i]}
-			score=$(python3 ../src/main.py train_clf -a ${algorithm} \
+			score=$(python3 ../src/main.py train_model -a ${algorithm} \
 													 -f ${features_pct} \
 													 -l 'english' \
 													 -o None \
 													 -p ${profile})
 
-			score=$(echo ${score} | cut -d" " -f 3)
+			score=$(echo ${score} | cut -d " " -f 1)
 			echo "		${clf_types[$i]}: $score" >> ${output}
 		done
 	done

@@ -65,14 +65,13 @@ def train_model(algorithm, feats_pct, lang, output, profile_name):
 		file_type = 'profile_t'
 	)
 
-	node_classif = NodeClassif()
-	node_classif.train(
+	node_classif = NodeClassif(
 		algorithm = algorithm.lower(),
 		feats_pct = feats_pct,
 		lang = lang,
-		profile_data = profile_data
 	)
 
+	node_classif.train(profile_data)
 	save_object(node_classif, output, 'model')
 
 

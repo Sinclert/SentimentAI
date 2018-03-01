@@ -8,7 +8,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.svm import LinearSVC
 from sklearn.ensemble import RandomForestClassifier as RandomForest
-from sklearn.base import clone
+from sklearn.pipeline import make_pipeline
 from sklearn.model_selection import cross_val_score
 
 from text_tokenizer import TextTokenizer
@@ -53,7 +53,7 @@ class NodeClassif(object):
 
 
 
-	def __init__(self, file_name = None):
+	def __init__(self, file_name = None, **parameters):
 
 		""" Loads a trained model if specified
 
@@ -62,57 +62,50 @@ class NodeClassif(object):
 			file_name:
 				type: string
 				info: name of the saved model file
+
+			parameters:
+				type: keywords arguments
+				info: the possible keys are:
+
+					- algorithm:
+						type: lowercase string
+						info: name of the algorithm to train
+
+					- feats_pct:
+						type: int
+						info: percentage of features to keep
+
+					- lang:
+						type: string
+						info: language to perform the tokenizer process
 		"""
 
 		if file_name is not None:
 			self.__dict__ = load_object(file_name, 'model')
 
 		else:
-			self.model = None
-			self.selector = None
-			self.vectorizer = None
+
+			try:
+				self.model = algorithms[parameters['algorithm']]
+
+				self.selector = SelectPercentile(
+					score_func = chi2,
+					percentile = parameters['feats_pct']
+				)
+
+				self.vectorizer = CountVectorizer(
+					tokenizer = TextTokenizer(parameters['lang']),
+					ngram_range = (1, 2)
+				)
+
+			except KeyError:
+				exit('Invalid algorithm name')
 
 
 
 
-	def __init_attr(self, algorithm, feats_pct, lang):
-
-		""" Set ups the instance attributes before training
-
-		Arguments:
-		----------
-			algorithm:
-				type: string (lowercase)
-				info: name of the algorithm to train
-
-			feats_pct:
-				type: int
-				info: percentage of features to keep
-
-			lang:
-				type: string
-				info: language to perform the tokenizer process
-		"""
-
-		try:
-			self.model = algorithms[algorithm]
-		except KeyError:
-			exit('Invalid algorithm name')
-
-		self.selector = SelectPercentile(
-			score_func = chi2,
-			percentile = feats_pct
-		)
-
-		self.vectorizer = CountVectorizer(
-			tokenizer = TextTokenizer(lang),
-			ngram_range = (1, 2)
-		)
-
-
-
-
-	def __build_feats(self, datasets_info):
+	@staticmethod
+	def __build_feats(datasets_info):
 
 		""" Builds the feature and label vectors from the specified datasets
 
@@ -126,16 +119,16 @@ class NodeClassif(object):
 
 		Returns:
 		----------
-			feats_v:
-				type: numpy.array
-				info: vector containing all the sentences features
+			samples:
+				type: list
+				info: contains all the sentences
 
-			labels_v:
-				type: numpy.array
-				info: vector contains all the sentences labels
+			samples:
+				type: list
+				info: contains all the sentences labels
 		"""
 
-		feats = []
+		samples = []
 		labels = []
 
 		for info in datasets_info:
@@ -147,50 +140,45 @@ class NodeClassif(object):
 				file_type = 'dataset'
 			)
 
-			feats.extend(sentences)
+			samples.extend(sentences)
 			labels.extend([label] * len(sentences))
 
-		# Sentences are transformed using tokenization and selection
-		feats = self.vectorizer.fit_transform(feats)
-		feats = self.selector.fit_transform(feats, labels)
-
-		return feats, labels
+		return samples, labels
 
 
 
 
-	@staticmethod
-	def __validate(algorithm, feats, labels, cv_folds = 10):
+	def __validate(self, samples, labels, cv_folds = 10):
 
 		""" Validates the trained algorithm using CV and F1 score
 
 		Arguments:
 		----------
-			algorithm:
-				type: string (lowercase)
-				info: name of any valid classification algorithm
-
-			feats:
-				type: numpy.array / list
-				info: vector containing all the sentences features
+			samples:
+				type: list
+				info: contains all the sentences
 
 			labels:
-				type: numpy.array / list
-				info: vector contains all the sentences labels
+				type: list
+				info: contains all the sentences labels
 
 			cv_folds:
 				type: int
 				info: number of cross validation folds
 		"""
 
+		model = make_pipeline(self.vectorizer, self.selector, self.model)
+		print("Validation start")
+
 		results = cross_val_score(
-			estimator = clone(algorithms[algorithm]),
-			X = feats,
+			estimator = model,
+			X = samples,
 			y = labels,
 			scoring = 'f1_weighted',
 			cv = cv_folds
 		)
 
+		print("Validation completed")
 		print('F1 score:', round(results.mean(), 4))
 
 
@@ -248,7 +236,7 @@ class NodeClassif(object):
 
 
 
-	def train(self, algorithm, feats_pct, lang, profile_data, validate = True):
+	def train(self, profile_data, validate = True):
 
 		""" Trains the specified classification algorithm
 
@@ -275,17 +263,15 @@ class NodeClassif(object):
 				info: indicates if the model should be validated
 		"""
 
-		self.__init_attr(algorithm, feats_pct, lang)
+		samples, labels = self.__build_feats(profile_data)
 
-		# Training process
-		feats, labels = self.__build_feats(profile_data)
+		# Samples are transformed into features in order to train
+		feats = self.vectorizer.fit_transform(samples)
+		feats = self.selector.fit_transform(feats, labels)
 		self.model.fit(feats, labels)
 
 		# Validation process
 		if validate: self.__validate(
-			algorithm = algorithm,
-			feats = feats,
+			samples = samples,
 			labels = labels
 		)
-
-		print('Training process completed')
