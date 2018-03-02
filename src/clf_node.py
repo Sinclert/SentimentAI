@@ -68,7 +68,7 @@ class NodeClassif(object):
 				info: the possible keys are:
 
 					- algorithm:
-						type: lowercase string
+						type: string (lowercase)
 						info: name of the algorithm to train
 
 					- feats_pct:
@@ -99,7 +99,7 @@ class NodeClassif(object):
 				)
 
 			except KeyError:
-				exit('Invalid algorithm name')
+				exit('Invalid keyword arguments')
 
 
 
@@ -242,18 +242,6 @@ class NodeClassif(object):
 
 		Arguments:
 		----------
-			algorithm:
-				type: string (lowercase)
-				info: name of the algorithm to train
-
-			feats_pct:
-				type: int
-				info: percentage of features to keep
-
-			lang:
-				type: string
-				info: language to perform the tokenizer process
-
 			profile_data:
 				type: list
 				info: dictionaries containing datasets paths and labels
