@@ -142,7 +142,7 @@ Command line example:
 $ ... train_model -a Logistic-Regression -f 2 -l english -o polarity.pickle -p polarity.json
 ```
 
-<b>Important consideration:</b> In order to avoid Python to freeze both in macOS and Linux when validating the model, it is required to specify the environment variable <i>"JOBLIB_START_METHOD"</i> as <i>"forkserver"</i>. This is required to make used of multiprocessing capabilities, as it is stated in the <a href="http://scikit-learn.org/stable/faq.html">Scikit-learn FAQ</a>.
+<b>Important consideration:</b> In order to avoid Python to freeze both in macOS and Linux when validating the model, it is required to specify the environment variable <i>"JOBLIB_START_METHOD"</i> with the value <i>"forkserver"</i>. This way, the use of the multiprocessing package won't produce any error, as it is explained in the <a href="http://scikit-learn.org/stable/faq.html">Scikit-learn FAQ</a>.
 
 <br>
 
