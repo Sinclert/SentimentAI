@@ -60,7 +60,7 @@ class NodeClassif(object):
 		Arguments:
 		----------
 			file_name:
-				type: string
+				type: string (optional)
 				info: name of the saved model file
 
 			parameters:
@@ -123,7 +123,7 @@ class NodeClassif(object):
 				type: list
 				info: contains all the sentences
 
-			samples:
+			labels:
 				type: list
 				info: contains all the sentences labels
 		"""
@@ -163,7 +163,7 @@ class NodeClassif(object):
 				info: contains all the sentences labels
 
 			cv_folds:
-				type: int
+				type: int (optional)
 				info: number of cross validation folds
 		"""
 

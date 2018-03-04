@@ -210,8 +210,8 @@ class TwitterListener(StreamListener):
         Arguments:
 		----------
 		    tweet:
-		        type: dict
-		        info: dict object containing all the fields of a tweet
+		        type: Status
+		        info: object containing all the fields of a tweet
         """
 
         tweet_text = self.get_text(tweet)

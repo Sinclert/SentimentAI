@@ -36,9 +36,7 @@ class FiguresDrawer(object):
 
 		from matplotlib import pyplot
 
-		sizes = []
-		for label in labels:
-			sizes.append(counter[label])
+		sizes = [counter[label] for label in labels]
 
 		pyplot.pie(
 			x = sizes,
@@ -77,9 +75,7 @@ class FiguresDrawer(object):
 				info: colors RGB codes
 		"""
 
-		sizes = []
-		for label in labels:
-			sizes.append(counter[label])
+		sizes = [counter[label] for label in labels]
 
 		if sum(sizes) > 0:
 
