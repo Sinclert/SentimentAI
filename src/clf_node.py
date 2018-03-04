@@ -168,18 +168,18 @@ class NodeClassif(object):
 		"""
 
 		model = make_pipeline(self.vectorizer, self.selector, self.model)
-		print("Validation start")
+		print('Starting cross-validation')
 
 		results = cross_val_score(
 			estimator = model,
 			X = samples,
 			y = labels,
 			scoring = 'f1_weighted',
-			cv = cv_folds
+			cv = cv_folds,
+			n_jobs = -1
 		)
 
-		print("Validation completed")
-		print('F1 score:', round(results.mean(), 4))
+		print('F-score:', round(results.mean(), 4))
 
 
 
