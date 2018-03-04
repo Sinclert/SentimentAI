@@ -164,7 +164,7 @@ $ ... search_data -q "#excited OR #happy -filter:retweets" -l en -d 1000 -o pos_
 Predicts the category of historic user tweets filtered by word using the Twitter REST API. The prediction is performed using a hierarchical classifier defined by a profile file inside <i>profile/predicting</i>. The expected arguments are:
 - <b>-u user:</b> user account name (without the '@').
 - <b>-w filter word:</b> word that has to be present in the retrieved tweets.
-- <b>-p profile:</b> JSON specifying the hierarhical classification tree (inside <i>profile/predicting</i>).
+- <b>-p profile:</b> JSON specifying the hierarchical classification tree (inside <i>profile/predicting</i>).
 
 Command line example:
 ```shell
@@ -179,7 +179,7 @@ Predicts the category of real time tweets filtered by word and location using th
 - <b>-t filtered word:</b> word that has to be present in the retrieved tweets.
 - <b>-l language:</b> language of the retrieved tweets.
 - <b>-c coord_1 coord_2 coord_3 coord_4:</b> coordinates of the desired location.
-- <b>-p profile:</b> JSON specifying the hierarhical classification tree (inside <i>profile/predicting</i>).
+- <b>-p profile:</b> JSON specifying the hierarchical classification tree (inside <i>profile/predicting</i>).
 
 
 Command line example:

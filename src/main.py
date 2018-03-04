@@ -122,7 +122,7 @@ def search_data(query, lang, depth, output):
 
 
 
-def predict_user(user_id, filter_word, profile_path):
+def predict_user(user_id, filter_word, profile_name):
 
 	""" Prepares arguments to predict Twitter account tweets labels
 
@@ -136,12 +136,12 @@ def predict_user(user_id, filter_word, profile_path):
 			type: string
 			info: word applied to filter all tweets sentences
 
-		profile_path:
+		profile_name:
 			type: string
-			info: relative path to the JSON profile file
+			info: name of the JSON profile file
 	"""
 
-	h_clf = HierarchicalClassif(profile_path)
+	h_clf = HierarchicalClassif(profile_name)
 
 	miner = TwitterMiner(
 		token_key = U_K['token_key'],
@@ -169,7 +169,7 @@ def predict_user(user_id, filter_word, profile_path):
 
 
 
-def predict_stream(buffer_size, tracks, langs, coordinates, profile_path):
+def predict_stream(buffer_size, tracks, langs, coordinates, profile_name):
 
 	""" Prepares arguments to predict Twitter stream tweets labels
 
@@ -195,12 +195,12 @@ def predict_stream(buffer_size, tracks, langs, coordinates, profile_path):
 		        3. North-East longitude
 		        4. North-East latitude
 
-		profile_path:
+		profile_name:
 			type: string
-			info: relative path to the JSON profile file
+			info: name of the JSON profile file
 	"""
 
-	h_clf = HierarchicalClassif(profile_path)
+	h_clf = HierarchicalClassif(profile_name)
 
 	listener = TwitterListener(
 		token_key = U_K['token_key'],
@@ -239,7 +239,7 @@ if __name__ == '__main__':
 		    '            -f <features percentage>\n'
 		    '            -l <language>\n'
 		    '            -o <output name>\n'
-			'            -p <training profile path>\n'
+			'            -p <training profile name>\n'
 			'  \n'
 			'  search_data: stores query tweets into a new dataset\n'
 		    '            -q <search query>\n'
@@ -250,14 +250,14 @@ if __name__ == '__main__':
 		    '  predict_user: analyses tweets of a Twitter account\n'
 		    '            -u <Twitter user>\n'
 		    '            -w <filter word>\n'
-		    '            -p <predicting profile path>\n'
+		    '            -p <predicting profile name>\n'
 		    '  \n'
 		    '  predict_stream: analyses tweets of a Twitter stream\n'
 		    '            -s <buffer size>\n'
 		    '            -t <filter tracks>\n'
 		    '            -l <language codes>\n'
 		    '            -c <coord 1> <coord 2> <coord 3> <coord 4>\n'
-			'            -p <predicting profile path>\n',
+			'            -p <predicting profile name>\n',
 		formatter_class = RawDescriptionHelpFormatter
 	)
 
