@@ -180,20 +180,20 @@ def predict_stream(buffer_size, tracks, langs, coordinates, profile_name):
 			info: size of the labels circular buffer
 
 		tracks:
-		    type: string
+			type: string
 			info: words to filter
 
 		langs:
-		    type: string
-		    info: language codes to filter
+			type: string
+			info: language codes to filter
 
 		coordinates
-		    type: string
-		    info: groups of 4 coordinates to filter, where:
-		        1. South-West longitude
-		        2. South-West latitude
-		        3. North-East longitude
-		        4. North-East latitude
+			type: string
+			info: groups of 4 coordinates to filter, where:
+				1. South-West longitude
+				2. South-West latitude
+				3. North-East longitude
+				4. North-East latitude
 
 		profile_name:
 			type: string
@@ -233,31 +233,31 @@ if __name__ == '__main__':
 		usage = 'main.py [mode] [arguments]',
 		description =
 			'modes and arguments:\n'
-		    '  \n'
-		    '  train_model: trains and store the specified ML algorithm\n'
-		    '            -a <algorithm name>\n'
-		    '            -f <features percentage>\n'
-		    '            -l <language>\n'
-		    '            -o <output name>\n'
-			'            -p <training profile name>\n'
+			'  \n'
+			'  train_model: trains and store the specified ML algorithm\n'
+			'			-a <algorithm name>\n'
+			'			-f <features percentage>\n'
+			'			-l <language>\n'
+			'			-o <output name>\n'
+			'			-p <training profile name>\n'
 			'  \n'
 			'  search_data: stores query tweets into a new dataset\n'
-		    '            -q <search query>\n'
-		    '            -l <language code>\n'
-		    '            -d <search depth>\n'
-		    '            -o <output name>\n'
-		    '  \n'
-		    '  predict_user: analyses tweets of a Twitter account\n'
-		    '            -u <Twitter user>\n'
-		    '            -w <filter word>\n'
-		    '            -p <predicting profile name>\n'
-		    '  \n'
-		    '  predict_stream: analyses tweets of a Twitter stream\n'
-		    '            -s <buffer size>\n'
-		    '            -t <filter tracks>\n'
-		    '            -l <language codes>\n'
-		    '            -c <coord 1> <coord 2> <coord 3> <coord 4>\n'
-			'            -p <predicting profile name>\n',
+			'			-q <search query>\n'
+			'			-l <language code>\n'
+			'			-d <search depth>\n'
+			'			-o <output name>\n'
+			'  \n'
+			'  predict_user: analyses tweets of a Twitter account\n'
+			'			-u <Twitter user>\n'
+			'			-w <filter word>\n'
+			'			-p <predicting profile name>\n'
+			'  \n'
+			'  predict_stream: analyses tweets of a Twitter stream\n'
+			'			-s <buffer size>\n'
+			'			-t <filter tracks>\n'
+			'			-l <language codes>\n'
+			'			-c <coord 1> <coord 2> <coord 3> <coord 4>\n'
+			'			-p <predicting profile name>\n',
 		formatter_class = RawDescriptionHelpFormatter
 	)
 

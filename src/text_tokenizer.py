@@ -23,16 +23,16 @@ class TextTokenizer(object):
 	Attributes:
 	----------
 		lemmatizer:
-		    type: SnowballStemmer
-		    info: use to extract the root of every word
+			type: SnowballStemmer
+			info: use to extract the root of every word
 
 		tokenizer:
-		    type: TweetTokenizer
-		    info: use to split a text into individual tokens
+			type: TweetTokenizer
+			info: use to split a text into individual tokens
 
 		stopwords:
-		    type: set
-		    info: irrelevant words to filter
+			type: set
+			info: irrelevant words to filter
 	"""
 
 

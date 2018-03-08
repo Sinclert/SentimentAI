@@ -24,8 +24,8 @@ class TwitterMiner(object):
 	Attributes:
 	----------
 		API:
-		    type: tweepy.API
-		    info: object used to make connection with Twitter
+			type: tweepy.API
+			info: object used to make connection with Twitter
 	"""
 
 
