@@ -1,18 +1,18 @@
 {
-    "tree": {
-        "clf_file": "subjectivity.pickle",
-        "clf_object": null,
-        "clf_children": {
-            "polarized": {
-                "clf_file": "sentiment.pickle",
-                "clf_object": null,
-                "clf_children": {}
-            }
-        }
-    },
-    "colors": {
-        "neutral": [0.6, 0.6, 0.6],
-        "negative": [0.8, 0.0, 0.0],
-        "positive": [0.0, 0.8, 0.0]
-    }
+	"tree": {
+		"clf_file": "subjectivity.pickle",
+		"clf_object": null,
+		"clf_children": {
+			"polarized": {
+				"clf_file": "sentiment.pickle",
+				"clf_object": null,
+				"clf_children": {}
+			}
+		}
+	},
+	"colors": {
+		"neutral": [0.6, 0.6, 0.6],
+		"negative": [0.8, 0.0, 0.0],
+		"positive": [0.0, 0.8, 0.0]
+	}
 }

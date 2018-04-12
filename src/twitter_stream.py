@@ -88,7 +88,7 @@ class TwitterListener(StreamListener):
 			exit('Unable to create the tweepy API object')
 
 		self.stream = None
-		self.buffer = buffer_size * [None]
+		self.buffer = [None] * buffer_size
 		self.index = 0
 		self.clf = clf
 		self.counters = Counter()

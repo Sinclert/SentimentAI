@@ -32,7 +32,7 @@ class HierarchicalClassif(object):
 	"""
 
 
-	# Class attribute containing the required JSON nodes keys
+	# Required JSON node keys (class attribute)
 	keys = ['clf_file', 'clf_object', 'clf_children']
 
 
@@ -57,7 +57,6 @@ class HierarchicalClassif(object):
 		try:
 			self.tree = profile['tree']
 			self.colors = profile['colors']
-
 			self.__load_clf(self.tree)
 
 		except KeyError:

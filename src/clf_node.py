@@ -53,7 +53,7 @@ class NodeClassif(object):
 
 
 
-	def __init__(self, file_name = None, **parameters):
+	def __init__(self, file_name = None, **params):
 
 		""" Loads a trained model if specified
 
@@ -63,7 +63,7 @@ class NodeClassif(object):
 				type: string (optional)
 				info: name of the saved model file
 
-			parameters:
+			params:
 				type: keywords arguments
 				info: the possible keys are:
 
@@ -86,15 +86,15 @@ class NodeClassif(object):
 		else:
 
 			try:
-				self.model = algorithms[parameters['algorithm']]
+				self.model = algorithms[params['algorithm']]
 
 				self.selector = SelectPercentile(
 					score_func = chi2,
-					percentile = parameters['feats_pct']
+					percentile = params['feats_pct']
 				)
 
 				self.vectorizer = CountVectorizer(
-					tokenizer = TextTokenizer(parameters['lang']),
+					tokenizer = TextTokenizer(params['lang']),
 					ngram_range = (1, 2)
 				)
 
@@ -128,8 +128,7 @@ class NodeClassif(object):
 				info: contains all the sentences labels
 		"""
 
-		samples = []
-		labels = []
+		samples, labels = [], []
 
 		for info in datasets_info:
 			name = info['dataset_name']

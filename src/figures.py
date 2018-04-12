@@ -59,8 +59,8 @@ class FiguresDrawer(object):
 		Arguments:
 		----------
 			axis:
-				type: ¿?
-				info: ¿?
+				type: AxesSubplot
+				info: space where the pie is drawn
 
 			counter:
 				type: dict
