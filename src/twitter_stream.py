@@ -50,27 +50,17 @@ class TwitterListener(StreamListener):
 
 
 
-	def __init__(self, token_key, token_secret, buffer_size, clf):
+	def __init__(self, token_key: str, token_secret: str, buffer_size: int, clf):
 
 		""" Creates a Twitter listener object
 
 		Arguments:
 		----------
-			token_key:
-				type: string
-				info: identifies the user
+			token_key: identifies the user
+			token_secret: accompanies the token key
+			buffer_size: size of the label circular buffer
+			clf: HierarchicalClassif object used to predict labels
 
-			token_secret:
-				type: string
-				info: accompanies the token key
-
-			buffer_size:
-				type: int
-				info: size of the label circular buffer
-
-			clf:
-				type: HierarchicalClassif
-				info: hierarchical classifier to predict labels
 		"""
 
 		super().__init__()
@@ -96,15 +86,14 @@ class TwitterListener(StreamListener):
 
 
 
-	def __update_buffer(self, label):
+	def __update_buffer(self, label: str):
 
 		""" Replace the self.index position by the specified label
 
 		Arguments:
 		----------
-			label:
-				type: string
-				info: label to the replace the one in self.index position
+			label: replaces the one in self.index position
+
 		"""
 
 		try:
@@ -120,21 +109,18 @@ class TwitterListener(StreamListener):
 
 
 	@staticmethod
-	def get_text(tweet):
+	def get_text(tweet) -> str:
 
 		""" Extracts the text from a Status object (tweet)
 
 		Arguments:
 		----------
-			tweet:
-				type: Status object
-				info: contains all the attributes of a tweet
+			tweet: Status object containing all the attributes of a tweet
 
 		Returns:
 		----------
-			text:
-				type: string
-				info: lowercase tweet text
+			text: lowercase tweet text
+
 		"""
 
 		if hasattr(tweet, 'retweeted_status'):
@@ -150,31 +136,23 @@ class TwitterListener(StreamListener):
 
 
 
-	def start_stream(self, queries, langs, coordinates, timeout = 15):
+	def start_stream(self, queries: list, langs: list, coords: list, timeout: int = 15):
 
 		""" Starts the Twitter stream
 
 		Arguments:
 		----------
-			queries:
-				type: list
-				info: words to filter
+			queries: words to filter
+			langs: language codes to filter
 
-			langs:
-				type: list
-				info: language codes to filter
+			coords: groups of 4 coordinates to filter, where:
+				1. South-West longitude
+				2. South-West latitude
+				3. North-East longitude
+				4. North-East latitude
 
-			coordinates
-				type: list
-				info: groups of 4 coordinates to filter, where:
-					1. South-West longitude
-					2. South-West latitude
-					3. North-East longitude
-					4. North-East latitude
+			timeout: seconds to launch an exception (optional)
 
-			timeout:
-				type: int (optional)
-				info: number of seconds to launch an exception
 		"""
 
 		self.stream = Stream(
@@ -186,7 +164,7 @@ class TwitterListener(StreamListener):
 		self.stream.filter(
 			track = queries,
 			languages = langs,
-			locations = coordinates,
+			locations = coords,
 			async = True
 		)
 
@@ -209,9 +187,8 @@ class TwitterListener(StreamListener):
 
 		Arguments:
 		----------
-			tweet:
-				type: Status
-				info: object containing all the fields of a tweet
+			tweet: Status object containing all the fields of a tweet
+
 		"""
 
 		tweet_text = self.get_text(tweet)
@@ -225,7 +202,7 @@ class TwitterListener(StreamListener):
 
 
 
-	def on_exception(self, exception):
+	def on_exception(self, exception: Exception):
 
 		""" Finish stream due to the timeout exception """
 
@@ -235,15 +212,14 @@ class TwitterListener(StreamListener):
 
 
 
-	def on_error(self, code):
+	def on_error(self, code: int):
 
 		""" Prints error code
 
 		Arguments:
 		----------
-			code:
-				type: int
-				info: stream error code
+			code: stream error code
+
 		"""
 
-		exit('Twitter stream error: ' + code)
+		exit('Twitter stream error: ' + str(code))

@@ -38,15 +38,14 @@ class TextTokenizer(object):
 
 
 
-	def __init__(self, lang):
+	def __init__(self, lang: str):
 
 		""" Creates a text tokenizer object
 
 		Arguments:
 		----------
-			lang:
-				type: string
-				info: language to perform the tokenizer process
+			lang: language to perform the tokenizer process
+
 		"""
 
 		if lang not in languages:
@@ -67,21 +66,18 @@ class TextTokenizer(object):
 
 
 
-	def __call__(self, text):
+	def __call__(self, text: str) -> list:
 
 		""" Tokenize the specified text
 
 		Arguments:
 		----------
-			text:
-				type: string
-				info: text that is going to be tokenize
+			text: what is going to be tokenize
 
 		Returns:
 		----------
-			tokens:
-				type: list
-				info: text tokens (without stopwords)
+			tokens: text tokens (without stopwords)
+
 		"""
 
 		tokens = self.tokenizer.tokenize(text)

@@ -1,5 +1,7 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
+from typing import Tuple
+from typing import Union
 
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_selection import chi2
@@ -53,31 +55,19 @@ class NodeClassif(object):
 
 
 
-	def __init__(self, file_name = None, **params):
+	def __init__(self, file_name: str = None, **kwargs):
 
 		""" Loads a trained model if specified
 
 		Arguments:
 		----------
-			file_name:
-				type: string (optional)
-				info: name of the saved model file
+			file_name: saved model file name (optional)
 
-			params:
-				type: keywords arguments
-				info: the possible keys are:
+			kwargs: possible arguments:
+				- algorithm: name of the algorithm to train
+				- feats_pct: percentage of features to keep
+				- lang: language to perform the tokenizer process
 
-					- algorithm:
-						type: string (lowercase)
-						info: name of the algorithm to train
-
-					- feats_pct:
-						type: int
-						info: percentage of features to keep
-
-					- lang:
-						type: string
-						info: language to perform the tokenizer process
 		"""
 
 		if file_name is not None:
@@ -86,15 +76,15 @@ class NodeClassif(object):
 		else:
 
 			try:
-				self.model = algorithms[params['algorithm']]
+				self.model = algorithms[kwargs['algorithm']]
 
 				self.selector = SelectPercentile(
 					score_func = chi2,
-					percentile = params['feats_pct']
+					percentile = kwargs['feats_pct']
 				)
 
 				self.vectorizer = CountVectorizer(
-					tokenizer = TextTokenizer(params['lang']),
+					tokenizer = TextTokenizer(kwargs['lang']),
 					ngram_range = (1, 2)
 				)
 
@@ -105,27 +95,21 @@ class NodeClassif(object):
 
 
 	@staticmethod
-	def __build_feats(datasets_info):
+	def __build_feats(datasets_info: list) -> Tuple[list, list]:
 
 		""" Builds the feature and label vectors from the specified datasets
 
 		Arguments:
 		----------
-			datasets_info:
-				type: list
-				info: list of dictionaries containing:
-					- dataset_file (string)
-					- dataset_label (string)
+			datasets_info: list of dictionaries containing:
+				- dataset_file (string)
+				- dataset_label (string)
 
 		Returns:
 		----------
-			samples:
-				type: list
-				info: contains all the sentences
+			samples: contains all the sentences
+			labels: contains all the sentences labels
 
-			labels:
-				type: list
-				info: contains all the sentences labels
 		"""
 
 		samples, labels = [], []
@@ -147,23 +131,16 @@ class NodeClassif(object):
 
 
 
-	def __validate(self, samples, labels, cv_folds = 10):
+	def __validate(self, samples: list, labels: list, cv_folds: int = 10):
 
 		""" Validates the trained algorithm using CV and F1 score
 
 		Arguments:
 		----------
-			samples:
-				type: list
-				info: contains all the sentences
+			samples: contains all the sentences
+			labels: contains all the sentences labels
+			cv_folds: number of cross validation folds (optional)
 
-			labels:
-				type: list
-				info: contains all the sentences labels
-
-			cv_folds:
-				type: int (optional)
-				info: number of cross validation folds
 		"""
 
 		model = make_pipeline(self.vectorizer, self.selector, self.model)
@@ -183,15 +160,14 @@ class NodeClassif(object):
 
 
 
-	def get_labels(self):
+	def get_labels(self) -> list:
 
 		""" Gets the trained label names
 
 		Returns:
 		----------
-			labels:
-				type: list
-				info: trained model label names
+			labels: trained model label names
+
 		"""
 
 		try:
@@ -202,21 +178,18 @@ class NodeClassif(object):
 
 
 
-	def predict(self, sentence):
+	def predict(self, sentence: str) -> Union[str, None]:
 
 		""" Predicts the label of the given sentence
 
 		Arguments:
 		----------
-			sentence:
-				type: string
-				info: text to classify
+			sentence: text to classify
 
 		Returns:
 		----------
-			label:
-				type: string / None
-				info: predicted sentence label
+			label: predicted sentence label
+
 		"""
 
 		try:
@@ -235,19 +208,15 @@ class NodeClassif(object):
 
 
 
-	def train(self, profile_data, validate = True):
+	def train(self, profile_data: list, validate: bool = True):
 
 		""" Trains the specified classification algorithm
 
 		Arguments:
 		----------
-			profile_data:
-				type: list
-				info: dictionaries containing datasets paths and labels
+			profile_data: dictionaries containing datasets paths and labels
+			validate: indicates if the model should be validated (optional)
 
-			validate:
-				type: bool (optional)
-				info: indicates if the model should be validated
 		"""
 
 		samples, labels = self.__build_feats(profile_data)

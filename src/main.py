@@ -30,38 +30,25 @@ modes = [
 
 
 
-def train_model(algorithm, feats_pct, lang, output, profile_name):
+def train_model(algorithm: str, feats_pct: int, lang: str, output: str, profile: str):
 
 	""" Prepares arguments to train and saves a NodeClassif object
 
 	Arguments:
 	----------
-		algorithm:
-			type: string
-			info: name of the algorithm to train
+		algorithm: name of the algorithm to train
+		feats_pct: percentage of features to keep
+		lang: language to perform the tokenizer process
+		output: output file name including extension
+		profile: JSON training profile file name
 
-		feats_pct:
-			type: int
-			info: percentage of features to keep
-
-		lang:
-			type: string
-			info: language to perform the tokenizer process
-
-		output:
-			type: string
-			info: output file name including extension
-
-		profile_name:
-			type: string
-			info: name of the JSON training profile file
 	"""
 
 	if (feats_pct < 0) or (feats_pct > 100):
 		exit('The specified features percentage is invalid')
 
 	profile_data = read_json(
-		file_name = profile_name,
+		file_name = profile,
 		file_type = 'profile_t'
 	)
 
@@ -77,27 +64,17 @@ def train_model(algorithm, feats_pct, lang, output, profile_name):
 
 
 
-def search_data(query, lang, depth, output):
+def search_data(query: str, lang: str, depth: int, output: str):
 
 	""" Prepares arguments to search tweets and save them in a file
 
 	Arguments:
 	----------
-		query:
-			type: string
-			info: string with logic operations (AND, OR...)
+		query: string with logic operations (AND, OR...)
+		lang: language abbreviation to filter the tweets
+		depth: number of tweets to retrieve
+		output: output file name including extension
 
-		lang:
-			type: string
-			info: language abbreviation to filter the tweets
-
-		depth:
-			type: int
-			info: number of tweets to retrieve
-
-		output:
-			type: string
-			info: output file name including extension
 	"""
 
 	miner = TwitterMiner(
@@ -122,26 +99,19 @@ def search_data(query, lang, depth, output):
 
 
 
-def predict_user(user_id, filter_word, profile_name):
+def predict_user(user_id: str, filter_word: str, profile: str):
 
 	""" Prepares arguments to predict Twitter account tweets labels
 
 	Arguments:
 	----------
-		user_id:
-			type: string
-			info: Twitter user account without the '@'
+		user_id: Twitter user account without the '@'
+		filter_word: word applied to filter all tweets sentences
+		profile: JSON profile file name
 
-		filter_word:
-			type: string
-			info: word applied to filter all tweets sentences
-
-		profile_name:
-			type: string
-			info: name of the JSON profile file
 	"""
 
-	h_clf = HierarchicalClassif(profile_name)
+	h_clf = HierarchicalClassif(profile)
 
 	miner = TwitterMiner(
 		token_key = U_K['token_key'],
@@ -169,38 +139,27 @@ def predict_user(user_id, filter_word, profile_name):
 
 
 
-def predict_stream(buffer_size, tracks, langs, coordinates, profile_name):
+def predict_stream(buffer_size: int, tracks: str, langs: str, coords: list, profile: str):
 
 	""" Prepares arguments to predict Twitter stream tweets labels
 
 	Arguments:
 	----------
-		buffer_size:
-			type: int
-			info: size of the labels circular buffer
+		buffer_size: labels circular buffer size
+		tracks: words to filter
+		langs: language codes to filter
 
-		tracks:
-			type: string
-			info: words to filter
+		coords: list with multiples of 4 coordinates, where:
+			1. South-West longitude
+			2. South-West latitude
+			3. North-East longitude
+			4. North-East latitude
 
-		langs:
-			type: string
-			info: language codes to filter
+		profile: JSON profile file name
 
-		coordinates
-			type: string
-			info: groups of 4 coordinates to filter, where:
-				1. South-West longitude
-				2. South-West latitude
-				3. North-East longitude
-				4. North-East latitude
-
-		profile_name:
-			type: string
-			info: name of the JSON profile file
 	"""
 
-	h_clf = HierarchicalClassif(profile_name)
+	h_clf = HierarchicalClassif(profile)
 
 	listener = TwitterListener(
 		token_key = U_K['token_key'],
@@ -212,7 +171,7 @@ def predict_stream(buffer_size, tracks, langs, coordinates, profile_name):
 	# Start the stream
 	tracks = tracks.split(', ')
 	langs = langs.split(', ')
-	listener.start_stream(tracks, langs, coordinates)
+	listener.start_stream(tracks, langs, coords)
 
 	FiguresDrawer.animate_pie(
 		counter = listener.counters,

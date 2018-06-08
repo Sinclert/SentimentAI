@@ -1,5 +1,6 @@
 # Created by Sinclert Perez (Sinclert@hotmail.com)
 
+from typing import Union
 
 from clf_node import NodeClassif
 
@@ -38,21 +39,23 @@ class HierarchicalClassif(object):
 
 
 
-	def __init__(self, profile_name):
+	def __init__(self, profile: str):
 
 		""" Loads the JSON profile models into the tree attribute
 
 		Arguments:
 		----------
-			profile_path:
-				type: string
-				info: name of the JSON predicting profile file
+			profile: JSON predicting profile file name
+
 		"""
 
 		profile = read_json(
-			file_name = profile_name,
+			file_name = profile,
 			file_type = 'profile_p'
 		)
+
+		# Checking that the JSON structure is a dict
+		assert isinstance(profile, dict)
 
 		try:
 			self.tree = profile['tree']
@@ -65,19 +68,18 @@ class HierarchicalClassif(object):
 
 
 
-	def __load_clf(self, node):
+	def __load_clf(self, node: dict):
 
 		""" Recursively check and load classifier objects into 'clf_object'
 
 		Arguments:
 		----------
-			node:
-				type: dict
-				info: current tree node to load the 'clf_file' classifier
+			node: current tree node to load the 'clf_file' classifier
+
 		"""
 
 		check_keys(
-			keys = self.keys,
+			data_keys = self.keys,
 			data_struct = node,
 			error = 'Invalid JSON keys'
 		)
@@ -90,7 +92,7 @@ class HierarchicalClassif(object):
 			clf_child_nodes = node['clf_children'].values()
 
 			check_keys(
-				keys = clf_child_names,
+				data_keys = clf_child_names,
 				data_struct = clf_labels,
 				error = 'Invalid JSON keys'
 			)
@@ -104,15 +106,14 @@ class HierarchicalClassif(object):
 
 
 
-	def get_labels(self):
+	def get_labels(self) -> list:
 
 		""" Gets the label names
 
 		Returns:
 		----------
-			labels:
-				type: list
-				info: labels names
+			labels: labels names
+
 		"""
 
 		try:
@@ -123,15 +124,14 @@ class HierarchicalClassif(object):
 
 
 
-	def get_colors(self):
+	def get_colors(self) -> list:
 
 		""" Gets the label colors
 
 		Returns:
 		----------
-			colors:
-				type: list
-				info: labels associated colors
+			colors: labels associated colors
+
 		"""
 
 		try:
@@ -142,21 +142,18 @@ class HierarchicalClassif(object):
 
 
 
-	def predict(self, sentence):
+	def predict(self, sentence: str) -> Union[str, None]:
 
 		""" Predicts the label of a sentence using the loaded classifiers
 
 		Arguments:
 		----------
-			sentence:
-				type: string
-				info: text to classify
+			sentence: text to classify
 
 		Returns:
 		----------
-			label:
-				type: string / None
-				info: predicted sentence label
+			label: predicted sentence label
+
 		"""
 
 		node = self.tree

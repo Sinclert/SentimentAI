@@ -31,19 +31,15 @@ class TwitterMiner(object):
 
 
 
-	def __init__(self, token_key, token_secret):
+	def __init__(self, token_key: str, token_secret: str):
 
 		""" Creates a Twitter miner object
 
 		Arguments:
 		----------
-			token_key:
-				type: string
-				info: identifies the user
+			token_key: identifies the user
+			token_secret: accompanies the token key
 
-			token_secret:
-				type: string
-				info: accompanies the token key
 		"""
 
 		try:
@@ -62,21 +58,18 @@ class TwitterMiner(object):
 
 
 	@staticmethod
-	def get_text(tweet):
+	def get_text(tweet) -> str:
 
 		""" Extracts the text from a Status object (tweet)
 
 		Arguments:
 		----------
-			tweet:
-				type: Status object
-				info: contains all the attributes of a tweet
+			tweet: Status object containing all the attributes of a tweet
 
 		Returns:
 		----------
-			text:
-				type: string
-				info: lowercase tweet text
+			text: lowercase tweet text
+
 		"""
 
 		if hasattr(tweet, 'retweeted_status'):
@@ -84,36 +77,26 @@ class TwitterMiner(object):
 
 		try:
 			return tweet.full_text.lower()
-
 		except AttributeError:
 			return tweet.text.lower()
 
 
 
 
-	def get_user_tweets(self, user, word, depth = 1000):
+	def get_user_tweets(self, user: str, word: str, depth: int = 1000) -> str:
 
 		""" Generator that returns the 'depth' most recent user tweets
 
 		Arguments:
 		----------
-			user:
-				type: string
-				info: Twitter user account without the '@'
-
-			word:
-				type: string (lowercase)
-				info: word used to filter the tweets
-
-			depth:
-				type: int (optional)
-				info: number of tweets to retrieve
+			user: Twitter user account without the '@'
+			word: word used to filter the tweets (lowercase)
+			depth: number of tweets to retrieve (optional)
 
 		Yield:
 		----------
-			tweet_text:
-				type: string
-				info: cleaned tweet text
+			tweet_text: cleaned tweet text
+
 		"""
 
 		try:
@@ -136,33 +119,21 @@ class TwitterMiner(object):
 
 
 
-	def search_tweets(self, query, lang, filter_prob = 95, depth = 1000):
+	def search_tweets(self, query: str, lang: str, filter_prob: int = 95, depth: int = 1000) -> str:
 
 		""" Generator that returns the 'depth' most recent user tweets
 
 		Arguments:
 		----------
-			query:
-				type: string
-				info: string with logic operations (AND, OR...)
-
-			lang:
-				type: string
-				info: language abbreviation to filter the tweets
-
-			filter_prob:
-				type: int (optional)
-				info: probability in which the query words are removed
-
-			depth:
-				type: int (optional)
-				info: number of tweets to retrieve
+			query: string with logic operations (AND, OR...)
+			lang: language abbreviation to filter the tweets
+			filter_prob: probability percentage to remove query words (optional)
+			depth: number of tweets to retrieve (optional)
 
 		Yield:
 		----------
-			tweet_text:
-				type: string
-				info: cleaned tweet text
+			tweet_text: cleaned tweet text
+
 		"""
 
 		try:

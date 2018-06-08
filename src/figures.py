@@ -11,27 +11,17 @@ class FiguresDrawer(object):
 
 
 	@staticmethod
-	def draw_pie(counter, labels, colors, title):
+	def draw_pie(counter: dict, labels: list, colors: list, title: str):
 
 		""" Plots a pie graph with the desired parameters
 
 		Arguments:
 		----------
-			counter:
-				type: dict
-				info: occurrences of each label
+			counter: occurrences of each label
+			labels: labels names
+			colors: colors RGB codes
+			title: name of the graph
 
-			labels:
-				type: list
-				info: labels names
-
-			colors:
-				type: list
-				info: colors RGB codes
-
-			title:
-				type: string
-				info: name of the graph
 		"""
 
 		from matplotlib import pyplot
@@ -52,27 +42,17 @@ class FiguresDrawer(object):
 
 
 	@staticmethod
-	def update_pie(frame, axis, counter, labels, colors):
+	def update_pie(frame, axis, counter: dict, labels: list, colors: list):
 
 		""" Plots a pie graph with the desired parameters (animation)
 
 		Arguments:
 		----------
-			axis:
-				type: AxesSubplot
-				info: space where the pie is drawn
+			axis: space where the pie is drawn
+			counter: occurrences of each label
+			labels: labels names
+			colors: colors RGB codes
 
-			counter:
-				type: dict
-				info: occurrences of each label
-
-			labels:
-				type: list
-				info: labels names
-
-			colors:
-				type: list
-				info: colors RGB codes
 		"""
 
 		sizes = [counter[label] for label in labels]
@@ -90,27 +70,17 @@ class FiguresDrawer(object):
 
 
 	@staticmethod
-	def animate_pie(counter, labels, colors, title):
+	def animate_pie(counter: dict, labels: list, colors: list, title: str):
 
 		""" Plots a pie graph with the desired parameters (animation)
 
 		Arguments:
 		----------
-			counter:
-				type: dict
-				info: occurrences of each label
+			counter: occurrences of each label
+			labels: labels names
+			colors: colors RGB codes
+			title: name of the graph
 
-			labels:
-				type: list
-				info: labels names
-
-			colors:
-				type: list
-				info: colors RGB codes
-
-			title:
-				type: string
-				info: name of the graph
 		"""
 
 		from matplotlib import pyplot

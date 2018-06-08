@@ -7,6 +7,8 @@ import pickle
 import random
 import re
 
+from typing import Union
+
 
 project_paths = {
 	'dataset': ['resources', 'datasets'],
@@ -57,31 +59,27 @@ default_filters = [
 
 
 
-def append_text(file_name, min_length = 0):
+def append_text(file_name: str, min_length: int = 0):
 
 	""" Coroutine that appends the received text at the end of a file
 
 	Arguments:
 	----------
-		file_name:
-			type: string
-			info: appendable file name
-
-		min_length:
-			type: int (optional)
-			info: minimum length to append a text to the file
+		file_name: appendable file name
+		min_length: minimum length to append a text (optional)
 
 	Yield:
 	----------
-		text:
-			type: string
-			info: text to append in the file
+		text: text to append in the file
+
 	"""
 
 	file_path = compute_path(file_name, 'dataset')
 
-	file_dir = file_path.replace(file_name, '')
-	os.makedirs(file_dir, exist_ok = True)
+	os.makedirs(
+		file_path.replace(file_name, ''),
+		exist_ok = True
+	)
 
 	try:
 		file = open(file_path, 'a', encoding = 'utf-8')
@@ -100,25 +98,19 @@ def append_text(file_name, min_length = 0):
 
 
 
-def build_filters(words, words_prob):
+def build_filters(words: iter, words_prob: int) -> list:
 
 	""" Builds a list of probabilistic filters
 
-		Arguments:
-		----------
-			words:
-				type: list
-				info: words to subtract given a probability
-
-			words_prob:
-				type: int
-				info: probability in which the words are subtracted
+	Arguments:
+	----------
+		words: what to subtract given a probability
+		words_prob: probability percentage to remove words (optional)
 
 	Returns:
 	----------
-		filters:
-			type: list
-			info: contains the probabilistic filters
+		filters: list containing the probabilistic filters
+
 	"""
 
 	prob_filters = []
@@ -135,53 +127,40 @@ def build_filters(words, words_prob):
 
 
 
-def check_keys(keys, data_struct, error):
+def check_keys(data_keys: list, data_struct: dict, error: str):
 
 	""" Checks if all the keys are present in the data structure
 
 	Arguments:
 	----------
-		keys:
-			type: list
-			info: elements which must be in the data structure
+		data_keys: elements which must be in the data structure
+		data_struct: dict to check existence
+		error: message to print
 
-		data_struct:
-			type: set / dictionary
-			info: data structure to check existence
-
-		error:
-			type: string
-			info: error message to print
 	"""
 
-	if not all(k in data_struct for k in keys):
+	if not all(k in data_struct for k in data_keys):
 		exit(error)
 
 
 
 
-def clean_text(text, filters = default_filters):
+def clean_text(text: str, filters: list = default_filters) -> str:
 
 	""" Cleans the text applying regex substitution specified by the filters
 
 	Arguments:
 	----------
-		text:
-			type: string
-			info: lowercase text where the regex substitutions will be applied
-
-		filters:
-			type: list (optional)
-			info: list containing dictionaries with the following keys:
-				- pattern (regex)
-				- replace (string)
-				- prob (int)
+		text: lowercase text where the regex substitutions will be applied
+		filters: list containing dictionaries with the following keys (optional):
+			- pattern (regex)
+			- replace (string)
+			- prob (int)
 
 	Returns:
 	----------
-		text:
-			type: string
-			info: lowercase cleaned text
+		text: lowercase cleaned text
+
 	"""
 
 	try:
@@ -199,25 +178,19 @@ def clean_text(text, filters = default_filters):
 
 
 
-def compute_path(file_name, file_type):
+def compute_path(file_name: str, file_type: str) -> str:
 
 	""" Builds the absolute path to the desired file given its file type
 
 	Arguments:
 	----------
-		file_name:
-			type: string
-			info: desired file name
-
-		file_type:
-			type: string
-			info: {'dataset', 'model', 'profile_p', 'profile_t', 'stopwords'}
+		file_name: desired file name
+		file_type: {'dataset', 'model', 'profile_p', 'profile_t', 'stopwords'}
 
 	Returns:
 	----------
-		path:
-			type: string
-			info: absolute path to the desired file
+		path: absolute path to the desired file
+
 	"""
 
 	try:
@@ -235,25 +208,19 @@ def compute_path(file_name, file_type):
 
 
 
-def load_object(file_name, file_type):
+def load_object(file_name: str, file_type: str) -> dict:
 
 	""" Loads an object from the specified file
 
 	Arguments:
-		----------
-		file_name:
-			type: string
-			info: saved object file name
-
-		file_type:
-			type: string
-			info: used to determine the proper path
+	----------
+		file_name: saved object file name
+		file_type: used to determine the proper path
 
 	Returns:
 	----------
-		obj:
-			type: dict
-			info: dictionary containing the object information
+		obj: dictionary containing the object information
+
 	"""
 
 	file_path = compute_path(file_name, file_type)
@@ -271,29 +238,24 @@ def load_object(file_name, file_type):
 
 
 
-def save_object(obj, file_name, file_type):
+def save_object(obj: object, file_name: str, file_type: str):
 
 	""" Saves an object in the specified path
 
 	Arguments:
 	----------
-		obj:
-			type: object
-			info: instance of a class that will be serialized
+		obj: instance of a class that will be serialized
+		file_name: saved object file name
+		file_type: used to determine the proper path
 
-		file_name:
-			type: string
-			info: saved object file name
-
-		file_type:
-			type: string
-			info: used to determine the proper path
 	"""
 
 	file_path = compute_path(file_name, file_type)
 
-	file_dir = file_path.replace(file_name, '')
-	os.makedirs(file_dir, exist_ok = True)
+	os.makedirs(
+		file_path.replace(file_name, ''),
+		exist_ok = True
+	)
 
 	try:
 		file = open(file_path, 'wb')
@@ -306,25 +268,19 @@ def save_object(obj, file_name, file_type):
 
 
 
-def read_json(file_name, file_type):
+def read_json(file_name: str, file_type: str) -> Union[dict, list]:
 
 	""" Reads a JSON file and returns it as a dictionary
 
 	Arguments:
 	----------
-		file_name:
-			type: string
-			info: readable file name
-
-		file_type:
-			type: string
-			info: used to determine the proper path
+		file_name: readable file name
+		file_type: used to determine the proper path
 
 	Returns:
 	----------
-		json_dict:
-			type: dict
-			info: dictionary containing the parsed JSON file
+		json_dict: dictionary containing the parsed JSON file
+
 	"""
 
 	file_path = compute_path(file_name, file_type)
@@ -342,25 +298,19 @@ def read_json(file_name, file_type):
 
 
 
-def read_lines(file_name, file_type):
+def read_lines(file_name: str, file_type: str) -> list:
 
 	""" Reads the lines of a file and returns them inside a list
 
 	Arguments:
 	----------
-		file_name:
-			type: string
-			info: readable file name
-
-		file_type:
-			type: string
-			info: used to determine the proper path
+		file_name: readable file name
+		file_type: used to determine the proper path
 
 	Returns:
 	----------
-		lines:
-			type: list
-			info: file lines (separated by the new line character)
+		lines: file lines (separated by the new line character)
+
 	"""
 
 	file_path = compute_path(file_name, file_type)
