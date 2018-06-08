@@ -55,10 +55,9 @@ class FiguresDrawer(object):
 
 		"""
 
-		sizes = [counter[label] for label in labels]
+		if len(counter) > 0:
 
-		if sum(sizes) > 0:
-
+			sizes = [counter[label] for label in labels]
 			axis.clear()
 			axis.pie(
 				x = sizes,
