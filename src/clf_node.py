@@ -171,7 +171,8 @@ class NodeClassif(object):
 		"""
 
 		try:
-			return self.model.classes_
+			return list(self.model.classes_)
+
 		except AttributeError:
 			exit('The classifier has not been trained')
 

@@ -127,24 +127,6 @@ def build_filters(words: iter, words_prob: int) -> list:
 
 
 
-def check_keys(data_keys: list, data_struct: dict, error: str):
-
-	""" Checks if all the keys are present in the data structure
-
-	Arguments:
-	----------
-		data_keys: elements which must be in the data structure
-		data_struct: dict to check existence
-		error: message to print
-
-	"""
-
-	if not all(k in data_struct for k in data_keys):
-		exit(error)
-
-
-
-
 def clean_text(text: str, filters: list = default_filters) -> str:
 
 	""" Cleans the text applying regex substitution specified by the filters

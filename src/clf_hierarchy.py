@@ -3,9 +3,7 @@
 from typing import Union
 
 from clf_node import NodeClassif
-
 from utils import read_json
-from utils import check_keys
 
 
 
@@ -78,11 +76,8 @@ class HierarchicalClassif(object):
 
 		"""
 
-		check_keys(
-			data_keys = self.keys,
-			data_struct = node,
-			error = 'Invalid JSON keys'
-		)
+		# Check JSON keys coherence
+		assert all(k in node for k in self.keys)
 
 		node['clf_object'] = NodeClassif(node['clf_file'])
 
@@ -91,11 +86,8 @@ class HierarchicalClassif(object):
 			clf_child_names = node['clf_children'].keys()
 			clf_child_nodes = node['clf_children'].values()
 
-			check_keys(
-				data_keys = clf_child_names,
-				data_struct = clf_labels,
-				error = 'Invalid JSON keys'
-			)
+			# Check that all clf children names are also labels
+			assert all(k in clf_labels for k in clf_child_names)
 
 			for child_node in clf_child_nodes:
 				self.__load_clf(child_node)
@@ -117,7 +109,8 @@ class HierarchicalClassif(object):
 		"""
 
 		try:
-			return self.colors.keys()
+			return list(self.colors.keys())
+
 		except AttributeError:
 			exit('Invalid JSON labels structure')
 
@@ -135,7 +128,8 @@ class HierarchicalClassif(object):
 		"""
 
 		try:
-			return self.colors.values()
+			return list(self.colors.values())
+
 		except AttributeError:
 			exit('Invalid JSON labels structure')
 
