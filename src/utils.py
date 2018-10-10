@@ -19,7 +19,7 @@ project_paths = {
 }
 
 
-default_filters = [
+default_filters = (
 	{
 		'pattern': 'http\S+',
 		'replace': '',
@@ -54,7 +54,7 @@ default_filters = [
 		'replace': ' ',
 		'prob': 100
 	},
-]
+)
 
 
 
