@@ -20,12 +20,12 @@ from utils import save_object
 
 
 # Default CLI modes
-modes = [
+modes = (
 	'train_model',
 	'search_data',
 	'predict_user',
 	'predict_stream',
-]
+)
 
 
 

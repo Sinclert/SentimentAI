@@ -165,7 +165,7 @@ class TwitterListener(StreamListener):
 			track = queries,
 			languages = langs,
 			locations = coords,
-			async = True
+			is_async = True
 		)
 
 

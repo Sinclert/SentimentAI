@@ -12,7 +12,7 @@ from utils import build_filters
 from utils import clean_text
 
 
-search_ops = ['AND', 'OR', ':']
+search_ops = {'AND', 'OR', ':'}
 
 
 
