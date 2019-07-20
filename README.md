@@ -1,10 +1,8 @@
 # Sentiment AI 📊
 
-This project is based on the code used in my CS Bachelor's thesis research. Its main goal is to provide a simple way of training ML models to perform classification over tweets (using Twitter APIs). The models can be combined using a JSON configuration file, in order to build a hierarchical classifier in the shape of a tree, where nodes are trained models and leaves are the final categories.
+This project is based on the code used in my Bachelor's Thesis research. Its main goal is to provide a simple way of training ML models to perform classification over tweets (using Twitter APIs). The models can be combined using a JSON configuration file, in order to build a hierarchical classifier in the shape of a tree, where nodes are trained models and leaves are the final categories.
 
 Althought the models could be trained using datasets of very different nature, one of the most straightforward applications is to build a <a href="https://en.wikipedia.org/wiki/Sentiment_analysis">sentiment analysis</a> hierarchical classifier. This particular classification example is hosted online using packages such as <i>Flask</i> and <i>Gunicorn</i>, to show the project potential capabilities.
-
-<b><a target="_blank" href="https://sentiment-ai-183521.appspot.com">Check out the Web Application here!</a></b>
 
 <br>
 
